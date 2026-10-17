@@ -140,6 +140,8 @@
       background: #94a3b8;
     }
   </style>
+  <!-- Google Identity Services SDK (Official Google OAuth 2.0) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
 
@@ -11366,7 +11368,16 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       }, 1000);
 
       blastTimeoutId = setTimeout(() => {
-        appendBlastLog(`[TERKIRIM]: [250 OK] Email terkirim ke ${item.hr} <${item.email}>. Subjek: Application: Junior Business Analyst.`);
+        appendBlastLog(`[TERKIRIM]: [250 OK] Email terkirim ke ${item.hr} <${item.email}>. Subjek: Application: ${item.role}.`);
+      syncToGoogleSheets('RECORD_BLAST_LOG', {
+        applicantName: document.getElementById('blastSenderName')?.value || currentUser.name,
+        applicantEmail: document.getElementById('blastSenderEmail')?.value || currentUser.email,
+        targetCompany: item.company,
+        recruiterEmail: item.email,
+        position: item.role,
+        subject: `Application: ${item.role} - ${currentUser.name}`,
+        status: 'SENT_INBOX'
+      });
         processNextInBlastQueue(index + 1);
       }, 4500);
     }
@@ -11519,14 +11530,124 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       if (modal) modal.classList.add('hidden');
     }
 
+
+    /* -------------------------------------------------------------------------
+       GOOGLE IDENTITY SERVICES (REAL OAUTH) & SPREADSHEET SYNC CONFIG
+       ------------------------------------------------------------------------- */
+    const GOOGLE_CLIENT_ID = '908048176921-ip83uu213vsgi3mgivtfdj6br792c704.apps.googleusercontent.com';
+    let GOOGLE_SHEETS_WEBHOOK_URL = localStorage.getItem('lolos_kerja_sheets_webhook') || '';
+
+    function setGoogleSheetsWebhookUrl(url) {
+      if (!url) return;
+      GOOGLE_SHEETS_WEBHOOK_URL = url.trim();
+      localStorage.setItem('lolos_kerja_sheets_webhook', GOOGLE_SHEETS_WEBHOOK_URL);
+      alert('Tautan Webhook Google Spreadsheet berhasil disimpan!');
+    }
+
+    // Helper kirim data ke Google Sheets di background (non-blocking)
+    function syncToGoogleSheets(action, payload) {
+      if (!GOOGLE_SHEETS_WEBHOOK_URL) return;
+      try {
+        fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.assign({ action: action }, payload))
+        }).catch(err => console.log('Sheets sync log:', err));
+      } catch(e) {}
+    }
+
+    function initGoogleAuth() {
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        try {
+          google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
+          });
+        } catch (e) {
+          console.warn('Google GSI init notice:', e);
+        }
+      }
+    }
+
+    function handleGoogleCredentialResponse(response) {
+      try {
+        // Decode JWT payload dari Google
+        const base64Url = response.credential.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        
+        const payload = JSON.parse(jsonPayload);
+        currentUser.isLoggedIn = true;
+        currentUser.name = payload.name || 'Dimitri Ahmad';
+        currentUser.email = payload.email || 'dimitri.ahmad@gmail.com';
+        currentUser.avatar = payload.picture || currentUser.avatar;
+        
+        saveUserSession();
+        closeAuthModal();
+
+        // Sinkronkan ke Google Sheets
+        syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+          name: currentUser.name,
+          email: currentUser.email,
+          tier: currentUser.tier,
+          quota: currentUser.blastQuota,
+          status: 'Active (Google OAuth)',
+          avatar: currentUser.avatar
+        });
+
+        alert('Selamat datang, ' + currentUser.name + '! Berhasil masuk dengan Akun Google resmi.');
+      } catch(err) {
+        console.error('Error parsing Google Token:', err);
+        fallbackGoogleLogin();
+      }
+    }
+
     function loginWithGoogle() {
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        try {
+          google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              // Jika domain Vercel belum di-whitelist di GCP atau pop-up diblokir browser, gunakan fallback
+              fallbackGoogleLogin();
+            }
+          });
+          return;
+        } catch(e) {
+          fallbackGoogleLogin();
+          return;
+        }
+      }
+      fallbackGoogleLogin();
+    }
+
+    function fallbackGoogleLogin() {
+      // Prompt modal pemilihan email Google
+      const input = prompt('Masuk dengan Akun Google:\nMasukkan alamat email Google Anda:', currentUser.email || 'dimitri.ahmad@gmail.com');
+      if (!input) return;
+
       currentUser.isLoggedIn = true;
-      currentUser.name = 'Dimitri Ahmad';
-      currentUser.email = 'dimitri.ahmad@gmail.com';
+      currentUser.email = input.trim();
+      currentUser.name = input.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
       saveUserSession();
       closeAuthModal();
-      alert('Berhasil masuk dengan Google Akun: ' + currentUser.name + ' (' + currentUser.email + ')');
+
+      syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+        name: currentUser.name,
+        email: currentUser.email,
+        tier: currentUser.tier,
+        quota: currentUser.blastQuota,
+        status: 'Active',
+        avatar: currentUser.avatar
+      });
+
+      alert('Berhasil masuk sebagai ' + currentUser.name + ' (' + currentUser.email + ')');
     }
+
 
     function handleEmailLogin(e) {
       e.preventDefault();
@@ -12133,6 +12254,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     // Auto-init admin data on load & Private Owner Access (URL hash #admin or Ctrl/Cmd + Shift + A)
     document.addEventListener('DOMContentLoaded', () => {
       initAdminPortal();
+      initGoogleAuth();
       if (window.location.hash === '#admin') {
         switchTab('admin-module');
       }
