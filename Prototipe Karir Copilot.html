@@ -905,6 +905,22 @@
               <textarea id="blastCoverLetterBody" rows="5" class="dospem-input w-full p-3 rounded-lg text-xs font-mono leading-relaxed"></textarea>
             </div>
 
+            <!-- Mode Pengiriman: Nyata vs Simulasi Database -->
+            <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl space-y-2">
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input type="checkbox" id="blastSendRealEmailToggle" checked class="mt-0.5 rounded text-blue-600 focus:ring-blue-500 w-4 h-4">
+                <div>
+                  <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>Kirim Email Fisik via Gmail (Real Mail Delivery)</span>
+                    <span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-mono font-bold">LIVE GMAIL</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Saat dicentang, sistem Google Apps Script akan memanggil <code>MailApp.sendEmail()</code> untuk mengirimkan email fisik nyata langsung ke alamat email HRD / akun target dan tercatat di folder <em>Sent (Terkirim)</em>.
+                  </p>
+                </div>
+              </label>
+            </div>
+
             <div class="flex gap-2 pt-1">
               <button id="btnStartBlast" onclick="startSmartDripBlast()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-md">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
@@ -11388,6 +11404,8 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
           saveUserSession();
           if (typeof syncCurrentSessionWithAdminDatabase === 'function') syncCurrentSessionWithAdminDatabase();
         }
+      const sendRealEmailVal = document.getElementById('blastSendRealEmailToggle') ? document.getElementById('blastSendRealEmailToggle').checked : true;
+
       syncToGoogleSheets('RECORD_BLAST_LOG', {
         applicantName: document.getElementById('blastSenderName')?.value || currentUser.name,
         applicantEmail: document.getElementById('blastSenderEmail')?.value || currentUser.email,
@@ -11397,7 +11415,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
         subject: `Application: ${item.role} - ${currentUser.name}`,
         body: document.getElementById('blastCoverLetterBody')?.value || '',
         status: 'TERKIRIM',
-        sendRealEmail: false
+        sendRealEmail: sendRealEmailVal
       });
         processNextInBlastQueue(index + 1);
       }, 4500);
