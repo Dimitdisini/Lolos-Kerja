@@ -11533,7 +11533,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
        GOOGLE IDENTITY SERVICES (REAL OAUTH) & SPREADSHEET SYNC CONFIG
        ------------------------------------------------------------------------- */
     const GOOGLE_CLIENT_ID = '908048176921-ip83uu213vsgi3mgivtfdj6br792c704.apps.googleusercontent.com';
-    let GOOGLE_SHEETS_WEBHOOK_URL = localStorage.getItem('lolos_kerja_sheets_webhook') || '';
+    let GOOGLE_SHEETS_WEBHOOK_URL = localStorage.getItem('lolos_kerja_sheets_webhook') || 'https://script.google.com/macros/s/AKfycbwnJRB7kk3RRQYvsKi_R3zghQsDDObHpsTGpF0msRbgya1kGKxnFtbwWpENUR46E-NSvw/exec';
 
     function setGoogleSheetsWebhookUrl(url) {
       if (!url) return;
@@ -11546,11 +11546,12 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     function syncToGoogleSheets(action, payload) {
       if (!GOOGLE_SHEETS_WEBHOOK_URL) return;
       try {
+        const fullPayload = JSON.stringify(Object.assign({ action: action }, payload));
         fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
           method: 'POST',
           mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(Object.assign({ action: action }, payload))
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: fullPayload
         }).catch(err => console.log('Sheets sync log:', err));
       } catch(e) {}
     }
