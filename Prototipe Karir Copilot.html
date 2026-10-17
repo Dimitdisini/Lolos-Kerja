@@ -11829,14 +11829,8 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
        7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC - FULL CRUD)
        ------------------------------------------------------------------------- */
     const defaultAdminUsers = [
-      { name: 'Dimitri Ahmad', email: 'dimitriahmad000@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
-      { name: 'Dimitri Ahmad (Fleek)', email: 'dimitri@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
-      { name: 'Sasa Mentor', email: 'sasa@karircopilot.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Partner)' },
-      { name: 'Alif Yusfan', email: 'alif@fleekgroup.id', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 5, status: 'Active' },
-      { name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Active (Free)' },
-      { name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', tier: 'FLASH', tierName: 'Paket 24 Jam', quota: 10, status: 'Active (24h Expire)' },
-      { name: 'Bima Satria', email: 'bima.eng@itb.ac.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
-      { name: 'Fresh Graduate Binaan', email: 'candidate@student.ac.id', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Free' }
+      { name: 'Dimitri Ahmad', email: 'dimitriahmad000@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner / VIP)' },
+      { name: 'Dimitri Ahmad (Backup)', email: 'dimitriahmad0@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner / VIP)' }
     ];
 
     const defaultAdminTransactions = [
@@ -12694,45 +12688,27 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       </div>
 
       <!-- Daftar Akun Siap Pakai -->
-      <div class="space-y-1.5 pt-1">
+      <div class="space-y-2 pt-1">
         
-        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">DA</div>
-          <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Dimitri Ahmad (Owner / VIP)</div>
+        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50/60 border border-slate-200 hover:border-blue-400 transition text-left">
+          <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">DA</div>
+          <div class="overflow-hidden flex-1">
+            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
+              <span>Dimitri Ahmad</span>
+              <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-mono font-bold">VIP 50 Kuota</span>
+            </div>
             <div class="text-[11px] text-slate-500 font-mono truncate">dimitriahmad000@gmail.com</div>
           </div>
         </button>
 
-        <button onclick="selectGoogleAccount('Alif Yusfan', 'alif@fleekgroup.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">AY</div>
-          <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Alif Yusfan (Dibantuin)</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">alif@fleekgroup.id</div>
-          </div>
-        </button>
-
-        <button onclick="selectGoogleAccount('Rangga Daniswara', 'rangga.danis@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">RD</div>
-          <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Rangga Daniswara (Fresh Grad / Free)</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">rangga.danis@gmail.com</div>
-          </div>
-        </button>
-
-        <button onclick="selectGoogleAccount('Bima Satria', 'bima.eng@itb.ac.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-xs shrink-0">BS</div>
-          <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Bima Satria (Engineering Tech VIP)</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">bima.eng@itb.ac.id</div>
-          </div>
-        </button>
-
-        <button onclick="selectGoogleAccount('Anindya Putri', 'anindya.p@ui.ac.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-xs shrink-0">AP</div>
-          <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Anindya Putri (Flash 24h)</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">anindya.p@ui.ac.id</div>
+        <button onclick="selectGoogleAccount('Dimitri Ahmad (Backup)', 'dimitriahmad0@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50/60 border border-slate-200 hover:border-emerald-400 transition text-left">
+          <div class="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">DA</div>
+          <div class="overflow-hidden flex-1">
+            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
+              <span>Dimitri Ahmad (Backup)</span>
+              <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-mono font-bold">VIP 50 Kuota</span>
+            </div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">dimitriahmad0@gmail.com</div>
           </div>
         </button>
 
