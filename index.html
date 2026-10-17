@@ -11802,111 +11802,179 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
       }
     }
 
-    function editAdminUserModal(userIndex) {
-      const u = adminState.users[userIndex];
-      if (!u) return;
-      const newName = prompt('Ubah Nama Pelamar:', u.name);
-      if (newName === null) return;
-      const newEmail = prompt('Ubah Email Pelamar:', u.email);
-      if (newEmail === null) return;
-      const newTier = prompt('Ubah Tier (VIP / DIBANTUIN / FLASH / FREE):', u.tier);
-      if (newTier === null) return;
-      const newQuota = prompt('Ubah Kuota Auto-Blast:', u.quota);
-      if (newQuota === null) return;
+    // Current editing pointers
+    let adminEditingUserIndex = -1;
+    let adminEditingJobIndex = -1;
 
-      u.name = newName.trim() || u.name;
-      u.email = newEmail.trim() || u.email;
-      u.tier = newTier.trim().toUpperCase() || u.tier;
-      u.tierName = u.tier === 'VIP' ? 'Dikerjain VIP' : u.tier === 'DIBANTUIN' ? 'Dibantuin' : u.tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)';
-      u.quota = parseInt(newQuota, 10) || 0;
+    function openAdminUserModal(isEdit = false, userIndex = -1) {
+      adminEditingUserIndex = userIndex;
+      const modal = document.getElementById('adminUserModal');
+      const titleEl = document.getElementById('adminUserModalTitle');
+      const nameInput = document.getElementById('modalUserNameInput');
+      const emailInput = document.getElementById('modalUserEmailInput');
+      const tierInput = document.getElementById('modalUserTierInput');
+      const quotaInput = document.getElementById('modalUserQuotaInput');
+      const statusInput = document.getElementById('modalUserStatusInput');
 
-      saveAdminUsersToStorage();
-      renderAdminUsers();
-      alert('Data pengguna berhasil diperbarui!');
+      if (isEdit && userIndex >= 0 && adminState.users[userIndex]) {
+        const u = adminState.users[userIndex];
+        titleEl.innerText = 'Edit Data Pelamar & Kuota';
+        nameInput.value = u.name || '';
+        emailInput.value = u.email || '';
+        tierInput.value = u.tier || 'VIP';
+        quotaInput.value = u.quota !== undefined ? u.quota : 20;
+        statusInput.value = u.status || 'Active';
+      } else {
+        titleEl.innerText = 'Tambah Pelamar Baru';
+        nameInput.value = '';
+        emailInput.value = '';
+        tierInput.value = 'VIP';
+        quotaInput.value = '20';
+        statusInput.value = 'Active';
+      }
+
+      modal.classList.remove('hidden');
     }
 
-    function promptAddNewUser() {
-      const name = prompt('Masukkan Nama Lengkap Pelamar:');
-      if (!name) return;
-      const email = prompt('Masukkan Email Pelamar:');
-      if (!email) return;
-      const tier = prompt('Pilih Tier (VIP / DIBANTUIN / FLASH / FREE):', 'VIP') || 'VIP';
-      const quotaStr = prompt('Masukkan Kuota Blast Awal:', tier.toUpperCase() === 'VIP' ? '20' : '5');
-      const quota = parseInt(quotaStr, 10) || 10;
+    function closeAdminUserModal() {
+      const modal = document.getElementById('adminUserModal');
+      if (modal) modal.classList.add('hidden');
+    }
 
-      adminState.users.unshift({
-        name: name.trim(),
-        email: email.trim(),
-        tier: tier.toUpperCase(),
-        tierName: tier.toUpperCase() === 'VIP' ? 'Dikerjain VIP (Manual)' : tier.toUpperCase() === 'DIBANTUIN' ? 'Dibantuin' : 'Paket 24 Jam',
-        quota: quota,
-        status: 'Active'
-      });
+    function handleSaveAdminUser(e) {
+      e.preventDefault();
+      const name = document.getElementById('modalUserNameInput').value.trim();
+      const email = document.getElementById('modalUserEmailInput').value.trim();
+      const tier = document.getElementById('modalUserTierInput').value;
+      const quota = parseInt(document.getElementById('modalUserQuotaInput').value, 10) || 0;
+      const status = document.getElementById('modalUserStatusInput').value;
+
+      if (!name || !email) {
+        alert('Mohon isi nama dan email dengan lengkap!');
+        return;
+      }
+
+      const tierName = tier === 'VIP' ? 'Dikerjain VIP' : tier === 'DIBANTUIN' ? 'Dibantuin' : tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)';
+
+      if (adminEditingUserIndex >= 0 && adminState.users[adminEditingUserIndex]) {
+        // Edit existing
+        const u = adminState.users[adminEditingUserIndex];
+        u.name = name;
+        u.email = email;
+        u.tier = tier;
+        u.tierName = tierName;
+        u.quota = quota;
+        u.status = status;
+      } else {
+        // Add new
+        adminState.users.unshift({
+          name, email, tier, tierName, quota, status
+        });
+      }
+
       saveAdminUsersToStorage();
       renderAdminUsers();
       updateAdminKPIs();
-      alert(`User baru [${name}] berhasil didaftarkan dengan kuota ${quota} recruiter.`);
+      closeAdminUserModal();
     }
 
-    function promptAddNewJob() {
-      const title = prompt('Nama Posisi Loker:');
-      if (!title) return;
-      const company = prompt('Nama Perusahaan Mitra:');
-      if (!company) return;
-      const category = prompt('Kategori (it-software / engineering-iot / business-operations / bumn-trainee / marketing-growth):', 'it-software');
-      if (!category) return;
-      const location = prompt('Lokasi (jakarta / bandung / surabaya / yogyakarta / bali / remote):', 'jakarta');
-      if (!location) return;
-      const salary = prompt('Kisaran Gaji (e.g. Rp 8.000.000 - Rp 12.000.000):', 'Rp 8.000.000 - Rp 12.000.000');
-      const query = prompt('Keyword Pencarian Glints / LinkedIn:', `${title} ${company}`);
+    function editAdminUserModal(userIndex) {
+      openAdminUserModal(true, userIndex);
+    }
 
-      const newJobObj = {
-        id: Date.now(),
-        title: title.trim(),
-        company: company.trim(),
-        category: category.trim(),
-        location: location.trim(),
-        level: 'junior',
-        type: 'Full-time',
-        salary: salary ? salary.trim() : 'Kompetitif',
-        keyRequirements: ['Komunikasi Profesional', 'Problem Solving', 'Inisiatif Tinggi'],
-        valueAddSkills: ['Pengalaman Terkait', 'Portofolio Kuat'],
-        query: query ? query.trim() : `${title} ${company}`,
-        link: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title + ' ' + company)}`
-      };
+    function promptAddNewUser() {
+      openAdminUserModal(false, -1);
+    }
 
-      if (typeof curatedJobsDatabase !== 'undefined') {
-        curatedJobsDatabase.unshift(newJobObj);
+    function openAdminJobModal(isEdit = false, jobIndex = -1) {
+      adminEditingJobIndex = jobIndex;
+      const modal = document.getElementById('adminJobModal');
+      const titleEl = document.getElementById('adminJobModalTitle');
+      const jobList = appState.activeJobs || curatedJobsDatabase || [];
+
+      const posInput = document.getElementById('modalJobTitleInput');
+      const compInput = document.getElementById('modalJobCompanyInput');
+      const catInput = document.getElementById('modalJobCategoryInput');
+      const locInput = document.getElementById('modalJobLocationInput');
+      const salInput = document.getElementById('modalJobSalaryInput');
+
+      if (isEdit && jobIndex >= 0 && jobList[jobIndex]) {
+        const j = jobList[jobIndex];
+        titleEl.innerText = 'Edit Lowongan Kerja';
+        posInput.value = j.title || '';
+        compInput.value = j.company || '';
+        catInput.value = j.category || 'it-software';
+        locInput.value = j.location || 'jakarta';
+        salInput.value = j.salary || '';
+      } else {
+        titleEl.innerText = 'Tambah Lowongan Kerja Baru';
+        posInput.value = '';
+        compInput.value = '';
+        catInput.value = 'it-software';
+        locInput.value = 'jakarta';
+        salInput.value = 'Rp 8.000.000 - Rp 12.000.000';
       }
-      appState.activeJobs = curatedJobsDatabase;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeAdminJobModal() {
+      const modal = document.getElementById('adminJobModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleSaveAdminJob(e) {
+      e.preventDefault();
+      const title = document.getElementById('modalJobTitleInput').value.trim();
+      const company = document.getElementById('modalJobCompanyInput').value.trim();
+      const category = document.getElementById('modalJobCategoryInput').value;
+      const location = document.getElementById('modalJobLocationInput').value;
+      const salary = document.getElementById('modalJobSalaryInput').value.trim() || 'Kompetitif';
+
+      if (!title || !company) {
+        alert('Mohon isi posisi dan perusahaan dengan lengkap!');
+        return;
+      }
+
+      const jobList = appState.activeJobs || curatedJobsDatabase || [];
+
+      if (adminEditingJobIndex >= 0 && jobList[adminEditingJobIndex]) {
+        const j = jobList[adminEditingJobIndex];
+        j.title = title;
+        j.company = company;
+        j.category = category;
+        j.location = location;
+        j.salary = salary;
+        j.query = `${title} ${company}`;
+      } else {
+        const newJob = {
+          id: Date.now(),
+          title, company, category, location,
+          level: 'junior',
+          type: 'Full-time',
+          salary,
+          keyRequirements: ['Komunikasi Profesional', 'Problem Solving', 'Inisiatif Tinggi'],
+          valueAddSkills: ['Pengalaman Terkait', 'Portofolio Kuat'],
+          query: `${title} ${company}`,
+          link: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title + ' ' + company)}`
+        };
+        if (typeof curatedJobsDatabase !== 'undefined') {
+          curatedJobsDatabase.unshift(newJob);
+        }
+        appState.activeJobs = curatedJobsDatabase;
+      }
+
       renderAdminJobs();
       if (typeof renderJobs === 'function') renderJobs(curatedJobsDatabase);
-      alert(`Loker [${title} di ${company}] berhasil ditambahkan ke katalog publik dan admin!`);
+      closeAdminJobModal();
     }
 
     function editAdminJobModal(jobIndex) {
-      const jobList = appState.activeJobs || curatedJobsDatabase || [];
-      const j = jobList[jobIndex];
-      if (!j) return;
+      openAdminJobModal(true, jobIndex);
+    }
 
-      const newTitle = prompt('Ubah Posisi Loker:', j.title);
-      if (newTitle === null) return;
-      const newCompany = prompt('Ubah Perusahaan:', j.company);
-      if (newCompany === null) return;
-      const newSalary = prompt('Ubah Gaji:', j.salary);
-      if (newSalary === null) return;
-      const newLocation = prompt('Ubah Lokasi:', j.location);
-      if (newLocation === null) return;
-
-      j.title = newTitle.trim() || j.title;
-      j.company = newCompany.trim() || j.company;
-      j.salary = newSalary.trim() || j.salary;
-      j.location = newLocation.trim() || j.location;
-      j.query = `${j.title} ${j.company}`;
-
-      renderAdminJobs();
-      if (typeof renderJobs === 'function') renderJobs(curatedJobsDatabase);
-      alert('Data lowongan berhasil diperbarui di katalog admin dan publik!');
+    function promptAddNewJob() {
+      openAdminJobModal(false, -1);
     }
 
     function deleteAdminJob(jobIndex) {
@@ -12167,6 +12235,143 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
       <p class="text-center text-[11px] text-slate-400">
         Status pembayaran akan terverifikasi otomatis dalam 1-3 detik setelah transfer.
       </p>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 3: ADMIN EDIT/ADD USER FORM (CLEAN DOSPEM FORM MODAL)              -->
+  <!-- ========================================================================= -->
+  <div id="adminUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="dospem-card max-w-md w-full p-6 sm:p-7 space-y-5 bg-white relative animate-in fade-in zoom-in-95 duration-200">
+      
+      <button onclick="closeAdminUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 font-mono">DIMITRI HQ • ADMIN</span>
+        <h3 class="text-lg font-extrabold text-slate-900" id="adminUserModalTitle">Edit Data Pelamar & Kuota</h3>
+        <p class="text-xs text-slate-500">Atur profil, tingkatan paket langganan, dan sisa kuota kirim lamaran.</p>
+      </div>
+
+      <form onsubmit="handleSaveAdminUser(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Pelamar</label>
+          <input type="text" id="modalUserNameInput" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email</label>
+          <input type="email" id="modalUserEmailInput" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Tier Paket</label>
+            <select id="modalUserTierInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+              <option value="VIP">Dikerjain VIP</option>
+              <option value="DIBANTUIN">Dibantuin</option>
+              <option value="FLASH">Paket 24 Jam</option>
+              <option value="FREE">Dibimbing (Free)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Sisa Kuota Blast</label>
+            <input type="number" id="modalUserQuotaInput" min="0" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-mono font-bold">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun</label>
+          <select id="modalUserStatusInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+            <option value="Active">Active</option>
+            <option value="Active (VIP)">Active (VIP)</option>
+            <option value="Active (Owner)">Active (Owner)</option>
+            <option value="Active (Partner)">Active (Partner)</option>
+            <option value="Free">Free</option>
+          </select>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeAdminUserModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20 transition">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 4: ADMIN EDIT/ADD JOB FORM (CLEAN DOSPEM FORM MODAL)               -->
+  <!-- ========================================================================= -->
+  <div id="adminJobModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="dospem-card max-w-md w-full p-6 sm:p-7 space-y-5 bg-white relative animate-in fade-in zoom-in-95 duration-200">
+      
+      <button onclick="closeAdminJobModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <div>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 font-mono">KATALOG LOKER • ADMIN</span>
+        <h3 class="text-lg font-extrabold text-slate-900" id="adminJobModalTitle">Edit Lowongan Kerja</h3>
+        <p class="text-xs text-slate-500">Sesuaikan posisi, nama instansi, kategori, dan kisaran gaji.</p>
+      </div>
+
+      <form onsubmit="handleSaveAdminJob(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Posisi Lowongan</label>
+          <input type="text" id="modalJobTitleInput" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium" placeholder="Contoh: Junior Backend Developer">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Perusahaan Mitra</label>
+          <input type="text" id="modalJobCompanyInput" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium" placeholder="Contoh: PT Bank Mandiri (Persero)">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
+            <select id="modalJobCategoryInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+              <option value="it-software">IT & Software</option>
+              <option value="engineering-iot">Engineering & IoT</option>
+              <option value="business-operations">Bisnis & Operasional</option>
+              <option value="bumn-trainee">BUMN & MT</option>
+              <option value="marketing-growth">Marketing & Growth</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Lokasi</label>
+            <select id="modalJobLocationInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+              <option value="jakarta">Jakarta</option>
+              <option value="bandung">Bandung</option>
+              <option value="surabaya">Surabaya</option>
+              <option value="yogyakarta">Yogyakarta</option>
+              <option value="bali">Bali</option>
+              <option value="remote">Remote (WFH)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kisaran Gaji</label>
+          <input type="text" id="modalJobSalaryInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-mono font-medium" placeholder="Rp 7.000.000 - Rp 10.000.000">
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeAdminJobModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+            Batal
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition">
+            Simpan Lowongan
+          </button>
+        </div>
+      </form>
 
     </div>
   </div>
