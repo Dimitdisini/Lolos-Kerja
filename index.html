@@ -1493,6 +1493,7 @@
       sampleAudioInterval: null,
       activeJobs: []
     };
+    window.appState = appState;
 
     // Database CV Presets
     const cvPresets = {
@@ -10467,12 +10468,22 @@
       const preset = cvPresets[key];
       if (!preset) return;
 
-      document.getElementById('targetRole').value = preset.role;
-      document.getElementById('targetLevel').value = preset.level;
-      document.getElementById('cvInputText').value = preset.rawText;
-      document.getElementById('socraticPromptText').innerText = `"${preset.socraticQuestion}"`;
-      document.getElementById('beforeBulletText').innerText = `"${preset.beforeText}"`;
-      document.getElementById('afterBulletText').innerText = `"${preset.optimizedStar}"`;
+      const roleElem = document.getElementById('targetRole');
+      if (roleElem) roleElem.value = preset.role;
+      const levelElem = document.getElementById('targetLevel');
+      if (levelElem) levelElem.value = preset.level;
+
+      const cvInput = document.getElementById('cvExperienceInput') || document.getElementById('cvInputText');
+      if (cvInput) cvInput.value = preset.rawText;
+
+      const socraticEl = document.getElementById('socraticQuestionText') || document.getElementById('socraticPromptText');
+      if (socraticEl) socraticEl.innerText = `"${preset.socraticQuestion}"`;
+
+      const beforeEl = document.getElementById('previewBefore') || document.getElementById('beforeBulletText');
+      if (beforeEl) beforeEl.innerText = `"${preset.beforeText}"`;
+
+      const afterEl = document.getElementById('previewAfter') || document.getElementById('afterBulletText');
+      if (afterEl) afterEl.innerText = `"${preset.optimizedStar}"`;
 
       // Update chips
       const chipsContainer = document.getElementById('metricChipsContainer');
@@ -11306,6 +11317,11 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       const selectedIds = checkedBoxes.map(cb => cb.value);
       blastQueue = verifiedRecruiterTargets.filter(t => selectedIds.includes(t.id));
 
+      if (currentUser.blastQuota !== undefined && currentUser.blastQuota < blastQueue.length) {
+        alert(`Sisa kuota Auto-Blast Anda (${currentUser.blastQuota} recruiter) tidak mencukupi untuk mengirim ke ${blastQueue.length} target terpilih. Silakan kurangi pilihan target atau tambah kuota Anda.`);
+        return;
+      }
+
       isBlastRunning = true;
       const btnStart = document.getElementById('btnStartBlast');
       btnStart.disabled = true;
@@ -11367,6 +11383,11 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
 
       blastTimeoutId = setTimeout(() => {
         appendBlastLog(`[TERKIRIM]: [250 OK] Email terkirim ke ${item.hr} <${item.email}>. Subjek: Application: ${item.role}.`);
+        if (currentUser.blastQuota !== undefined && currentUser.blastQuota > 0) {
+          currentUser.blastQuota--;
+          saveUserSession();
+          if (typeof syncCurrentSessionWithAdminDatabase === 'function') syncCurrentSessionWithAdminDatabase();
+        }
       syncToGoogleSheets('RECORD_BLAST_LOG', {
         applicantName: document.getElementById('blastSenderName')?.value || currentUser.name,
         applicantEmail: document.getElementById('blastSenderEmail')?.value || currentUser.email,
@@ -11477,6 +11498,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       blastQuota: 0,
       orderPending: null
     };
+    window.currentUser = currentUser;
 
     let qrisTimerInterval = null;
 
@@ -11524,8 +11546,19 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
         if (nameElem) nameElem.innerText = currentUser.name;
         if (avatarElem) avatarElem.src = currentUser.avatar;
         if (badgeElem) {
-          badgeElem.innerText = currentUser.tier === 'VIP' ? 'DIKERJAIN VIP' : (currentUser.tier === 'DIBANTUIN' ? 'DIBANTUIN' : 'DIBIMBING (FREE)');
-          badgeElem.className = currentUser.tier === 'VIP' ? 'text-[10px] font-extrabold text-amber-600 uppercase font-mono' : (currentUser.tier === 'DIBANTUIN' ? 'text-[10px] font-extrabold text-blue-600 uppercase font-mono' : 'text-[10px] font-extrabold text-slate-400 uppercase font-mono');
+          if (currentUser.tier === 'VIP') {
+            badgeElem.innerText = 'DIKERJAIN VIP';
+            badgeElem.className = 'text-[10px] font-extrabold text-amber-600 uppercase font-mono';
+          } else if (currentUser.tier === 'DIBANTUIN') {
+            badgeElem.innerText = 'DIBANTUIN';
+            badgeElem.className = 'text-[10px] font-extrabold text-blue-600 uppercase font-mono';
+          } else if (currentUser.tier === 'FLASH') {
+            badgeElem.innerText = 'PAKET 24 JAM';
+            badgeElem.className = 'text-[10px] font-extrabold text-purple-600 uppercase font-mono';
+          } else {
+            badgeElem.innerText = 'DIBIMBING (FREE)';
+            badgeElem.className = 'text-[10px] font-extrabold text-slate-400 uppercase font-mono';
+          }
         }
       } else {
         if (loggedOutView) loggedOutView.classList.remove('hidden');
@@ -11796,10 +11829,11 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
        7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC - FULL CRUD)
        ------------------------------------------------------------------------- */
     const defaultAdminUsers = [
-      { name: 'Dimitri Ahmad', email: 'dimitri@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
+      { name: 'Dimitri Ahmad', email: 'dimitriahmad000@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
+      { name: 'Dimitri Ahmad (Fleek)', email: 'dimitri@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
       { name: 'Sasa Mentor', email: 'sasa@karircopilot.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Partner)' },
-      { name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
-      { name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 5, status: 'Active' },
+      { name: 'Alif Yusfan', email: 'alif@fleekgroup.id', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 5, status: 'Active' },
+      { name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Active (Free)' },
       { name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', tier: 'FLASH', tierName: 'Paket 24 Jam', quota: 10, status: 'Active (24h Expire)' },
       { name: 'Bima Satria', email: 'bima.eng@itb.ac.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
       { name: 'Fresh Graduate Binaan', email: 'candidate@student.ac.id', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Free' }
@@ -11829,6 +11863,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     }
 
     var adminState = loadAdminFromStorage();
+    window.adminState = adminState;
 
     function saveAdminUsersToStorage() {
       try {
@@ -12661,23 +12696,43 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       <!-- Daftar Akun Siap Pakai -->
       <div class="space-y-1.5 pt-1">
         
-        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">
-            DA
-          </div>
+        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">DA</div>
           <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Dimitri Ahmad</div>
+            <div class="text-xs font-bold text-slate-900 truncate">Dimitri Ahmad (Owner / VIP)</div>
             <div class="text-[11px] text-slate-500 font-mono truncate">dimitriahmad000@gmail.com</div>
           </div>
         </button>
 
-        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitri@fleekgroup.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
-          <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs shrink-0">
-            FG
-          </div>
+        <button onclick="selectGoogleAccount('Alif Yusfan', 'alif@fleekgroup.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs shrink-0">AY</div>
           <div class="overflow-hidden">
-            <div class="text-xs font-bold text-slate-900 truncate">Dimitri Ahmad (Fleek Group)</div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">dimitri@fleekgroup.id</div>
+            <div class="text-xs font-bold text-slate-900 truncate">Alif Yusfan (Dibantuin)</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">alif@fleekgroup.id</div>
+          </div>
+        </button>
+
+        <button onclick="selectGoogleAccount('Rangga Daniswara', 'rangga.danis@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs shrink-0">RD</div>
+          <div class="overflow-hidden">
+            <div class="text-xs font-bold text-slate-900 truncate">Rangga Daniswara (Fresh Grad / Free)</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">rangga.danis@gmail.com</div>
+          </div>
+        </button>
+
+        <button onclick="selectGoogleAccount('Bima Satria', 'bima.eng@itb.ac.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-xs shrink-0">BS</div>
+          <div class="overflow-hidden">
+            <div class="text-xs font-bold text-slate-900 truncate">Bima Satria (Engineering Tech VIP)</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">bima.eng@itb.ac.id</div>
+          </div>
+        </button>
+
+        <button onclick="selectGoogleAccount('Anindya Putri', 'anindya.p@ui.ac.id', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 border border-slate-100 hover:border-slate-300 transition text-left">
+          <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-xs shrink-0">AP</div>
+          <div class="overflow-hidden">
+            <div class="text-xs font-bold text-slate-900 truncate">Anindya Putri (Flash 24h)</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">anindya.p@ui.ac.id</div>
           </div>
         </button>
 
