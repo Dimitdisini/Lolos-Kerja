@@ -1363,7 +1363,7 @@
                   <th class="py-3 px-4">Tier Akses</th>
                   <th class="py-3 px-4">Sisa Kuota Blast</th>
                   <th class="py-3 px-4">Status Akun</th>
-                  <th class="py-3 px-4 text-right">Kelola Kuota</th>
+                  <th class="py-3 px-4 text-right">Aksi Kelola</th>
                 </tr>
               </thead>
               <tbody id="adminUsersTableBody" class="divide-y divide-slate-100 font-medium">
@@ -11542,30 +11542,60 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
     };
 
     /* -------------------------------------------------------------------------
-       7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC)
+       7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC - FULL CRUD)
        ------------------------------------------------------------------------- */
-    const adminState = {
-      currentSubTab: 'orders',
-      transactions: [
-        { id: 'LK-ORD-92811', name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS BCA', time: '10 mnt lalu', status: 'SETTLED' },
-        { id: 'LK-ORD-88234', name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', plan: 'Dibantuin', amount: 49000, method: 'GoPay', time: '42 mnt lalu', status: 'SETTLED' },
-        { id: 'LK-ORD-77190', name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', plan: 'Paket 24 Jam', amount: 9999, method: 'ShopeePay', time: '1 jam lalu', status: 'SETTLED' },
-        { id: 'LK-ORD-65239', name: 'Bima Satria', email: 'bima.eng@itb.ac.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS Mandiri', time: '2 jam lalu', status: 'SETTLED' },
-        { id: 'LK-ORD-51902', name: 'Dhea Kusuma', email: 'dhea.k@ugm.ac.id', plan: 'Dibantuin', amount: 49000, method: 'OVO', time: '3 jam lalu', status: 'SETTLED' },
-        { id: 'LK-ORD-41098', name: 'Fikri Haikal', email: 'fikri.hk@telkomuniversity.ac.id', plan: 'Paket 24 Jam', amount: 9999, method: 'DANA', time: '5 jam lalu', status: 'SETTLED' }
-      ],
-      users: [
-        { name: 'Dimitri Ahmad', email: 'dimitri@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
-        { name: 'Sasa Mentor', email: 'sasa@karircopilot.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Partner)' },
-        { name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
-        { name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 5, status: 'Active' },
-        { name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', tier: 'FLASH', tierName: 'Paket 24 Jam', quota: 10, status: 'Active (24h Expire)' },
-        { name: 'Bima Satria', email: 'bima.eng@itb.ac.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
-        { name: 'Fresh Graduate Binaan', email: 'candidate@student.ac.id', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Free' }
-      ]
-    };
+    const defaultAdminUsers = [
+      { name: 'Dimitri Ahmad', email: 'dimitri@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)' },
+      { name: 'Sasa Mentor', email: 'sasa@karircopilot.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Partner)' },
+      { name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
+      { name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 5, status: 'Active' },
+      { name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', tier: 'FLASH', tierName: 'Paket 24 Jam', quota: 10, status: 'Active (24h Expire)' },
+      { name: 'Bima Satria', email: 'bima.eng@itb.ac.id', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 20, status: 'Active' },
+      { name: 'Fresh Graduate Binaan', email: 'candidate@student.ac.id', tier: 'FREE', tierName: 'Dibimbing (Free)', quota: 0, status: 'Free' }
+    ];
+
+    const defaultAdminTransactions = [
+      { id: 'LK-ORD-92811', name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS BCA', time: '10 mnt lalu', status: 'SETTLED' },
+      { id: 'LK-ORD-88234', name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', plan: 'Dibantuin', amount: 49000, method: 'GoPay', time: '42 mnt lalu', status: 'SETTLED' },
+      { id: 'LK-ORD-77190', name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', plan: 'Paket 24 Jam', amount: 9999, method: 'ShopeePay', time: '1 jam lalu', status: 'SETTLED' },
+      { id: 'LK-ORD-65239', name: 'Bima Satria', email: 'bima.eng@itb.ac.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS Mandiri', time: '2 jam lalu', status: 'SETTLED' },
+      { id: 'LK-ORD-51902', name: 'Dhea Kusuma', email: 'dhea.k@ugm.ac.id', plan: 'Dibantuin', amount: 49000, method: 'OVO', time: '3 jam lalu', status: 'SETTLED' },
+      { id: 'LK-ORD-41098', name: 'Fikri Haikal', email: 'fikri.hk@telkomuniversity.ac.id', plan: 'Paket 24 Jam', amount: 9999, method: 'DANA', time: '5 jam lalu', status: 'SETTLED' }
+    ];
+
+    function loadAdminFromStorage() {
+      try {
+        const savedUsers = localStorage.getItem('lolos_kerja_admin_users');
+        const savedTx = localStorage.getItem('lolos_kerja_admin_transactions');
+        return {
+          currentSubTab: 'orders',
+          users: savedUsers ? JSON.parse(savedUsers) : defaultAdminUsers,
+          transactions: savedTx ? JSON.parse(savedTx) : defaultAdminTransactions
+        };
+      } catch(e) {
+        return { currentSubTab: 'orders', users: defaultAdminUsers, transactions: defaultAdminTransactions };
+      }
+    }
+
+    const adminState = loadAdminFromStorage();
+
+    function saveAdminUsersToStorage() {
+      try {
+        localStorage.setItem('lolos_kerja_admin_users', JSON.stringify(adminState.users));
+      } catch(e) {}
+    }
+
+    function saveAdminTxToStorage() {
+      try {
+        localStorage.setItem('lolos_kerja_admin_transactions', JSON.stringify(adminState.transactions));
+      } catch(e) {}
+    }
 
     function initAdminPortal() {
+      // Sinkronkan katalog lowongan dari curatedJobsDatabase (418 loker riil)
+      if (typeof curatedJobsDatabase !== 'undefined' && Array.isArray(curatedJobsDatabase)) {
+        appState.activeJobs = curatedJobsDatabase;
+      }
       renderAdminOrders();
       renderAdminUsers();
       renderAdminJobs();
@@ -11599,7 +11629,7 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
         return tx.id.toLowerCase().includes(query) || tx.name.toLowerCase().includes(query) || tx.plan.toLowerCase().includes(query);
       });
 
-      tbody.innerHTML = filtered.map(tx => `
+      tbody.innerHTML = filtered.map((tx, idx) => `
         <tr class="hover:bg-slate-50 transition">
           <td class="py-3 px-4 font-mono font-bold text-blue-600">${tx.id}</td>
           <td class="py-3 px-4">
@@ -11620,9 +11650,12 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
               ${tx.status}
             </span>
           </td>
-          <td class="py-3 px-4 text-right">
-            <button onclick="resendInvoiceReceipt('${tx.id}', '${tx.email}')" class="text-blue-600 hover:text-blue-800 font-bold text-[11px] hover:underline">
+          <td class="py-3 px-4 text-right space-x-1">
+            <button onclick="resendInvoiceReceipt('${tx.id}', '${tx.email}')" class="text-blue-600 hover:text-blue-800 font-bold text-[10px] bg-blue-50 px-2 py-1 rounded border border-blue-200">
               Kirim Nota
+            </button>
+            <button onclick="deleteAdminTransaction(${idx})" class="text-rose-600 hover:text-rose-800 font-bold text-[10px] bg-rose-50 px-2 py-1 rounded border border-rose-200">
+              Hapus
             </button>
           </td>
         </tr>
@@ -11634,6 +11667,17 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
       renderAdminOrders(q);
     }
 
+    function deleteAdminTransaction(txIndex) {
+      const tx = adminState.transactions[txIndex];
+      if (!tx) return;
+      if (confirm(`Yakin ingin menghapus catatan transaksi ${tx.id} atas nama ${tx.name}?`)) {
+        adminState.transactions.splice(txIndex, 1);
+        saveAdminTxToStorage();
+        renderAdminOrders();
+        updateAdminKPIs();
+      }
+    }
+
     function renderAdminUsers() {
       const tbody = document.getElementById('adminUsersTableBody');
       if (!tbody) return;
@@ -11643,28 +11687,39 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
           <td class="py-3 px-4">
             <div class="font-bold text-slate-900 flex items-center gap-1.5">
               <span>${u.name}</span>
-              ${u.status.includes('Owner') ? '<span class="text-[9px] bg-slate-900 text-white px-1.5 py-0.2 rounded font-mono">OWNER</span>' : ''}
+              ${u.status && u.status.includes('Owner') ? '<span class="text-[9px] bg-slate-900 text-white px-1.5 py-0.2 rounded font-mono">OWNER</span>' : ''}
             </div>
           </td>
           <td class="py-3 px-4 text-slate-500 font-mono text-[11px]">${u.email}</td>
           <td class="py-3 px-4">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.tier === 'VIP' ? 'bg-amber-100 text-amber-800' : u.tier === 'DIBANTUIN' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}">
-              ${u.tierName}
+              ${u.tierName || u.tier}
             </span>
           </td>
           <td class="py-3 px-4 font-mono font-bold ${u.quota > 0 ? 'text-indigo-600' : 'text-slate-400'}">
             ${u.quota} Recruiter
           </td>
           <td class="py-3 px-4">
-            <span class="text-[11px] text-emerald-600 font-semibold">${u.status}</span>
+            <span class="text-[11px] text-emerald-600 font-semibold">${u.status || 'Active'}</span>
           </td>
-          <td class="py-3 px-4 text-right space-x-1.5">
-            <button onclick="adjustUserQuota(${idx}, 10)" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded border border-indigo-200 transition">
-              +10 Kuota
-            </button>
-            <button onclick="upgradeUserToVIP(${idx})" class="text-[10px] bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold px-2 py-1 rounded border border-amber-200 transition">
-              Jadikan VIP
-            </button>
+          <td class="py-3 px-4 text-right">
+            <div class="flex items-center justify-end gap-1 flex-wrap">
+              <button onclick="adjustUserQuota(${idx}, 10)" title="Tambah 10 Kuota" class="text-[10px] bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-2 py-1 rounded border border-indigo-200 transition">
+                +10
+              </button>
+              <button onclick="adjustUserQuota(${idx}, -5)" title="Kurang 5 Kuota" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded border border-slate-300 transition">
+                -5
+              </button>
+              <button onclick="editAdminUserModal(${idx})" title="Edit Data User" class="text-[10px] bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded border border-blue-200 transition">
+                Edit
+              </button>
+              <button onclick="upgradeUserToVIP(${idx})" title="Jadikan VIP" class="text-[10px] bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold px-2 py-1 rounded border border-amber-200 transition">
+                VIP
+              </button>
+              <button onclick="deleteAdminUser(${idx})" title="Hapus User" class="text-[10px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded border border-rose-200 transition">
+                Hapus
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -11672,9 +11727,10 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
 
     function renderAdminJobs() {
       const tbody = document.getElementById('adminJobsTableBody');
-      if (!tbody || !appState.activeJobs) return;
+      if (!tbody) return;
+      const jobList = appState.activeJobs || curatedJobsDatabase || [];
 
-      tbody.innerHTML = appState.activeJobs.map((j, idx) => `
+      tbody.innerHTML = jobList.map((j, idx) => `
         <tr class="hover:bg-slate-50 transition">
           <td class="py-3 px-4 font-bold text-slate-900">${j.title}</td>
           <td class="py-3 px-4 text-slate-600 font-semibold">${j.company}</td>
@@ -11683,11 +11739,19 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
           </td>
           <td class="py-3 px-4 text-slate-500">${j.location}</td>
           <td class="py-3 px-4 font-mono font-semibold text-slate-700">${j.salary}</td>
-          <td class="py-3 px-4 font-mono text-[10px] text-blue-600 truncate max-w-xs">${j.query}</td>
+          <td class="py-3 px-4 font-mono text-[10px] text-blue-600 truncate max-w-xs">${j.query || j.title}</td>
           <td class="py-3 px-4 text-right">
-            <button onclick="testJobPortalLink('${encodeURIComponent(j.query)}')" class="text-blue-600 hover:text-blue-800 text-[11px] font-bold hover:underline">
-              Buka Loker &rarr;
-            </button>
+            <div class="flex items-center justify-end gap-1.5">
+              <button onclick="editAdminJobModal(${idx})" class="text-[10px] bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded border border-blue-200 transition">
+                Edit
+              </button>
+              <button onclick="deleteAdminJob(${idx})" class="text-[10px] bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded border border-rose-200 transition">
+                Hapus
+              </button>
+              <button onclick="testJobPortalLink('${encodeURIComponent(j.query || j.title)}')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded border border-slate-300 transition">
+                Buka
+              </button>
+            </div>
           </td>
         </tr>
       `).join('');
@@ -11711,18 +11775,54 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
 
     function adjustUserQuota(userIndex, amount) {
       if (!adminState.users[userIndex]) return;
-      adminState.users[userIndex].quota += amount;
+      adminState.users[userIndex].quota = Math.max(0, (adminState.users[userIndex].quota || 0) + amount);
+      saveAdminUsersToStorage();
       renderAdminUsers();
-      alert(`Berhasil menambahkan ${amount} kuota auto-blast untuk ${adminState.users[userIndex].name}. Kuota sekarang: ${adminState.users[userIndex].quota}`);
     }
 
     function upgradeUserToVIP(userIndex) {
       if (!adminState.users[userIndex]) return;
       adminState.users[userIndex].tier = 'VIP';
       adminState.users[userIndex].tierName = 'Dikerjain VIP';
-      adminState.users[userIndex].quota += 20;
+      adminState.users[userIndex].quota = (adminState.users[userIndex].quota || 0) + 20;
+      adminState.users[userIndex].status = 'Active (VIP)';
+      saveAdminUsersToStorage();
       renderAdminUsers();
       alert(`Berhasil upgrade ${adminState.users[userIndex].name} ke Dikerjain VIP (+20 kuota blast)!`);
+    }
+
+    function deleteAdminUser(userIndex) {
+      const u = adminState.users[userIndex];
+      if (!u) return;
+      if (confirm(`Yakin ingin menghapus user [${u.name} - ${u.email}]?`)) {
+        adminState.users.splice(userIndex, 1);
+        saveAdminUsersToStorage();
+        renderAdminUsers();
+        updateAdminKPIs();
+      }
+    }
+
+    function editAdminUserModal(userIndex) {
+      const u = adminState.users[userIndex];
+      if (!u) return;
+      const newName = prompt('Ubah Nama Pelamar:', u.name);
+      if (newName === null) return;
+      const newEmail = prompt('Ubah Email Pelamar:', u.email);
+      if (newEmail === null) return;
+      const newTier = prompt('Ubah Tier (VIP / DIBANTUIN / FLASH / FREE):', u.tier);
+      if (newTier === null) return;
+      const newQuota = prompt('Ubah Kuota Auto-Blast:', u.quota);
+      if (newQuota === null) return;
+
+      u.name = newName.trim() || u.name;
+      u.email = newEmail.trim() || u.email;
+      u.tier = newTier.trim().toUpperCase() || u.tier;
+      u.tierName = u.tier === 'VIP' ? 'Dikerjain VIP' : u.tier === 'DIBANTUIN' ? 'Dibantuin' : u.tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)';
+      u.quota = parseInt(newQuota, 10) || 0;
+
+      saveAdminUsersToStorage();
+      renderAdminUsers();
+      alert('Data pengguna berhasil diperbarui!');
     }
 
     function promptAddNewUser() {
@@ -11730,18 +11830,22 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
       if (!name) return;
       const email = prompt('Masukkan Email Pelamar:');
       if (!email) return;
+      const tier = prompt('Pilih Tier (VIP / DIBANTUIN / FLASH / FREE):', 'VIP') || 'VIP';
+      const quotaStr = prompt('Masukkan Kuota Blast Awal:', tier.toUpperCase() === 'VIP' ? '20' : '5');
+      const quota = parseInt(quotaStr, 10) || 10;
 
       adminState.users.unshift({
-        name: name,
-        email: email,
-        tier: 'VIP',
-        tierName: 'Dikerjain VIP (Manual Grant)',
-        quota: 20,
-        status: 'Active (VIP)'
+        name: name.trim(),
+        email: email.trim(),
+        tier: tier.toUpperCase(),
+        tierName: tier.toUpperCase() === 'VIP' ? 'Dikerjain VIP (Manual)' : tier.toUpperCase() === 'DIBANTUIN' ? 'Dibantuin' : 'Paket 24 Jam',
+        quota: quota,
+        status: 'Active'
       });
+      saveAdminUsersToStorage();
       renderAdminUsers();
       updateAdminKPIs();
-      alert(`User VIP baru [${name}] berhasil didaftarkan dengan kuota 20 recruiter.`);
+      alert(`User baru [${name}] berhasil didaftarkan dengan kuota ${quota} recruiter.`);
     }
 
     function promptAddNewJob() {
@@ -11749,21 +11853,71 @@ Telepon: +62 812-3456-7890 | LinkedIn: linkedin.com/in/${name.toLowerCase().repl
       if (!title) return;
       const company = prompt('Nama Perusahaan Mitra:');
       if (!company) return;
-      const category = prompt('Kategori (teknik/bisnis/kreatif):', 'bisnis');
-      const location = prompt('Lokasi (e.g. Jakarta Selatan / Remote):', 'Jakarta');
-      const salary = prompt('Kisaran Gaji (e.g. Rp 7.000.000 - Rp 10.000.000):', 'Rp 7.000.000 - Rp 11.000.000');
+      const category = prompt('Kategori (it-software / engineering-iot / business-operations / bumn-trainee / marketing-growth):', 'it-software');
+      if (!category) return;
+      const location = prompt('Lokasi (jakarta / bandung / surabaya / yogyakarta / bali / remote):', 'jakarta');
+      if (!location) return;
+      const salary = prompt('Kisaran Gaji (e.g. Rp 8.000.000 - Rp 12.000.000):', 'Rp 8.000.000 - Rp 12.000.000');
       const query = prompt('Keyword Pencarian Glints / LinkedIn:', `${title} ${company}`);
 
-      if (appState.activeJobs) {
-        appState.activeJobs.unshift({
-          title, company, category, location, salary,
-          skillsMatch: ['Komunikasi', 'Problem Solving', 'Adaptif'],
-          skillsGap: ['SOP Perusahaan'],
-          query
-        });
+      const newJobObj = {
+        id: Date.now(),
+        title: title.trim(),
+        company: company.trim(),
+        category: category.trim(),
+        location: location.trim(),
+        level: 'junior',
+        type: 'Full-time',
+        salary: salary ? salary.trim() : 'Kompetitif',
+        keyRequirements: ['Komunikasi Profesional', 'Problem Solving', 'Inisiatif Tinggi'],
+        valueAddSkills: ['Pengalaman Terkait', 'Portofolio Kuat'],
+        query: query ? query.trim() : `${title} ${company}`,
+        link: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(title + ' ' + company)}`
+      };
+
+      if (typeof curatedJobsDatabase !== 'undefined') {
+        curatedJobsDatabase.unshift(newJobObj);
+      }
+      appState.activeJobs = curatedJobsDatabase;
+      renderAdminJobs();
+      if (typeof renderJobs === 'function') renderJobs(curatedJobsDatabase);
+      alert(`Loker [${title} di ${company}] berhasil ditambahkan ke katalog publik dan admin!`);
+    }
+
+    function editAdminJobModal(jobIndex) {
+      const jobList = appState.activeJobs || curatedJobsDatabase || [];
+      const j = jobList[jobIndex];
+      if (!j) return;
+
+      const newTitle = prompt('Ubah Posisi Loker:', j.title);
+      if (newTitle === null) return;
+      const newCompany = prompt('Ubah Perusahaan:', j.company);
+      if (newCompany === null) return;
+      const newSalary = prompt('Ubah Gaji:', j.salary);
+      if (newSalary === null) return;
+      const newLocation = prompt('Ubah Lokasi:', j.location);
+      if (newLocation === null) return;
+
+      j.title = newTitle.trim() || j.title;
+      j.company = newCompany.trim() || j.company;
+      j.salary = newSalary.trim() || j.salary;
+      j.location = newLocation.trim() || j.location;
+      j.query = `${j.title} ${j.company}`;
+
+      renderAdminJobs();
+      if (typeof renderJobs === 'function') renderJobs(curatedJobsDatabase);
+      alert('Data lowongan berhasil diperbarui di katalog admin dan publik!');
+    }
+
+    function deleteAdminJob(jobIndex) {
+      const jobList = appState.activeJobs || curatedJobsDatabase || [];
+      const j = jobList[jobIndex];
+      if (!j) return;
+      if (confirm(`Yakin ingin menghapus lowongan [${j.title} di ${j.company}]?`)) {
+        jobList.splice(jobIndex, 1);
         renderAdminJobs();
-        if (typeof renderJobsList === 'function') renderJobsList();
-        alert(`Loker [${title} di ${company}] berhasil ditambahkan ke katalog publik & admin!`);
+        if (typeof renderJobs === 'function') renderJobs(curatedJobsDatabase);
+        alert('Lowongan berhasil dihapus dari katalog!');
       }
     }
 
