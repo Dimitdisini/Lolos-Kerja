@@ -11374,7 +11374,9 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
         recruiterEmail: item.email,
         position: item.role,
         subject: `Application: ${item.role} - ${currentUser.name}`,
-        status: 'SENT_INBOX'
+        body: document.getElementById('blastCoverLetterBody')?.value || '',
+        status: 'TERKIRIM',
+        sendRealEmail: false
       });
         processNextInBlastQueue(index + 1);
       }, 4500);
