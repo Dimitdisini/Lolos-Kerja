@@ -11478,6 +11478,18 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
 
     let qrisTimerInterval = null;
 
+    function syncCurrentSessionWithAdminDatabase() {
+      if (!currentUser.email || typeof adminState === 'undefined' || !adminState.users) return;
+      const matched = adminState.users.find(u => u.email.toLowerCase() === currentUser.email.toLowerCase());
+      if (matched) {
+        currentUser.tier = matched.tier || currentUser.tier;
+        currentUser.tierName = matched.tierName || (matched.tier === 'VIP' ? 'Dikerjain VIP' : (matched.tier === 'DIBANTUIN' ? 'Dibantuin' : (matched.tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)')));
+        currentUser.blastQuota = matched.quota !== undefined ? matched.quota : currentUser.blastQuota;
+        localStorage.setItem('lolos_kerja_user', JSON.stringify(currentUser));
+        updateUserNavbarUI();
+      }
+    }
+
     function initUserSession() {
       const saved = localStorage.getItem('lolos_kerja_user');
       if (saved) {
@@ -11488,6 +11500,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
           console.error('Session load error', e);
         }
       }
+      syncCurrentSessionWithAdminDatabase();
       updateUserNavbarUI();
     }
 
@@ -11626,7 +11639,28 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       currentUser.name = name;
       currentUser.email = email;
       if (avatar) currentUser.avatar = avatar;
-      
+
+      // Cek apakah email terdaftar di database Admin
+      const matchedAdminUser = adminState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (matchedAdminUser) {
+        currentUser.tier = matchedAdminUser.tier || 'VIP';
+        currentUser.tierName = matchedAdminUser.tierName || 'Dikerjain VIP';
+        currentUser.blastQuota = matchedAdminUser.quota !== undefined ? matchedAdminUser.quota : 50;
+      } else {
+        // Daftarkan ke database admin sebagai pengguna baru
+        adminState.users.unshift({
+          name: name,
+          email: email,
+          tier: currentUser.tier,
+          tierName: currentUser.tierName,
+          quota: currentUser.blastQuota,
+          status: 'Active (Google)'
+        });
+        saveAdminUsersToStorage();
+        renderAdminUsers();
+        updateAdminKPIs();
+      }
+
       saveUserSession();
       closeGoogleAccountPicker();
 
@@ -11990,20 +12024,24 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
 
     function adjustUserQuota(userIndex, amount) {
       if (!adminState.users[userIndex]) return;
-      adminState.users[userIndex].quota = Math.max(0, (adminState.users[userIndex].quota || 0) + amount);
+      const targetUser = adminState.users[userIndex];
+      targetUser.quota = Math.max(0, (targetUser.quota || 0) + amount);
       saveAdminUsersToStorage();
       renderAdminUsers();
+      syncCurrentSessionWithAdminDatabase();
     }
 
     function upgradeUserToVIP(userIndex) {
       if (!adminState.users[userIndex]) return;
-      adminState.users[userIndex].tier = 'VIP';
-      adminState.users[userIndex].tierName = 'Dikerjain VIP';
-      adminState.users[userIndex].quota = (adminState.users[userIndex].quota || 0) + 20;
-      adminState.users[userIndex].status = 'Active (VIP)';
+      const targetUser = adminState.users[userIndex];
+      targetUser.tier = 'VIP';
+      targetUser.tierName = 'Dikerjain VIP';
+      targetUser.quota = (targetUser.quota || 0) + 20;
+      targetUser.status = 'Active (VIP)';
       saveAdminUsersToStorage();
       renderAdminUsers();
-      alert(`Berhasil upgrade ${adminState.users[userIndex].name} ke Dikerjain VIP (+20 kuota blast)!`);
+      syncCurrentSessionWithAdminDatabase();
+      alert(`Berhasil upgrade ${targetUser.name} ke Dikerjain VIP (+20 kuota blast)!`);
     }
 
     function deleteAdminUser(userIndex) {
@@ -12090,6 +12128,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       saveAdminUsersToStorage();
       renderAdminUsers();
       updateAdminKPIs();
+      syncCurrentSessionWithAdminDatabase();
       closeAdminUserModal();
     }
 
