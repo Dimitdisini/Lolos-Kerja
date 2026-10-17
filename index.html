@@ -1330,12 +1330,32 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <span class="text-xs text-slate-400">Gateway:</span>
+            <button onclick="toggleWebhookConfigBox()" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <span>Setup Database Sheets</span>
+            </button>
             <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              QRIS Midtrans / Xendit Sandbox Live
+              QRIS Live
             </span>
           </div>
+        </div>
+
+        <!-- Webhook Configuration Accordion Box -->
+        <div id="adminWebhookConfigBox" class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-800">Tautan Webhook Google Apps Script Aktif:</span>
+            <span class="text-[11px] text-slate-400 font-mono" id="currentWebhookStatusTag">Tersimpan</span>
+          </div>
+          <div class="flex gap-2">
+            <input type="text" id="adminWebhookUrlInput" class="dospem-input flex-1 p-2 text-xs font-mono rounded-lg" placeholder="https://script.google.com/macros/s/.../exec">
+            <button onclick="saveAdminWebhookUrl()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+              Simpan URL Baru
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">
+            Jika Dimitri membuat <em>New deployment</em> di Google Apps Script dan mendapatkan URL baru, tempel URL tersebut di atas dan klik <strong>Simpan URL Baru</strong>.
+          </p>
         </div>
 
         <!-- 1. Orders & Transactions View -->
@@ -11605,7 +11625,25 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       if (!url) return;
       GOOGLE_SHEETS_WEBHOOK_URL = url.trim();
       localStorage.setItem('lolos_kerja_sheets_webhook', GOOGLE_SHEETS_WEBHOOK_URL);
-      alert('Tautan Webhook Google Spreadsheet berhasil disimpan!');
+      const tag = document.getElementById('currentWebhookStatusTag');
+      if (tag) tag.innerText = 'Tersimpan (Aktif)';
+      alert('Tautan Webhook Google Spreadsheet berhasil diperbarui & disimpan!');
+    }
+
+    function toggleWebhookConfigBox() {
+      const box = document.getElementById('adminWebhookConfigBox');
+      if (box) box.classList.toggle('hidden');
+      const input = document.getElementById('adminWebhookUrlInput');
+      if (input) input.value = GOOGLE_SHEETS_WEBHOOK_URL;
+    }
+
+    function saveAdminWebhookUrl() {
+      const val = document.getElementById('adminWebhookUrlInput')?.value;
+      if (!val) {
+        alert('Silakan masukkan URL webhook Google Apps Script terlebih dahulu.');
+        return;
+      }
+      setGoogleSheetsWebhookUrl(val);
     }
 
     // Helper kirim data ke Google Sheets di background (non-blocking)
@@ -12343,6 +12381,8 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     document.addEventListener('DOMContentLoaded', () => {
       initAdminPortal();
       initGoogleAuth();
+      const webhookInput = document.getElementById('adminWebhookUrlInput');
+      if (webhookInput) webhookInput.value = GOOGLE_SHEETS_WEBHOOK_URL;
       if (window.location.hash === '#admin') {
         switchTab('admin-module');
       }
