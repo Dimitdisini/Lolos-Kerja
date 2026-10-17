@@ -83,46 +83,67 @@ function doPost(e) {
     else if (action === 'RECORD_BLAST_LOG') {
       var sheet = ss.getSheetByName('BlastLogs') || ss.insertSheet('BlastLogs');
       
-      // URUTAN PERSIS SESUAI HEADER SPREADSHEET DIMITRI:
-      // Kolom A: Nama Pelamar (data.applicantName)
-      // Kolom B: Email Pelamar (data.applicantEmail)
+      // URUTAN PERSIS SESUAI HEADER SPREADSHEET DIMITRI (8 KOLOM):
+      // Kolom A: Log ID (BLG-XXXXX)
+      // Kolom B: ID Pengguna / Email Pelamar (data.applicantEmail atau USR-XXX)
       // Kolom C: Perusahaan Target (data.targetCompany)
       // Kolom D: Posisi Dilamar (data.position)
       // Kolom E: Email HRD (data.recruiterEmail)
       // Kolom F: Tanggal Kirim (formattedDate)
-      // Kolom G: Status Pengiriman ('TERKIRIM') -> Cocok dengan Dropdown Validasi Data
-      // Kolom H: Catatan HRD (Subjek / Keterangan ATS)
+      // Kolom G: Status Pengiriman ('TERKIRIM') -> Match dengan Dropdown
+      // Kolom H: Catatan HRD / Subjek ATS
       
+      var nextLogId = 'BLG-' + (sheet.getLastRow() + 10000);
+      var userIdentifier = data.applicantEmail || data.applicantName || 'USR-1001';
       var catatanAts = data.subject || 'CV ATS Terlampir';
 
       sheet.appendRow([
-        data.applicantName || 'Dimitri Ahmad',
-        data.applicantEmail || 'dimitriahmad000@gmail.com',
-        data.targetCompany,
-        data.position,
-        data.recruiterEmail,
+        nextLogId,
+        userIdentifier,
+        data.targetCompany || '-',
+        data.position || '-',
+        data.recruiterEmail || '-',
         formattedDate,
         'TERKIRIM',
         catatanAts
       ]);
 
-      // (OPSIONAL) Kirim email fisik via Gmail jika ada parameter sendRealEmail: true
-      if (data.sendRealEmail && data.recruiterEmail && data.body) {
+      // EKSEKUSI PENGIRIMAN FISIK REAL VIA GMAIL
+      var emailSentStatus = false;
+      var emailError = '';
+      if (data.sendRealEmail && data.recruiterEmail) {
         try {
-          MailApp.sendEmail({
-            to: data.recruiterEmail,
-            subject: data.subject || ('Lamaran Pekerjaan: ' + data.position + ' - ' + data.applicantName),
-            body: data.body,
+          var emailSubject = data.subject || ('Lamaran Pekerjaan: ' + (data.position || '') + ' - ' + (data.applicantName || 'Dimitri Ahmad'));
+          var emailBody = data.body || ('Yth. Tim Rekrutmen ' + (data.targetCompany || '') + ',\n\nTerlampir surat lamaran dan CV saya untuk posisi ' + (data.position || '') + '.\n\nHormat saya,\n' + (data.applicantName || 'Dimitri Ahmad'));
+          
+          GmailApp.sendEmail(data.recruiterEmail, emailSubject, emailBody, {
             name: data.applicantName || 'Dimitri Ahmad',
-            replyTo: data.applicantEmail
+            replyTo: data.applicantEmail || 'dimitriahmad000@gmail.com'
           });
+          emailSentStatus = true;
         } catch(mailErr) {
-          console.warn('Mail send log:', mailErr);
+          try {
+            MailApp.sendEmail({
+              to: data.recruiterEmail,
+              subject: emailSubject,
+              body: emailBody,
+              name: data.applicantName || 'Dimitri Ahmad',
+              replyTo: data.applicantEmail || 'dimitriahmad000@gmail.com'
+            });
+            emailSentStatus = true;
+          } catch(fallbackErr) {
+            emailError = fallbackErr.toString();
+            console.error('MailApp send error:', fallbackErr);
+          }
         }
       }
 
-      return ContentService.createTextOutput(JSON.stringify({ status: 'SUCCESS', message: 'Blast log saved with correct columns' }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ 
+        status: 'SUCCESS', 
+        message: 'Blast log saved perfectly', 
+        emailSent: emailSentStatus,
+        emailError: emailError 
+      })).setMimeType(ContentService.MimeType.JSON);
     }
 
     return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', message: 'Unknown action' }))
