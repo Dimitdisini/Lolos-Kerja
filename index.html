@@ -1624,7 +1624,7 @@
     /* -------------------------------------------------------------------------
        2. DATABASE 52 LOWONGAN KERJA TERKURASI (SMART JOB MATCHER)
        ------------------------------------------------------------------------- */
-    const curatedJobsDatabase = [
+    var curatedJobsDatabase = [
   {
     "id": 1,
     "title": "Food and Beverage Team Leader",
@@ -11467,7 +11467,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     /* -------------------------------------------------------------------------
        10. AUTHENTICATION & QRIS PAYMENT SESSION ENGINE (DOSPEM SAAS SPEC)
        ------------------------------------------------------------------------- */
-    const currentUser = {
+    var currentUser = {
       isLoggedIn: false,
       name: 'Dimitri Ahmad',
       email: 'dimitri.ahmad@gmail.com',
@@ -11828,7 +11828,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       }
     }
 
-    const adminState = loadAdminFromStorage();
+    var adminState = loadAdminFromStorage();
 
     function saveAdminUsersToStorage() {
       try {
