@@ -115,6 +115,33 @@
       opacity: 1;
     }
 
+    /* Dynamic Mobile & Safe-Area Adjustments */
+    :root {
+      --sab: env(safe-area-inset-bottom, 0px);
+    }
+    .pb-safe {
+      padding-bottom: calc(4.75rem + var(--sab));
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+    @media (max-width: 768px) {
+      .dospem-card {
+        border-radius: 0.875rem;
+      }
+      input, select, textarea {
+        font-size: 16px !important; /* Prevents auto-zoom on iOS Safari */
+      }
+    }
+
     /* Audio wave animation */
     @keyframes wavePulse {
       0%, 100% { height: 15%; }
@@ -272,7 +299,7 @@
           Panduan Agen
         </button>
 
-        <!-- Monitoring Portal Direct Tab (Dimitri Command Center) -->
+        <!-- Monitoring Portal Direct Tab -->
         <button onclick="switchTab('admin-module')" id="tab-admin-module" class="tab-btn px-3 py-1.5 rounded-lg transition text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold flex items-center gap-1.5 border border-emerald-200 shadow-sm cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>Portal Monitoring</span>
@@ -296,7 +323,7 @@
           <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 cursor-pointer hover:bg-slate-100 transition" onclick="openProfileDrawer()">
             <img id="navUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-6 h-6 rounded-full object-cover border border-blue-500" alt="Avatar">
             <div class="text-left hidden sm:block">
-              <span id="navUserName" class="text-xs font-bold text-slate-800 block leading-tight">Dimitri Ahmad</span>
+              <span id="navUserName" class="text-xs font-bold text-slate-800 block leading-tight">Kandidat Pelamar</span>
               <span id="navUserBadge" class="text-[10px] font-extrabold text-blue-600 uppercase font-mono">DIBIMBING (FREE)</span>
             </div>
           </div>
@@ -340,7 +367,7 @@
   </header>
 
   <!-- MAIN CONTAINER (Mobile-First Spacing) -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-12 space-y-8 sm:space-y-12">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 pb-safe md:pb-12 space-y-8 sm:space-y-12">
 
     <!-- ========================================================================= -->
     <!-- MODUL 0: BERANDA UTAMA (RE-ENGINEERING PERSIS DOSPEM.ID)                  -->
@@ -656,7 +683,7 @@
                       PDF
                     </div>
                     <div>
-                      <div id="cvUploadedFileName" class="text-xs font-bold text-slate-900 truncate max-w-xs">CV_Dimitri_Ahmad_Saefullah_Sidik.pdf</div>
+                      <div id="cvUploadedFileName" class="text-xs font-bold text-slate-900 truncate max-w-xs">CV_Kandidat_ATS_Harvard.pdf</div>
                       <div class="text-[11px] text-slate-500 flex items-center gap-2">
                         <span id="cvUploadedFileSize">184 KB</span>
                         <span>&bull;</span>
@@ -682,31 +709,25 @@
 
             <!-- Preset & Section Navigation Chips -->
             <div class="space-y-1.5">
-              <div class="flex items-center justify-between text-[11px] font-bold text-slate-600">
-                <span>Pilih Data Riwayat / Spesialisasi CV:</span>
-                <span class="text-blue-600 font-semibold cursor-pointer hover:underline" onclick="loadCVPreset('dimitri')">Muat CV Lengkap Dimitri (2 Hlm)</span>
+              <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 flex-wrap gap-1">
+                <span>Pilih Contoh Template CV Fresh Graduate:</span>
+                <span class="text-slate-400 font-normal">Siap uji ATS & poles STAR</span>
               </div>
               <div class="flex flex-wrap gap-1.5" id="cvSectionChipsContainer">
-                <button type="button" id="btn-preset-dimitri" onclick="loadCVPreset('dimitri')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg border transition bg-blue-600 text-white border-blue-600 shadow-sm">
-                  CV Lengkap (2 Halaman)
+                <button type="button" id="btn-preset-freshgrad_ba" onclick="loadCVPreset('freshgrad_ba')" class="text-[11px] font-bold px-3 py-1.5 rounded-lg border transition bg-blue-600 text-white border-blue-600 shadow-sm active:scale-95">
+                  1. Bisnis & Manajemen
                 </button>
-                <button type="button" id="btn-preset-dimitri_ai" onclick="loadCVPreset('dimitri_ai')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  AI & Web Agency (Fleek & Xavortree)
+                <button type="button" id="btn-preset-freshgrad_tech" onclick="loadCVPreset('freshgrad_tech')" class="text-[11px] font-medium px-3 py-1.5 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95">
+                  2. IT & Software Dev
                 </button>
-                <button type="button" id="btn-preset-dimitri_iot" onclick="loadCVPreset('dimitri_iot')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  IoT & Hardware (46 AQMS Telkom & DLH DKI)
+                <button type="button" id="btn-preset-freshgrad_marcom" onclick="loadCVPreset('freshgrad_marcom')" class="text-[11px] font-medium px-3 py-1.5 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95">
+                  3. Marketing & Komunikasi
                 </button>
-                <button type="button" id="btn-preset-dimitri_brin" onclick="loadCVPreset('dimitri_brin')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  Riset Quantum & Lab (BRIN & Tel-U)
+                <button type="button" id="btn-preset-freshgrad_data" onclick="loadCVPreset('freshgrad_data')" class="text-[11px] font-medium px-3 py-1.5 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 active:scale-95">
+                  4. Data Analyst & Sains
                 </button>
-                <button type="button" id="btn-preset-dimitri_edu" onclick="loadCVPreset('dimitri_edu')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  Pendidikan S1 Cum Laude (Tel-U 3.69)
-                </button>
-                <button type="button" id="btn-preset-bisnis" onclick="loadCVPreset('bisnis')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  Preset Siswa BA
-                </button>
-                <button type="button" id="btn-preset-teknik" onclick="loadCVPreset('teknik')" class="text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
-                  Preset Siswa Dev
+                <button type="button" onclick="resetCVInput()" class="text-[11px] font-medium px-2.5 py-1.5 rounded-lg border transition bg-white text-slate-500 border-slate-200 hover:text-red-600 hover:bg-red-50">
+                  &times; Kosongkan Draf
                 </button>
               </div>
             </div>
@@ -749,7 +770,7 @@
         </div>
 
         <!-- Kolom Kanan: Rapor Skor ATS & Perbandingan -->
-        <div class="lg:col-span-5 space-y-4">
+        <div id="cvScoreColumn" class="lg:col-span-5 space-y-4 lg:block hidden">
           <div class="dospem-card p-5 space-y-4">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-500 uppercase">Indeks Kesiapan Mesin</span>
@@ -1133,7 +1154,7 @@
                 <div class="flex items-center gap-2">
                   <select id="blastAiPersonaSelect" onchange="regenerateBlastCoverLetter()" class="text-[11px] bg-slate-50 border border-slate-300 rounded px-2 py-1 font-semibold text-slate-700">
                     <option value="general">Gaya Umum Fresh Graduate (Netral)</option>
-                    <option value="dimitri">Gaya Spesifik Dimitri (IoT, BA, Fleek)</option>
+                    <option value="confident">Gaya Percaya Diri & Metrik STAR</option>
                     <option value="corporate">Gaya Formal Korporat MNC (Sopan)</option>
                     <option value="creative">Gaya Kreatif & Startup Tech (Agresif)</option>
                   </select>
@@ -1500,7 +1521,7 @@
         <div class="space-y-1.5">
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono text-[11px] font-bold tracking-wider">PORTAL OWNER & ADMIN</span>
-            <span class="text-xs text-slate-400 font-mono">Dimitri HQ Command Portal</span>
+            <span class="text-xs text-slate-400 font-mono">Lolos Kerja Command Center</span>
           </div>
           <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">Executive SaaS Dashboard • Lolos Kerja</h2>
           <p class="text-xs sm:text-sm text-slate-300 max-w-2xl">
@@ -1611,7 +1632,7 @@
             </button>
           </div>
           <p class="text-[11px] text-slate-500 leading-relaxed">
-            Jika Dimitri membuat <em>New deployment</em> di Google Apps Script dan mendapatkan URL baru, tempel URL tersebut di atas dan klik <strong>Simpan URL Baru</strong>.
+            Jika admin membuat <em>New deployment</em> di Google Apps Script dan mendapatkan URL baru, tempel URL tersebut di atas dan klik <strong>Simpan URL Baru</strong>.
           </p>
         </div>
 
@@ -1722,7 +1743,7 @@
               <div class="space-y-1">
                 <div class="flex items-center gap-2">
                   <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold tracking-wider border border-emerald-500/30">CRON AUTO-PIPELINE</span>
-                  <span class="text-xs text-slate-400 font-mono">Dimitri HQ Automated Engine</span>
+                  <span class="text-xs text-slate-400 font-mono">Automated Engine</span>
                 </div>
                 <h3 class="text-base sm:text-lg font-black tracking-tight text-white">Sistem Otomasi Scraper Loker & Safe Auto-Blast</h3>
                 <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
@@ -1796,7 +1817,7 @@
                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 <span>Pemetaan Arsitektur: Flow Beririsan vs Standalone</span>
               </h4>
-              <span class="text-[11px] font-mono text-slate-400">Blueprint Dimitri HQ</span>
+              <span class="text-[11px] font-mono text-slate-400">Blueprint Arsitektur</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -1823,7 +1844,7 @@
                 <ul class="space-y-1.5 text-slate-600 text-[11px] leading-relaxed">
                   <li><strong>1. Voice Mock Interview:</strong> User dapat langsung latihan wawancara suara (Dual-score: Relevansi vs Delivery &amp; Filler Words) tanpa wajib upload CV terlebih dahulu.</li>
                   <li><strong>2. Eksplorasi Katalog Loker:</strong> Kandidat tamu bebas mencari loker dan mengklik deep-link Glints/LinkedIn secara mandiri.</li>
-                  <li><strong>3. Portal Monitoring &amp; Admin:</strong> Dashboard Dimitri HQ berjalan independen untuk memantau cron scraper dan webhook.</li>
+                  <li><strong>3. Portal Monitoring &amp; Admin:</strong> Dashboard berjalan independen untuk memantau cron scraper dan webhook.</li>
                 </ul>
               </div>
             </div>
@@ -1914,7 +1935,7 @@
        ------------------------------------------------------------------------- */
     const appState = {
       currentTab: 'cv-module',
-      persona: 'dimitri',
+      persona: 'freshgrad_ba',
       interviewLanguage: 'id',
       isRecording: false,
       recordingStartTime: null,
@@ -1928,227 +1949,159 @@
     };
     window.appState = appState;
 
-    // Database CV Presets - Diinjeksi Lengkap dengan CV Riil Dimitri Ahmad Saefullah Sidik
+    // Database CV Presets Universal Fresh Graduate
     const cvPresets = {
-      dimitri: {
-        role: 'iot-engineer',
-        level: 'fresh-grad',
-        title: 'CV Lengkap Dimitri (2 Halaman - S1 Teknik Fisika Tel-U Cum Laude)',
-        rawText: `DIMITRI AHMAD SAEFULLAH SIDIK
-Purwakarta, Jawa Barat | +62 812-1915-9200 | dimitriahmad000@gmail.com | dimsport.vercel.app | LinkedIn: linkedin.com/in/dimitri-ahmad | Purwakarta, West Java (Willing to Relocate)
-
-SUMMARY
-Physics Engineering graduate from Telkom University (GPA: 3.69 / 4.00, Cum Laude) with a track record managing end-to-end technology projects across digital agency solutions (Xavortee), physical IoT sensor deployments (Ekshalasi & Telkom Indonesia), and workflow automations (Fleek Group). Experienced consulting directly with B2B clients and institutional partners, defining project scopes (SOW) and milestone schedules, and guiding technical teams through User Acceptance Testing (UAT) and project handovers.
-
-EDUCATION
-Telkom University – Bandung, Indonesia (2021 – 2025)
-Bachelor of Engineering in Physics Engineering (Fakultas Teknik Elektro) | GPA: 3.69 / 4.00 (Cum Laude)
-Specialization: Industrial Sensors & Instrumentation, Physical System Modeling, Fluid Dynamics (CFD), Thermodynamics, Physical Engineering Design, & Materials Physics.
-Undergraduate Thesis: Integration of Sampling Line Conditioning for Continuous and Real-Time Measurement of PM2.5 and CO2 Concentration Based on Microsensors (SNI 9178:2023).
-
-PROFESSIONAL EXPERIENCE
-GM AI Engineer & Technical Lead – PT Fleek Group Indonesia (May 2026 – Present)
-• Led AI workflow automation initiatives for corporate clients, integrating Claude API, Supabase PostgreSQL, and operational spreadsheets without vendor lock-in.
-• Structured commercial service packages (Setup Fee + Monthly Support) aligned with client operational budgets.
-• Leveraged AI assistants (Antigravity, Claude) to build fast working prototypes for stakeholder review.
-
-Chief Executive Officer (CEO) & Lead Project Manager – PT Xavortee Digital Solution (Jan 2026 – Present)
-• Founded and managed a digital solutions agency, coordinating engineering workflows, database modeling, and on-time client deliveries.
-• Consulted with business owners to define project Scopes of Work (SOWs), cost structures, and milestone timelines.
-• Guided custom management applications and B2B web platforms from requirements definition to live deployment.
-
-Chief Executive Officer (CEO) & Project Director – PT Ekshalasi Langit Biru (Jan 2025 – Feb 2026)
-• Managed institutional partnerships with Telkom Indonesia (CSR & SDGs programs) and the Jakarta Environmental Agency (DLH DKI Jakarta).
-• Coordinated procurement timelines, budget allocation, and deployment of 50+ IoT AQMS monitoring stations.
-• Delivered regular executive progress evaluations and HSE reports to Telkom management with 100% compliance.
-
-Project Manager & IoT Specialist – PT Ekshalasi Langit Biru (Aug 2024 – Jan 2025)
-• Managed IoT device assembly stages (3D CAD/FDM prototyping in SketchUp, wiring, component testing, firmware flashing).
-• Supervised field installation teams across telecom towers and roadside stations with strict safety adherence.
-• Established clear assembly SOPs that improved hardware turnaround time by 35% and reduced fabrication errors.
-
-Project Manager – Instrumentation Laboratory – Telkom University (Sep 2023 – Feb 2025)
-• Coordinated maintenance schedules and testing procedures for air quality instruments (Gent Sampler & Super SASS) with BRIN researchers.
-• Supported environmental sensor prototype testing across campus grounds.
-
-Quantum Physics Research Intern – National Research and Innovation Agency (BRIN) (Jun 2023 – Aug 2023)
-• Assisted experimental research on thin film Zinc Oxide (ZnO) fabrication using a pulsed Nd:YAG laser system via Pulsed Laser Deposition (PLD).
-• Logged laboratory measurement data and authored internship technical reports following mentor guidelines.
-
-FEATURED PROJECT EXPERIENCE
-• 46-Node AQMS Telkom Towers Deployment (Telkom CSR): Managed full-lifecycle installation and mechanical testing of 46 indoor/outdoor AQMS sensor nodes across 3 Telkom towers in Jakarta & Surabaya, integrating real-time HSE reporting.
-• Jakarta Raya Roadside AQMS (25 Titik – NGO x DLH DKI Jakarta): Awarded and executed 25 roadside emission monitoring stations for government vehicle emission programs (KRET).
-• Physical Hardware & Enclosure Prototyping (PT Ekshalasi): Modeled in 3D (SketchUp) and fabricated 50+ weatherproof sensor enclosures via FDM 3D printing optimized for natural airflow and rapid field assembly.
-• AQMS International Reference Instrumentation (BRIN x Tel-U): PM for validation and maintenance of Gent Sampler & Super SASS reference instruments across campus stations in collaboration with BRIN researchers.
-• Interactive Technical Portfolio: Full documentation of 3D modeling, simulation data, and physical prototypes accessible at https://dimsport.vercel.app.
-
-SKILLS & TOOLS
-• Hard Skills: End-to-End Project Lifecycle Management, Agile & Scrum Sprint Planning, Task Tracking & Backlog Prioritization, Scope of Work (SOW) & Timeline Governance, SLA Compliance, Technical & Commercial Proposals, AI Automation Workflows (Claude API, Supabase), IoT Hardware Systems.
-• Soft Skills: Team Leadership & Task Delegation, Stakeholder Communication (B2B Clients & Government Institutions), Scope & Cost Negotiation, Project Risk Mitigation, Problem Solving, Team Mentoring.
-• Tools & Tech: Jira, Trello, Notion, Figma, Supabase, Postman, Claude API, Antigravity, Google Workspace, SketchUp 3D, FDM 3D Printing.
-• Languages: Indonesian (Native), English (Working Proficiency).`,
-        beforeText: 'Membantu koordinasi proyek sensor IoT di beberapa lokasi dan membuat prototipe perangkat keras menggunakan printer 3D serta menyusun laporan pengujian berkala.',
-        socraticQuestion: 'Berapa total stasiun sensor yang kamu pasang di Telkom & DLH DKI, berapa efisiensi turnaround time fabrikasi enclosure, dan bagaimana validasi standar SNI 9178:2023 diuji?',
-        metrics: [
-          '46 Node AQMS di 3 Tower Telkom (Jakarta & Surabaya)',
-          '25 Titik Stasiun Monitoring Roadside DLH DKI Jakarta',
-          '50+ Enclosure Sensor 3D Printing FDM SketchUp',
-          'Memangkas Turnaround Time Fabrikasi Hardware 35%',
-          'IPK 3.69 / 4.00 Cum Laude Teknik Fisika Tel-U',
-          'Standar SNI 9178:2023 PM2.5 & CO2 Sampling Line',
-          'Riset Laser PLD Nd:YAG Lapisan Tipis ZnO di BRIN',
-          'Automasi Enterprise AI Claude API & Supabase di Fleek'
-        ],
-        optimizedStar: `• Memimpin instalasi & mechanical testing 46 node sensor AQMS indoor/outdoor di 3 tower Telkom (Jakarta & Surabaya) serta 25 titik roadside DLH DKI Jakarta dengan zero safety incident dan kepatuhan SLA 99.8%.
-• Mengembangkan automasi enterprise AI di PT Fleek Group Indonesia berbasis Claude API & Supabase PostgreSQL, menekan latensi operasional klien hingga 40% tanpa vendor lock-in.
-• Mendirikan PT Xavortree Digital Solution, mengawal tata kelola SOW, sprint backlog, dan UAT platform B2B klien dengan tingkat on-time delivery 100%.
-• Memodelkan 50+ enclosure sensor tahan cuaca via SketchUp & fabrikasi FDM 3D printing ber-airflow optimal yang memangkas turnaround time perakitan sebesar 35%.
-• Meriset fabrikasi lapisan tipis ZnO via laser pulsed Nd:YAG (Pulsed Laser Deposition) di BRIN dan menguji instrumen referensi Gent Sampler & Super SASS di Telkom University (IPK 3.69 Cum Laude).`,
-        scores: { overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 }
-      },
-      dimitri_ai: {
-        role: 'software-eng',
-        level: 'fresh-grad',
-        title: 'Spesialisasi AI & Solusi Digital (Fleek & Xavortree)',
-        rawText: `GM AI Engineer & Technical Lead – PT Fleek Group Indonesia (Mei 2026 – Sekarang)
-• Memimpin inisiatif automasi workflow enterprise AI untuk klien korporat dengan mengintegrasikan Claude API, Supabase PostgreSQL, dan spreadsheet operasional tanpa ketergantungan vendor lock-in.
-• Merancang paket layanan komersial AI (Setup Fee + Retainer Bulanan) terukur sesuai anggaran operasional klien.
-• Mengembangkan prototipe MVP fungsional cepat menggunakan asisten AI (Antigravity & Claude) untuk review stakeholder dan percepatan deployment.
-
-Chief Executive Officer (CEO) & Lead Project Manager – PT Xavortree Digital Solution (Jan 2026 – Sekarang)
-• Mendirikan dan memimpin agensi solusi digital, mengoordinasikan alur kerja engineering, pemodelan database, dan ketepatan delivery klien B2B.
-• Bernegosiasi langsung dengan pemilik bisnis untuk merumuskan Scope of Work (SOW), struktur biaya dev, dan timeline sprint mingguan.
-• Mengawal delivery aplikasi custom management dan platform web B2B dari tahap rekayasa kebutuhan hingga live production dan UAT.`,
-        beforeText: 'Membuat website untuk klien dan mengintegrasikan model AI untuk bantu otomatisasi tugas kantor.',
-        socraticQuestion: 'Berapa proyek klien yang kamu tangani, berapa persen pemangkasan waktu operasional dengan AI workflow, dan bagaimana struktur SLA yang kamu terapkan?',
-        metrics: [
-          'Memangkas latensi alur kerja operasional klien hingga 40%',
-          'Integrasi arsitektur RAG & Claude API di VPS Docker Supabase',
-          'Tingkat on-time delivery sprint mencapai 100%',
-          'Membuat paket komersial Setup Fee + Retainer Bulanan'
-        ],
-        optimizedStar: 'Memimpin arsitektur automasi alur kerja enterprise AI berbasis Claude API dan Supabase PostgreSQL di PT Fleek Group serta mengawal delivery platform B2B di PT Xavortree dengan pencapaian on-time delivery 100% dan efisiensi waktu operasional klien sebesar 40%.',
-        scores: { overall: 96, metric: 97, verb: 95, keyword: 96, format: 98 }
-      },
-      dimitri_iot: {
-        role: 'iot-engineer',
-        level: 'fresh-grad',
-        title: 'Spesialisasi IoT & Hardware Deployment (Ekshalasi & Telkom)',
-        rawText: `Chief Executive Officer (CEO) & Project Director – PT Ekshalasi Langit Biru (Jan 2025 – Feb 2026)
-• Memimpin kemitraan institusional strategis dengan Telkom Indonesia (program CSR & SDGs) dan Dinas Lingkungan Hidup (DLH) DKI Jakarta.
-• Mengoordinasikan pengadaan hardware, alokasi anggaran, dan deployment 50+ stasiun monitoring IoT AQMS (Air Quality Monitoring System).
-• Menyajikan evaluasi berkala tingkat eksekutif dan laporan HSE kepada manajemen Telkom dengan zero accident.
-
-Project Manager & IoT Specialist – PT Ekshalasi Langit Biru (Agu 2024 – Jan 2025)
-• Mengelola seluruh siklus manufaktur IoT (3D CAD SketchUp / FDM prototyping, wiring, pengujian komponen, firmware flashing ESP32).
-• Mensupervisi tim instalasi lapangan di tower telekomunikasi dan stasiun pinggir jalan raya dengan standar keselamatan kerja ketat.
-• Menyusun SOP perakitan terstandarisasi yang memangkas turnaround time fabrikasi perangkat keras hingga 35% dan menekan eror perakitan.
-
-Proyek Unggulan:
-• 46-Node AQMS Telkom Towers Deployment: Memimpin siklus penuh instalasi dan mechanical testing 46 node sensor AQMS indoor/outdoor di 3 tower Telkom (Jakarta & Surabaya).
-• Jakarta Raya Roadside AQMS (25 Titik – NGO x DLH DKI Jakarta): Mengeksekusi 25 stasiun monitoring emisi roadside untuk evaluasi program KRET kendaraan bermotor DLH DKI.`,
-        beforeText: 'Membantu riset laboratorium mengenai sensor pemantauan kualitas udara dan suhu menggunakan mikrokontroler ESP32.',
-        socraticQuestion: 'Berapa akurasi sensor yang kamu uji, berapa interval transmisi data MQTT, dan berapa data point yang berhasil ditransmisikan tanpa paket drop?',
-        metrics: [
-          '46 node AQMS di 3 tower Telkom (Jakarta & Surabaya)',
-          '25 titik stasiun roadside DLH DKI Jakarta',
-          'Turnaround time fabrikasi enclosure terpangkas 35%',
-          'Zero safety incident (HSE 100%) selama instalasi'
-        ],
-        optimizedStar: 'Memimpin deployment 46 node AQMS di 3 tower Telkom (Jakarta & Surabaya) serta 25 stasiun roadside DLH DKI Jakarta, mendesain 50+ enclosure 3D FDM tahan cuaca via SketchUp yang memangkas turnaround time perakitan sebesar 35% dengan kepatuhan HSE 100%.',
-        scores: { overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 }
-      },
-      dimitri_brin: {
-        role: 'iot-engineer',
-        level: 'fresh-grad',
-        title: 'Spesialisasi Riset Fisika & Laboratorium (BRIN & Tel-U)',
-        rawText: `Project Manager – Instrumentation Laboratory – Telkom University (Sep 2023 – Feb 2025)
-• Mengoordinasikan jadwal pemeliharaan dan prosedur pengujian instrumen kualitas udara referensi internasional (Gent Sampler & Super SASS) bersama peneliti BRIN.
-• Mendukung pengujian prototipe sensor lingkungan dan validasi data pengukuran di lingkungan kampus.
-
-Quantum Physics Research Intern – Badan Riset dan Inovasi Nasional (BRIN) (Jun 2023 – Agu 2023)
-• Melakukan eksperimen riset fabrikasi lapisan tipis Zinc Oxide (ZnO) menggunakan sistem laser pulsed Nd:YAG via Pulsed Laser Deposition (PLD).
-• Mencatat log data pengukuran spektroskopi laboratorium dan menyusun laporan riset teknis komprehensif mengikuti panduan mentor peneliti BRIN.`,
-        beforeText: 'Magang di laboratorium BRIN membantu pengujian sampel kaca dan mencatat data eksperimen laser.',
-        socraticQuestion: 'Bagaimana parameter laser Nd:YAG yang digunakan, berapa ketebalan lapisan tipis ZnO yang dihasilkan, dan apa korelasi data spektroskopi yang kamu temukan?',
-        metrics: [
-          'Eksperimen laser pulsed Nd:YAG Pulsed Laser Deposition (PLD)',
-          'Validasi instrumen referensi internasional Gent Sampler & Super SASS',
-          'Pemeliharaan terjadwal instrumen aerosol laboratorium',
-          'Penulisan laporan riset teknis standar BRIN'
-        ],
-        optimizedStar: 'Mengeksekusi eksperimen fabrikasi lapisan tipis Zinc Oxide (ZnO) menggunakan laser pulsed Nd:YAG via Pulsed Laser Deposition (PLD) di BRIN, serta mengoordinasikan pemeliharaan dan validasi instrumen referensi internasional aerosol (Gent Sampler & Super SASS) di Telkom University.',
-        scores: { overall: 94, metric: 92, verb: 94, keyword: 95, format: 97 }
-      },
-      dimitri_edu: {
-        role: 'iot-engineer',
-        level: 'fresh-grad',
-        title: 'Pendidikan Teknik Fisika Tel-U (IPK 3.69 Cum Laude)',
-        rawText: `Telkom University – Bandung, Indonesia (2021 – 2025)
-Sarjana Teknik (S.T.) - Teknik Fisika, Fakultas Teknik Elektro | IPK: 3.69 / 4.00 (Cum Laude)
-Peminatan: Industrial Sensors & Instrumentation, Physical System Modeling, Fluid Dynamics (CFD), Thermodynamics, Physical Engineering Design, & Materials Physics.
-
-Tugas Akhir:
-Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2 Berbasis Mikrosensor secara Kontinu dan Real-Time (Sesuai SNI 9178:2023).
-• Mengkaji dinamika fluida aliran aerosol dalam pipa sampling menggunakan pemodelan Computational Fluid Dynamics (CFD).
-• Memvalidasi kinerja mikrosensor terhadap variasi kelembaban dan suhu lingkungan sesuai baku mutu SNI.`,
-        beforeText: 'Kuliah Teknik Fisika di Telkom University lulus IPK 3.69 dengan tugas akhir tentang sensor polusi udara.',
-        socraticQuestion: 'Bagaimana integrasi pemodelan CFD membantu mengurangi kondensasi pada sampling line dan berapa persen deviasi hasil ukur mikrosensor terhadap instrumen acuan SNI?',
-        metrics: [
-          'IPK 3.69 / 4.00 Predikat Cum Laude (Fakultas Teknik Elektro)',
-          'Tugas Akhir Berstandar Nasional SNI 9178:2023',
-          'Pemodelan Computational Fluid Dynamics (CFD) Jalur Sampling',
-          'Pengukuran Kontinu & Real-Time Partikulat PM2.5 dan CO2'
-        ],
-        optimizedStar: 'Menyelesaikan studi Sarjana Teknik Fisika Telkom University dengan predikat Cum Laude (IPK 3.69/4.00), mengembangkan tugas akhir pengondisian jalur sampling aerosol berbasis pemodelan CFD untuk pengukuran kontinu PM2.5 & CO2 sesuai baku mutu SNI 9178:2023.',
-        scores: { overall: 95, metric: 96, verb: 93, keyword: 94, format: 98 }
-      },
-      bisnis: {
+      freshgrad_ba: {
         role: 'business-analyst',
         level: 'fresh-grad',
-        title: 'Preset Siswa BA (Business Analyst / PM)',
-        rawText: 'Membantu dokumentasi kebutuhan sistem operasional kampus, mewawancarai staf divisi, dan memetakan alur kerja administrasi manual ke digital.',
-        beforeText: 'Membantu dokumentasi kebutuhan sistem operasional kampus, mewawancarai staf divisi, dan memetakan alur kerja administrasi manual ke digital.',
-        socraticQuestion: 'Berapa banyak divisi/stakeholder yang kamu wawancarai, berapa User Story terstruktur yang kamu rumuskan, dan seberapa besar efisiensi waktu setelah alur kerja didigitalisasi?',
+        title: 'Fresh Graduate Manajemen & Business Analyst',
+        rawText: `DIMAS PRATAMA, S.M.
+Jakarta Selatan | +62 812-3456-7890 | dimas.pratama@gmail.com | LinkedIn: linkedin.com/in/dimas-pratama
+
+RINGKASAN PROFIL
+Lulusan S1 Manajemen Bisnis (IPK 3.72 / 4.00, Cum Laude) dengan pengalaman magang sebagai Junior Business Analyst dan Project Coordinator. Terbiasa memetakan alur proses bisnis AS-IS ke TO-BE, menyusun dokumen kebutuhan teknis (BRD), serta mengolah data performa operasional menggunakan Excel, SQL, dan Tableau.
+
+PENDIDIKAN
+Universitas Indonesia – Depok, Indonesia (2021 – 2025)
+Sarjana Manajemen (S.M.) – Fakultas Ekonomi dan Bisnis | IPK: 3.72 / 4.00 (Cum Laude)
+
+PENGALAMAN MAGANG & PROYEK
+Junior Business Analyst Intern – PT Mitra Solusi Digital (Agu 2024 – Feb 2025)
+• Menganalisis alur transaksi 12 modul operasional klien dan menyusun 25+ dokumen Business Requirement Document (BRD) terstandarisasi.
+• Mengidentifikasi hambatan proses kerja manual dan merekomendasikan automasi alur data yang memangkas waktu pemrosesan laporan sebesar 32%.
+• Memfasilitasi User Acceptance Testing (UAT) lintas fungsi bersama 40+ user internal dan tim developer sebelum rilis ke production.
+
+Project Coordinator Intern – Komunitas Akselerasi Muda (Jan 2024 – Jun 2024)
+• Mengkoordinasikan jadwal sprint mingguan dan alokasi tugas untuk 8 anggota tim dalam menyelenggarakan program inkubasi karir mahasiswa.
+• Mengelola kampanye digital yang menjangkau 15.000+ peserta dengan tingkat konversi pendaftaran mencapai 24%.
+
+KEAHLIAN & TOOLS
+• Hard Skills: Business Process Modeling (BPMN), Gap Analysis, Requirements Engineering, User Acceptance Testing (UAT), Sprint Planning.
+• Tools & Tech: Microsoft Excel (VLOOKUP, Pivot, Macro), SQL, Tableau, Figma, Trello, Jira, Notion.
+• Bahasa: Indonesia (Native), Inggris (TOEFL ITP 585 / Professional Working).`,
+        beforeText: 'Membantu analisis proses bisnis dan menyusun dokumen kebutuhan proyek serta memfasilitasi pengujian bersama tim pengembang.',
+        socraticQuestion: 'Berapa persen efisiensi waktu kerja yang dihasilkan dari analisis proses bisnismu, berapa banyak user yang terlibat saat UAT, dan apa indikator keberhasilan proyeknya?',
         metrics: [
-          'Memangkas waktu siklus persetujuan dokumen sebesar 45%',
-          'Merumuskan 24 User Story & kriteria penerimaan Gherkin',
-          'Mengurangi tingkat rework pada sprint pengembangan hingga 30%',
-          'Memfasilitasi 12 sesi wawancara kebutuhan dengan stakeholder'
+          'Memangkas Waktu Pemrosesan Laporan Sebesar 32%',
+          'Menyusun 25+ Dokumen Spesifikasi Kebutuhan (BRD)',
+          'Memfasilitasi UAT Bersama 40+ Pengguna Internal',
+          'Tingkat On-Time Delivery Milestone Sprint 100%',
+          'IPK 3.72 / 4.00 Cum Laude FEB UI',
+          'Mengelola Kampanye Karir Menjangkau 15.000+ Peserta'
         ],
-        optimizedStar: 'Memimpin analisis kebutuhan bisnis dan memodelkan alur kerja AS-IS ke TO-BE untuk sistem administrasi kampus lintas 4 divisi, merumuskan 24 User Story terstruktur yang memangkas waktu siklus verifikasi sebesar 45% dan menurunkan tingkat revisi pengembangan sebesar 30%.',
-        scores: { overall: 91, metric: 94, verb: 90, keyword: 88, format: 96 }
+        optimizedStar: `• Menganalisis alur operasional 12 modul sistem dan menyusun 25+ dokumen BRD terstandarisasi, menghasilkan efisiensi waktu pemrosesan laporan sebesar 32% bagi divisi operasional.
+• Memfasilitasi sesi User Acceptance Testing (UAT) lintas fungsi bersama 40+ stakeholder dan tim engineering dengan tingkat penyelesaian kendala (bug resolution) mencapai 98% sebelum jadwal go-live.
+• Mengoordinasikan milestone sprint proyek karir mahasiswa beranggotakan 8 personel yang berhasil menjaring 15.000+ partisipan secara tepat waktu.`,
+        scores: { overall: 96, metric: 97, verb: 95, keyword: 96, format: 98 }
       },
-      teknik: {
+      freshgrad_tech: {
         role: 'software-eng',
         level: 'fresh-grad',
-        title: 'Preset Siswa Dev (Junior Software Engineer)',
-        rawText: 'Membuat website sistem pendaftaran tugas akhir menggunakan React dan Node.js agar dosen dan mahasiswa bisa input data skripsi.',
-        beforeText: 'Membuat website sistem pendaftaran tugas akhir menggunakan React dan Node.js agar dosen dan mahasiswa bisa input data skripsi.',
-        socraticQuestion: 'Berapa banyak pengguna aktif sistem tersebut, dan seberapa cepat waktu pemrosesan dokumen skripsi setelah sistem kamu live?',
+        title: 'Fresh Graduate IT & Software Developer',
+        rawText: `RIAN KURNIAWAN, S.Kom.
+Bandung, Jawa Barat | +62 813-8899-7766 | rian.kurniawan@gmail.com | github.com/riankurnia | LinkedIn: linkedin.com/in/rian-kurniawan
+
+RINGKASAN PROFIL
+Lulusan S1 Teknik Informatika (IPK 3.68 / 4.00) dengan spesialisasi pengembangan web full-stack dan RESTful API. Memiliki portofolio aplikasi web berbasis React.js, Node.js, dan PostgreSQL dengan arsitektur bersih dan performa optimal.
+
+PENDIDIKAN
+Institut Teknologi Bandung – Bandung, Indonesia (2021 – 2025)
+Sarjana Komputer (S.Kom.) – Sekolah Teknik Elektro dan Informatika | IPK: 3.68 / 4.00
+
+PENGALAMAN KERJA & MAGANG
+Full-Stack Web Developer Intern – PT Kreasi Teknologi Nusantara (Sep 2024 – Feb 2025)
+• Mengembangkan 8 endpoint RESTful API modular menggunakan Express.js dan PostgreSQL untuk modul manajemen inventaris gudang.
+• Mengoptimasi kueri database relasional dan indeks SQL, berhasil menurunkan waktu respon server sebesar 45% (dari 380ms ke 210ms).
+• Mengimplementasikan komponen UI reaktif berbasis Tailwind CSS dan React.js dengan skor Google Lighthouse 95+.
+
+Lead Developer – Proyek Capstone Mahasiswa (Feb 2024 – Jun 2024)
+• Memimpin tim beranggotakan 4 developer membangun platform e-commerce katalog UMKM terintegrasi payment gateway sandbox Midtrans.
+• Menulis unit test dengan Jest mencapai code coverage 85% untuk mencegah regresi logika transaksi.
+
+KEAHLIAN & TEKNOLOGI
+• Bahasa & Framework: JavaScript (ES6+), TypeScript, React.js, Node.js, Express, Next.js, HTML5/CSS3.
+• Database & Tools: PostgreSQL, MySQL, Redis, Git, Docker, Postman, Vercel, Supabase.`,
+        beforeText: 'Membuat endpoint API untuk aplikasi manajemen inventaris dan memperbaiki tampilan website agar lebih cepat diakses.',
+        socraticQuestion: 'Berapa persen penurunan latency response time setelah optimasi database, berapa code coverage unit test yang kamu capai, dan berapa endpoint yang berhasil di-deploy ke production?',
         metrics: [
-          'Digunakan aktif oleh 450+ mahasiswa & 32 dosen penguji',
-          'Mempercepat verifikasi berkas dari 7 hari kerja menjadi 2 jam',
-          'Mencapai 99.8% uptime selama periode sidang',
-          'Mengurangi beban query database sebesar 40% dengan indexing'
+          'Menurunkan Response Time Server 45% (380ms ke 210ms)',
+          'Membangun 8 RESTful API Endpoints Modular di Node.js',
+          'Code Coverage Unit Testing Jest Mencapai 85%',
+          'Skor Google Lighthouse Web Performance 95+',
+          'Integrasi Payment Gateway Sandbox Midtrans & Webhook'
         ],
-        optimizedStar: 'Merancang dan mengimplementasikan arsitektur web pendaftaran tugas akhir berbasis React dan Node.js yang melayani 450+ mahasiswa dan 32 dosen, mempercepat alur verifikasi berkas sebesar 85% (dari 7 hari menjadi 2 jam) dengan uptime 99.8%.',
-        scores: { overall: 92, metric: 95, verb: 90, keyword: 88, format: 96 }
-      },
-      iot: {
-        role: 'iot-engineer',
-        level: 'fresh-grad',
-        title: 'Preset IoT (Sama dengan Dimitri Lengkap)',
-        rawText: '', // Injected dynamically from dimitri
-        beforeText: '',
-        socraticQuestion: '',
-        metrics: [],
-        optimizedStar: '',
+        optimizedStar: `• Merancang dan men-deploy 8 endpoint RESTful API berbasis Node.js dan PostgreSQL yang memproses sinkronisasi data inventaris secara real-time dengan uptime 99.9%.
+• Mengoptimasi indeks kueri database yang berhasil memangkas latency response time sebesar 45% (dari 380ms ke 210ms) pada beban transaksi puncak.
+• Membangun arsitektur frontend modular React.js berstandar clean code dengan code coverage test Jest 85% dan skor performa Google Lighthouse 95+.`,
         scores: { overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 }
+      },
+      freshgrad_marcom: {
+        role: 'digital-marketing',
+        level: 'fresh-grad',
+        title: 'Fresh Graduate Digital Marketing & Komunikasi',
+        rawText: `ANINDYA LESTARI, S.I.Kom.
+Surabaya, Jawa Timur | +62 821-4567-8910 | anindya.lestari@gmail.com | LinkedIn: linkedin.com/in/anindya-lestari
+
+RINGKASAN PROFIL
+Lulusan S1 Ilmu Komunikasi (IPK 3.75 / 4.00, Cum Laude) dengan keahlian storytelling konten, media sosial organik, dan digital campaign management. Berpengalaman merancang konten berbasis data tren yang terbukti menaikkan metrik engagement rate dan pertumbuhan audiens.
+
+PENDIDIKAN
+Universitas Airlangga – Surabaya, Indonesia (2021 – 2025)
+Sarjana Ilmu Komunikasi (S.I.Kom.) – Fakultas Ilmu Sosial dan Ilmu Politik | IPK: 3.75 / 4.00 (Cum Laude)
+
+PENGALAMAN MAGANG
+Social Media & Content Specialist Intern – PT Retail Kreasi Mandiri (Agu 2024 – Jan 2025)
+• Merancang editorial calendar mingguan dan memproduksi 40+ konten edukatif Instagram Reels & TikTok dengan total views 320.000+.
+• Menganalisis performa konten via Meta Business Suite, menghasilkan peningkatan engagement rate dari 2.4% ke 5.8% dalam 3 bulan.
+• Berkolaborasi dengan 15 micro-influencer dalam kampanye peluncuran produk baru dengan tingkat pencapaian target penjualan 115%.`,
+        beforeText: 'Membuat konten TikTok dan Instagram serta mengelola jadwal posting mingguan untuk menaikkan engagement brand.',
+        socraticQuestion: 'Berapa peningkatan engagement rate yang kamu capai, berapa total views dari konten yang kamu produksi, dan berapa persen konversi penjualan dari kampanye influencer?',
+        metrics: [
+          'Menaikkan Engagement Rate dari 2.4% ke 5.8%',
+          'Memproduksi 40+ Konten dengan 320.000+ Total Views',
+          'Pencapaian Target Penjualan Kampanye Produk 115%',
+          'Mengelola Kemitraan 15 Micro-Influencer Berkinerja Tinggi',
+          'IPK 3.75 / 4.00 Cum Laude Ilmu Komunikasi Unair'
+        ],
+        optimizedStar: `• Memproduksi 40+ aset konten video pendek terarah di Instagram & TikTok yang menghasilkan lebih dari 320.000 organic views dan melipatgandakan engagement rate akun dari 2.4% ke 5.8%.
+• Mengorkestrasi kampanye kolaborasi bersama 15 micro-influencer terpilih yang sukses mencapai 115% dari target awal penjualan produk ritel.
+• Menganalisis metrik audiens harian via Meta Business Suite untuk merumuskan pilar konten berbasis retensi pemirsa dan konversi tautan profil.`,
+        scores: { overall: 94, metric: 95, verb: 94, keyword: 93, format: 96 }
+      },
+      freshgrad_data: {
+        role: 'data-analyst',
+        level: 'fresh-grad',
+        title: 'Fresh Graduate Data Analyst & Sains Data',
+        rawText: `BAGAS WICAKSONO, S.Stat.
+Yogyakarta | +62 811-2345-6789 | bagas.wicaksono@gmail.com | github.com/bagasdata | LinkedIn: linkedin.com/in/bagas-wicaksono
+
+RINGKASAN PROFIL
+Lulusan S1 Statistika (IPK 3.70 / 4.00, Cum Laude) dengan kompetensi kuat dalam data wrangling, visualisasi analitik, dan permodelan prediktif. Menguasai Python (Pandas, Scikit-Learn), SQL, dan Power BI untuk mengekstraksi wawasan bisnis berharga dari data mentah.
+
+PENDIDIKAN
+Universitas Gadjah Mada – Yogyakarta, Indonesia (2021 – 2025)
+Sarjana Statistika (S.Stat.) – FMIPA | IPK: 3.70 / 4.00 (Cum Laude)
+
+PENGALAMAN MAGANG
+Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
+• Membersihkan dan mentransformasikan dataset transaksi keuangan berisi 100.000+ baris data menggunakan Python Pandas dengan zero discrepancy.
+• Membangun dashboard Power BI interaktif untuk monitoring retensi nasabah bulanan yang digunakan oleh 3 manajer regional.
+• Mengembangkan model segmentasi nasabah RFM (Recency, Frequency, Monetary) yang membantu divisi pemasaran menyasar 4 cluster potensial.`,
+        beforeText: 'Mengolah dataset transaksi keuangan nasabah dan membuat dashboard grafik visual untuk laporan bulanan.',
+        socraticQuestion: 'Berapa baris data yang kamu bersihkan, berapa parameter dalam dashboard Power BI, dan bagaimana model segmentasi membantu tim marketing?',
+        metrics: [
+          'Mengolah 100.000+ Baris Dataset Transaksi Finansial',
+          'Dashboard Interaktif Power BI untuk 3 Manajer Regional',
+          'Segmentasi Nasabah RFM Menghasilkan 4 Cluster Terarah',
+          'Memangkas Waktu Reporting Rutin 6 Jam Menjadi Otomatis',
+          'IPK 3.70 / 4.00 Cum Laude Statistika UGM'
+        ],
+        optimizedStar: `• Membersihkan dan memvalidasi pipeline 100.000+ baris data transaksi keuangan nasabah menggunakan Python Pandas dengan zero data discrepancy.
+• Merancang dashboard Power BI multi-dimensi untuk melacak metrik retensi dan churn nasabah secara real-time, menghemat 6 jam kerja penyusunan laporan mingguan manual.
+• Menerapkan segmentasi nasabah model RFM ke dalam 4 klaster terukur yang meningkatkan click-through-rate (CTR) promosi pemasaran sebesar 28%.`,
+        scores: { overall: 97, metric: 98, verb: 96, keyword: 97, format: 98 }
       }
     };
-    // Sync alias iot to dimitri
-    cvPresets.iot = cvPresets.dimitri;
 
     // Pertanyaan Wawancara Preset
     const interviewQuestions = {
@@ -2157,7 +2110,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
           q: 'Ceritakan tentang diri Anda dan pencapaian paling berkesan semasa kuliah.',
           cat: 'Perilaku (Behavioral)',
           exp: 'Ekspektasi: Ringkasan identitas, motivasi karir, dan pembuktian melalui pencapaian nyata (STAR).',
-          sampleTranscript: 'Halo, saya Dimitri, lulusan Teknik dengan fokus pada pemodelan sistem dan analisis data. Pencapaian paling membanggakan saya adalah memimpin perancangan sistem telemetri kampus yang kayak berhasil menghubungkan 12 sensor mandiri. Kami sempat menghadapi kendala sinyal yang aaa agak drop, tapi saya berinisiatif merombak protokol ke MQTT sehingga transmisi data stabil 99.8% dan gitu akhirnya diaplikasikan langsung di laboratorium.',
+          sampleTranscript: 'Halo, saya lulusan baru bidang manajemen dengan fokus pada pemodelan alur kerja dan analisis data. Pencapaian paling membanggakan saya adalah memimpin perancangan sistem telemetri kampus yang kayak berhasil menghubungkan 12 sensor mandiri. Kami sempat menghadapi kendala sinyal yang aaa agak drop, tapi saya berinisiatif merombak protokol ke MQTT sehingga transmisi data stabil 99.8% dan gitu akhirnya diaplikasikan langsung di laboratorium.',
           closingSuggest: 'Melalui pengalaman tersebut, saya terbiasa memecahkan masalah teknis di bawah tekanan dan saya antusias membawa etos kerja berbasis data ini ke perusahaan Anda.'
         },
         conflict: {
@@ -11015,6 +10968,50 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
     /* -------------------------------------------------------------------------
        3. NAVIGATION & TABS LOGIC
        ------------------------------------------------------------------------- */
+    function setMobileCvView(view) {
+      const inputCol = document.getElementById('cvInputColumn');
+      const scoreCol = document.getElementById('cvScoreColumn');
+      const btnInput = document.getElementById('mobileCvBtnInput');
+      const btnScores = document.getElementById('mobileCvBtnScores');
+
+      if (window.innerWidth >= 1024) {
+        if (inputCol) inputCol.classList.remove('hidden');
+        if (scoreCol) scoreCol.classList.remove('hidden');
+        return;
+      }
+
+      if (view === 'input') {
+        if (inputCol) inputCol.classList.remove('hidden');
+        if (scoreCol) scoreCol.classList.add('hidden');
+        if (btnInput) {
+          btnInput.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-blue-600 shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5';
+        }
+        if (btnScores) {
+          btnScores.className = 'flex-1 py-2.5 text-xs font-semibold text-slate-600 transition active:scale-95 flex items-center justify-center gap-1.5';
+        }
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      } else {
+        if (inputCol) inputCol.classList.add('hidden');
+        if (scoreCol) scoreCol.classList.remove('hidden');
+        if (btnInput) {
+          btnInput.className = 'flex-1 py-2.5 text-xs font-semibold text-slate-600 transition active:scale-95 flex items-center justify-center gap-1.5';
+        }
+        if (btnScores) {
+          btnScores.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl bg-white text-blue-600 shadow-sm transition active:scale-95 flex items-center justify-center gap-1.5';
+        }
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        const inputCol = document.getElementById('cvInputColumn');
+        const scoreCol = document.getElementById('cvScoreColumn');
+        if (inputCol) inputCol.classList.remove('hidden');
+        if (scoreCol) scoreCol.classList.remove('hidden');
+      }
+    });
+
     function switchTab(tabId) {
       appState.currentTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => {
@@ -11066,11 +11063,13 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
 
     function switchPersona(persona) {
       appState.persona = persona;
-      if (persona === 'dimitri') {
-        loadCVPreset('dimitri');
+      if (persona === 'freshgrad_ba') {
+        loadCVPreset('freshgrad_ba');
         initBlastTargets();
         loadHeroDemoText();
         initUserSession();
+      } else if (persona === 'freshgrad_tech') {
+        loadCVPreset('freshgrad_tech');
       } else if (persona === 'sasa') {
         loadCVPreset('bisnis');
       } else {
@@ -11118,17 +11117,17 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
       // Synchronize persona dropdown
       const personaSelect = document.getElementById('personaSelect');
       if (personaSelect) {
-        if (key.startsWith('dimitri') || key === 'iot') personaSelect.value = 'dimitri';
-        else if (key === 'bisnis') personaSelect.value = 'sasa';
-        else if (key === 'teknik') personaSelect.value = 'student';
+        if (key.includes('tech')) personaSelect.value = 'teknik';
+        else if (key === 'bisnis' || key.includes('ba')) personaSelect.value = 'bisnis';
+        else personaSelect.value = 'sasa';
       }
 
       // Highlight active preset button
-      const allPresetKeys = ['dimitri', 'dimitri_ai', 'dimitri_iot', 'dimitri_brin', 'dimitri_edu', 'bisnis', 'teknik'];
+      const allPresetKeys = ['freshgrad_ba', 'freshgrad_tech', 'freshgrad_marcom', 'freshgrad_data'];
       allPresetKeys.forEach(k => {
         const btn = document.getElementById('btn-preset-' + k);
         if (btn) {
-          if (k === key || (key === 'iot' && k === 'dimitri')) {
+          if (k === key) {
             btn.className = 'text-[11px] font-bold px-2.5 py-1 rounded-lg border transition bg-blue-600 text-white border-blue-600 shadow-sm';
           } else {
             btn.className = 'text-[11px] font-medium px-2.5 py-1 rounded-lg border transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100';
@@ -11237,7 +11236,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
       if (scanProgressBar) scanProgressBar.style.width = '35%';
 
       setTimeout(() => {
-        if (scanStepText) scanStepText.innerText = 'Mengekstrak riwayat karir, proyek Telkom & Fleek, dan publikasi SNI...';
+        if (scanStepText) scanStepText.innerText = 'Mengekstrak riwayat magang, proyek kuliah, dan keahlian...';
         if (scanProgressBar) scanProgressBar.style.width = '75%';
       }, 500);
 
@@ -11258,7 +11257,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
         const fileSizeEl = document.getElementById('cvUploadedFileSize');
         if (fileSizeEl) fileSizeEl.innerText = (file.size / 1024).toFixed(1) + ' KB';
 
-        // Ekstraksi teks riil Dimitri
+        // Ekstraksi teks dokumen CV pelamar
         const textarea = document.getElementById('cvExperienceInput');
         if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
           const reader = new FileReader();
@@ -11269,8 +11268,8 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
           };
           reader.readAsText(file);
         } else {
-          // Injeksi teks CV lengkap 2-halaman Dimitri Ahmad
-          if (textarea) textarea.value = cvPresets.dimitri.rawText;
+          // Injeksi teks dokumen CV pelamar
+          if (textarea) textarea.value = cvPresets.freshgrad_ba.rawText;
           runCVAnalysis();
           if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
         }
@@ -11300,7 +11299,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
 
       currentBlastCvFile = null;
       const blastCvStatus = document.getElementById('blastCvAttachmentStatus');
-      if (blastCvStatus) blastCvStatus.innerText = 'CV_Dimitri_Ahmad_ATS_Harvard.pdf (245 KB) Terlampir Default';
+      if (blastCvStatus) blastCvStatus.innerText = 'Belum ada CV terlampir (Unggah PDF di Modul 1)';
     }
 
     function loadFromGoogleDrivePrompt() {
@@ -11318,7 +11317,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
       if (fileSizeEl) fileSizeEl.innerText = 'Cloud Synced (100%)';
 
       const textarea = document.getElementById('cvExperienceInput');
-      if (textarea) textarea.value = cvPresets.dimitri.rawText;
+      if (textarea) textarea.value = cvPresets.freshgrad_ba.rawText;
       runCVAnalysis();
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
       alert('Tautan Google Drive berhasil diverifikasi dan disinkronkan ke Bedah CV serta Auto-Blast!');
@@ -11373,12 +11372,10 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
         keywordScore = 50;
       }
 
-      // Bonus jika CV Dimitri lengkap
-      if (text.includes('dimitri ahmad') || text.includes('telkom university') || text.includes('ekshalasi')) {
-        metricScore = Math.max(metricScore, 99);
-        verbScore = Math.max(verbScore, 98);
-        keywordScore = Math.max(keywordScore, 97);
-        formatScore = 99;
+      // Evaluasi metrik terbobot
+      if (numberMatches && numberMatches.length >= 3 && foundVerbs.length >= 2) {
+        metricScore = Math.max(metricScore, 88);
+        verbScore = Math.max(verbScore, 85);
       }
 
       const overall = Math.round((metricScore * 0.35) + (verbScore * 0.25) + (keywordScore * 0.25) + (formatScore * 0.15));
@@ -11391,6 +11388,8 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
     function updateScoreUI(scores) {
       const valEl = document.getElementById('atsScoreValue');
       if (valEl) valEl.innerText = scores.overall;
+      const mobBadge = document.getElementById('mobileCvScoreBadge');
+      if (mobBadge) mobBadge.innerText = scores.overall;
 
       const barEl = document.getElementById('atsScoreBar');
       if (barEl) barEl.style.width = scores.overall + '%';
@@ -11426,6 +11425,10 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
     }
 
     function applyStarOptimization() {
+      // Auto-switch to score & STAR comparison view on mobile
+      if (window.innerWidth < 1024 && typeof setMobileCvView === 'function') {
+        setMobileCvView('scores');
+      }
       const textarea = document.getElementById('cvExperienceInput');
       const raw = textarea ? textarea.value.trim() : '';
       if (!raw || raw.length < 5) {
@@ -11436,9 +11439,15 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
       const role = document.getElementById('targetRole')?.value || 'iot-engineer';
       let starResult = '';
 
-      // Jika teks mengandung riwayat Dimitri, tampilkan bullet point terstruktur lengkap
-      if (raw.includes('Ekshalasi') || raw.includes('Telkom') || raw.includes('Fleek') || raw.includes('AQMS') || raw.includes('DIMITRI')) {
-        starResult = cvPresets.dimitri.optimizedStar;
+      // Cek kecocokan preset langsung
+      if (raw.includes('DIMAS PRATAMA')) {
+        starResult = cvPresets.freshgrad_ba.optimizedStar;
+      } else if (raw.includes('RIAN KURNIAWAN')) {
+        starResult = cvPresets.freshgrad_tech.optimizedStar;
+      } else if (raw.includes('ANINDYA LESTARI')) {
+        starResult = cvPresets.freshgrad_marcom.optimizedStar;
+      } else if (raw.includes('BAGAS WICAKSONO')) {
+        starResult = cvPresets.freshgrad_data.optimizedStar;
       } else {
         const detectedMetrics = raw.match(/\d+(?:[.,]\d+)?%?|\b(persen|juta|ribu|hari|jam|pengguna|mahasiswa|divisi)\b/gi);
         let leadVerb = 'Menginisiasi dan merancang';
@@ -11967,7 +11976,7 @@ Integrasi Pengondisian Jalur Sampling untuk Pengukuran Konsentrasi PM2.5 dan CO2
         { agent: 'agentStatusTari', time: '00.38s', name: '@tari-agent', msg: 'Audit draf CV: Mendeteksi 4 metrik tersembunyi, menstrukturkan ke formula STAR (Akurasi 98.4%)...' },
         { agent: 'agentStatusVocalis', time: '00.74s', name: '@vocalis-agent', msg: 'Stream Web Audio dianalisis: WPM pacing 132 (Ideal), filter kata jeda aktif, delivery score 92...' },
         { agent: 'agentStatusScout', time: '01.10s', name: '@scout-agent', msg: 'Scouting 400+ database lowongan: 12 loker relevan teridentifikasi, deeplink auto-query Glints siap...' },
-        { agent: 'agentStatusDewi', time: '01.42s', name: '@dewi-gatekeeper', msg: '[PASS] Verifikasi Anti-AI Slop 100%, 0 emoji generik, lolos audit QA eksekutif Dimitri HQ.' }
+        { agent: 'agentStatusDewi', time: '01.42s', name: '@dewi-gatekeeper', msg: '[PASS] Verifikasi Anti-AI Slop 100%, 0 emoji generik, lolos audit QA eksekutif.' }
       ];
 
       // Reset indicators
@@ -12363,7 +12372,7 @@ Salam hangat,
 ${name}
 ${email} | Portofolio: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       } else {
-        // Gaya Spesifik Dimitri (IoT, BA, Fleek)
+        // Gaya Konfiden & Metrik STAR
         let experienceHighlight = starPreview && !starPreview.includes('Formula STAR yang siap') 
           ? starPreview 
           : 'Memiliki rekam jejak dalam merancang pemetaan alur kerja (AS-IS ke TO-BE), sensor telemetri MQTT ESP32 (akurasi 98.4%), dan otomatisasi proses berbasis AI.';
@@ -12604,6 +12613,13 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
     }
 
     function initUserSession() {
+      // Pembersihan otomatis residu session akun lama
+      try {
+        const savedRaw = localStorage.getItem('lolos_kerja_user');
+        if (savedRaw && (savedRaw.toLowerCase().includes('dimitri') || savedRaw.toLowerCase().includes('dimss'))) {
+          localStorage.removeItem('lolos_kerja_user');
+        }
+      } catch (e) {}
       const saved = localStorage.getItem('lolos_kerja_user');
       if (saved) {
         try {
@@ -12737,8 +12753,8 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
         
         const payload = JSON.parse(jsonPayload);
         currentUser.isLoggedIn = true;
-        currentUser.name = payload.name || 'Dimitri Ahmad';
-        currentUser.email = payload.email || 'dimitri.ahmad@gmail.com';
+        currentUser.name = payload.name || 'Kandidat Pelamar';
+        currentUser.email = payload.email || 'pelamar@gmail.com';
         currentUser.avatar = payload.picture || currentUser.avatar;
         
         saveUserSession();
@@ -12936,8 +12952,8 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
        7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC - FULL CRUD)
        ------------------------------------------------------------------------- */
     const defaultAdminUsers = [
-      { name: 'Dimitri Ahmad', email: 'dimitriahmad000@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner / VIP)' },
-      { name: 'Dimitri Ahmad (Backup)', email: 'dimitriahmad0@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner / VIP)' }
+      { name: 'Dimas Pratama', email: 'dimas.pratama@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (VIP Member)' },
+      { name: 'Sarah Anastasya', email: 'sarah.anastasya@gmail.com', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 20, status: 'Active' }
     ];
 
     const defaultAdminTransactions = [
@@ -13051,7 +13067,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
         statusInd.className = 'text-amber-400 text-[10px] font-bold animate-pulse';
       }
 
-      appendTerminalLog(`[MANUAL-TRIGGER] Dimitri memicu siklus scraping kurasi secara langsung...`);
+      appendTerminalLog(`[MANUAL-TRIGGER] Admin memicu siklus kurasi loker enterprise secara langsung...`);
       
       setTimeout(() => {
         appendTerminalLog(`[SCRAPER] Mengakses endpoint Glints & LinkedIn via background query...`);
@@ -13528,12 +13544,12 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       }
     });
 
-    // Secret shortcut for Dimitri (Cmd+Shift+A or Ctrl+Shift+A)
+    // Secret shortcut for Admin (Cmd+Shift+A or Ctrl+Shift+A)
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         switchTab('admin-module');
-        alert('Mode Owner Terbuka: Selamat datang di Dashboard Eksekutif Lolos Kerja (Dimitri HQ).');
+        alert('Mode Owner Terbuka: Selamat datang di Dashboard Eksekutif Lolos Kerja.');
       }
     });
 
@@ -13729,7 +13745,7 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
       </button>
 
       <div>
-        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 font-mono">DIMITRI HQ • ADMIN</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 font-mono">LK COMMAND • ADMIN</span>
         <h3 class="text-lg font-extrabold text-slate-900" id="adminUserModalTitle">Edit Data Pelamar & Kuota</h3>
         <p class="text-xs text-slate-500">Atur profil, tingkatan paket langganan, dan sisa kuota kirim lamaran.</p>
       </div>
@@ -13904,14 +13920,14 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
           </div>
         </button>
 
-        <button onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50/60 border border-slate-200 hover:border-emerald-400 transition text-left">
+        <button onclick="selectGoogleAccount('Budi Santoso', 'budi.santoso@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50/60 border border-slate-200 hover:border-emerald-400 transition text-left">
           <div class="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">DA</div>
           <div class="overflow-hidden flex-1">
             <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
-              <span>Dimitri Ahmad (Owner / Admin)</span>
+              <span>Budi Santoso (Member VIP)</span>
               <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-mono font-bold">VIP 50 Kuota</span>
             </div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">dimitriahmad000@gmail.com</div>
+            <div class="text-[11px] text-slate-500 font-mono truncate">budi.santoso@gmail.com</div>
           </div>
         </button>
 
@@ -13936,37 +13952,33 @@ LinkedIn: linkedin.com/in/${name.toLowerCase().replace(/\s+/g, '')}`;
   </div>
 
   <!-- FLOATING MOBILE BOTTOM NAVIGATION (Native App Bar) -->
-  <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
-    <div class="grid grid-cols-6 gap-1 max-w-md mx-auto items-center">
+  <!-- FLOATING MOBILE BOTTOM NAVIGATION (Native iOS & Android App Bar) -->
+  <nav id="mobileBottomNav" class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-1 py-1 shadow-[0_-4px_20px_rgba(0,0,0,0.07)] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+    <div class="flex items-center justify-around max-w-lg mx-auto w-full">
       <!-- 1. Beranda -->
-      <button onclick="switchTab('home-module')" id="mobile-tab-home-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-blue-600 font-bold active:scale-95">
+      <button onclick="switchTab('home-module')" id="mobile-tab-home-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-blue-600 font-bold active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-        <span class="text-[9px] tracking-tight">Beranda</span>
+        <span class="text-[10px] tracking-tight">Beranda</span>
       </button>
       <!-- 2. Bedah CV -->
-      <button onclick="switchTab('cv-module')" id="mobile-tab-cv-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95">
+      <button onclick="switchTab('cv-module')" id="mobile-tab-cv-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        <span class="text-[9px] tracking-tight">Bedah CV</span>
+        <span class="text-[10px] tracking-tight">Bedah CV</span>
       </button>
       <!-- 3. Mock Interview -->
-      <button onclick="switchTab('interview-module')" id="mobile-tab-interview-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95">
+      <button onclick="switchTab('interview-module')" id="mobile-tab-interview-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
-        <span class="text-[9px] tracking-tight">Interview</span>
+        <span class="text-[10px] tracking-tight">Interview</span>
       </button>
       <!-- 4. Loker -->
-      <button onclick="switchTab('jobs-module')" id="mobile-tab-jobs-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95">
+      <button onclick="switchTab('jobs-module')" id="mobile-tab-jobs-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-        <span class="text-[9px] tracking-tight">Loker</span>
+        <span class="text-[10px] tracking-tight">Loker</span>
       </button>
       <!-- 5. Auto-Blast -->
-      <button onclick="switchTab('blast-module')" id="mobile-tab-blast-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95">
+      <button onclick="switchTab('blast-module')" id="mobile-tab-blast-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-        <span class="text-[9px] tracking-tight">Blast</span>
-      </button>
-      <!-- 6. Monitor Portal -->
-      <button onclick="switchTab('admin-module'); switchAdminSubTab('monitoring');" id="mobile-tab-admin-module" class="mobile-bottom-tab flex flex-col items-center justify-center py-1.5 px-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95">
-        <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-        <span class="text-[9px] tracking-tight">Monitor</span>
+        <span class="text-[10px] tracking-tight">Auto-Blast</span>
       </button>
     </div>
   </nav>
