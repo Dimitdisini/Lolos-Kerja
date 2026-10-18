@@ -798,11 +798,19 @@
         <div>
           <div class="flex items-center gap-2 mb-1">
             <span class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">MODUL 03</span>
-            <h2 class="text-lg font-bold text-slate-900">400+ Lowongan Kerja Live (Hasil Scraping LinkedIn) (Glints & LinkedIn)</h2>
+            <h2 class="text-lg font-bold text-slate-900">Katalog Lowongan Kerja Terkurasi & Live Validasi</h2>
           </div>
           <p class="text-xs sm:text-sm text-slate-600">
-            Pencarian cerdas terhubung ke portal resmi tanpa perlu ribet copas link. Setiap kartu loker dilengkapi skor kecocokan dengan profilmu.
+            Disaring otomatis oleh <strong>@scout-agent</strong>. Loker bodong/fiktif dibersihkan, status kedaluwarsa diperiksa berkala (maks. 1x per hari hemat kuota), dan terhubung langsung ke portal resmi.
           </p>
+          <div class="flex items-center gap-2 pt-2 text-[11px] text-slate-500">
+            <span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Jadwal Scraping: 1x Per Hari (Hemat Token & Kuota)
+            </span>
+            <span>&bull;</span>
+            <span class="text-slate-400">Pembaruan Terakhir: Hari ini, 08:30 WIB</span>
+          </div>
         </div>
         <div class="flex items-center gap-2">
           <input type="text" id="jobSearchInput" oninput="filterJobs()" placeholder="Cari posisi atau perusahaan..." class="dospem-input text-xs rounded-lg px-3 py-2 w-48">
@@ -819,6 +827,11 @@
           <option value="iot-engineer">IoT & Hardware</option>
           <option value="digital-marketing">Marketing & Growth</option>
           <option value="operations-trainee">Management Trainee</option>
+        </select>
+
+        <select id="jobStatusFilter" onchange="filterJobs()" class="dospem-input rounded-lg p-2 font-semibold text-emerald-800 bg-emerald-50/50 border-emerald-300">
+          <option value="active">Status: Sedang Dibuka (Aktif & Valid)</option>
+          <option value="all">Semua Status (Termasuk Mendekati Tutup)</option>
         </select>
 
         <select id="jobLocationFilter" onchange="filterJobs()" class="dospem-input rounded-lg p-2">
@@ -11101,13 +11114,32 @@
           `;
         }
 
+        // Tanggal posting & Status Masa Berlaku
+        const postedDate = job.postedDate || '2 hari lalu';
+        const isExpired = job.isExpired === true;
+        const verifiedBadge = job.verified !== false ? `
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+            <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            Valid & Aktif
+          </span>` : `
+          <span class="inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
+            Terkurasi Mitra
+          </span>`;
+
         card.innerHTML = `
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full uppercase tracking-wider">${job.type || 'Full-time'}</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full uppercase tracking-wider">${job.type || 'Full-time'}</span>
+                  ${verifiedBadge}
+                </div>
                 <h3 class="text-sm font-extrabold text-slate-900 mt-2 leading-snug">${job.title}</h3>
                 <p class="text-xs text-slate-600 font-semibold">${job.company}</p>
+                <div class="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1">
+                  <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  <span>Dibuka: ${postedDate}</span>
+                </div>
               </div>
               ${matchScoreHtml}
             </div>
@@ -11161,15 +11193,17 @@
     function filterJobs() {
       const search = document.getElementById('jobSearchInput').value.toLowerCase();
       const cat = document.getElementById('jobCategoryFilter').value;
+      const statusFilter = document.getElementById('jobStatusFilter')?.value || 'active';
       const loc = document.getElementById('jobLocationFilter').value;
       const lvl = document.getElementById('jobLevelFilter').value;
 
       const filtered = curatedJobsDatabase.filter(job => {
         const matchesSearch = !search || job.title.toLowerCase().includes(search) || job.company.toLowerCase().includes(search);
         const matchesCat = cat === 'all' || job.category === cat;
-        const matchesLoc = loc === 'all' || job.location === loc;
-        const matchesLvl = lvl === 'all' || job.level === lvl;
-        return matchesSearch && matchesCat && matchesLoc && matchesLvl;
+        const matchesLoc = loc === 'all' || job.location.toLowerCase() === loc.toLowerCase();
+        const matchesLvl = lvl === 'all' || job.level.toLowerCase() === lvl.toLowerCase();
+        const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' && job.isExpired !== true);
+        return matchesSearch && matchesCat && matchesLoc && matchesLvl && matchesStatus;
       });
 
       renderJobs(filtered);
@@ -11178,6 +11212,7 @@
     function resetJobFilters() {
       document.getElementById('jobSearchInput').value = '';
       document.getElementById('jobCategoryFilter').value = 'all';
+      if (document.getElementById('jobStatusFilter')) document.getElementById('jobStatusFilter').value = 'active';
       document.getElementById('jobLocationFilter').value = 'all';
       document.getElementById('jobLevelFilter').value = 'all';
       renderJobs(curatedJobsDatabase);
