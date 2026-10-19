@@ -407,10 +407,10 @@
           Panduan Agen
         </button>
 
-        <!-- Monitoring Portal Direct Tab (Hidden for public, only visible for Owner/Admin) -->
-        <button onclick="switchTab('admin-module')" id="tab-admin-module" class="tab-btn px-3 py-1.5 rounded-lg transition text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold hidden items-center gap-1.5 border border-emerald-200 shadow-sm cursor-pointer">
+        <!-- Command Center Direct Tab (Hidden for public, only visible for Owner / Lord) -->
+        <button onclick="switchTab('admin-module')" id="tab-admin-module" class="tab-btn px-3 py-1.5 rounded-lg transition text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold hidden items-center gap-1.5 border border-emerald-200 shadow-sm cursor-pointer" title="Command Center Eksekutif (Lord HQ)">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Portal Monitoring</span>
+          <span>Command Center (Lord)</span>
         </button>
       </nav>
 
@@ -467,9 +467,9 @@
       <button onclick="switchTab('admin-module'); toggleMobileMenu();" id="mobile-tab-admin-module" class="w-full text-left py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold hidden items-center justify-between border border-emerald-200 mt-2">
         <span class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>7. Portal Monitoring & Admin</span>
+          <span>7. Command Center (Lord)</span>
         </span>
-        <span class="text-[10px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full font-mono font-bold">LIVE</span>
+        <span class="text-[10px] bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full font-mono font-bold">LORD</span>
       </button>
     </div>
   </header>
@@ -11436,15 +11436,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           (currentUser.name && currentUser.name.toLowerCase().includes('dimitri')) ||
           currentUser.role === 'admin' ||
           currentUser.role === 'owner'
-        )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#admin';
+        )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#lord' || window.location.hash === '#admin' || window.location.pathname.endsWith('/lord');
 
         if (!isOwner) {
-          const pin = prompt('Akses Khusus Pemilik (Owner/Admin):\nMasukkan PIN Keamanan untuk membuka Portal Monitoring:');
-          if (pin === '1908' || pin === 'admin' || pin === 'dimitri' || pin === 'dummy') {
+          const pin = prompt('Akses Khusus Pemilik (Lord HQ):\nMasukkan PIN Keamanan untuk membuka Command Center:');
+          if (pin === '1908' || pin === 'lord' || pin === 'admin' || pin === 'dimitri' || pin === 'dummy') {
             sessionStorage.setItem('dims_admin_unlocked', 'true');
             if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
           } else {
-            alert('Akses Ditolak: PIN Keamanan salah. Portal Monitoring hanya untuk Owner.');
+            alert('Akses Ditolak: PIN Keamanan salah. Command Center hanya untuk Owner.');
             return;
           }
         }
@@ -13504,7 +13504,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         (currentUser.name && currentUser.name.toLowerCase().includes('dimitri')) ||
         currentUser.role === 'admin' ||
         currentUser.role === 'owner'
-      )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#admin';
+      )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#lord' || window.location.hash === '#admin' || window.location.pathname.endsWith('/lord');
 
       const adminTabBtn = document.getElementById('tab-admin-module');
       const mobileAdminTabBtn = document.getElementById('mobile-tab-admin-module');
@@ -14468,6 +14468,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             </span>
           </td>
           <td class="py-3 px-4 text-right space-x-1">
+            <button onclick="toggleTransactionStatus(${idx})" title="Ubah Status Transaksi" class="text-amber-700 hover:text-amber-900 font-bold text-[10px] bg-amber-50 px-2 py-1 rounded border border-amber-200 transition">
+              Ubah Status
+            </button>
             <button onclick="resendInvoiceReceipt('${tx.id}', '${tx.email}')" class="text-blue-600 hover:text-blue-800 font-bold text-[10px] bg-blue-50 px-2 py-1 rounded border border-blue-200">
               Kirim Nota
             </button>
@@ -14477,6 +14480,30 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           </td>
         </tr>
       `).join('');
+    }
+
+    function toggleTransactionStatus(txIndex) {
+      const tx = adminState.transactions[txIndex];
+      if (!tx) return;
+      const statuses = ['SETTLED', 'PENDING', 'FAILED', 'EXPIRED'];
+      const currentIndex = statuses.indexOf(tx.status || 'SETTLED');
+      const nextSuggested = statuses[(currentIndex + 1) % statuses.length];
+      
+      const newStatus = prompt(`Ubah Status Transaksi [${tx.id} - ${tx.plan}]:\nKetik salah satu: SETTLED, PENDING, FAILED, EXPIRED`, nextSuggested);
+      if (!newStatus) return;
+      const cleanStatus = newStatus.trim().toUpperCase();
+      tx.status = cleanStatus;
+
+      saveAdminTxToStorage();
+      renderAdminOrders();
+      updateAdminKPIs();
+
+      // Sinkronkan ke Supabase
+      if (supabaseClient) {
+        supabaseClient.from('transactions').update({ payment_status: cleanStatus }).eq('order_id', tx.id).then(() => {
+          console.log('[SUPABASE] Transaction status updated:', tx.id, cleanStatus);
+        });
+      }
     }
 
     function filterAdminOrders() {
@@ -14517,7 +14544,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             ${u.quota} Recruiter
           </td>
           <td class="py-3 px-4">
-            <span class="text-[11px] text-emerald-600 font-semibold">${u.status || 'Active'}</span>
+            <span onclick="toggleUserStatus(${idx})" title="Klik untuk beralih status cepat (Active / Suspended)" class="text-[11px] font-semibold cursor-pointer px-2 py-0.5 rounded transition ${u.status && u.status.includes('Suspended') ? 'bg-rose-100 text-rose-700 hover:bg-rose-200' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'}">
+              ${u.status || 'Active'}
+            </span>
           </td>
           <td class="py-3 px-4 text-right">
             <div class="flex items-center justify-end gap-1 flex-wrap">
@@ -14632,6 +14661,11 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       saveAdminUsersToStorage();
       renderAdminUsers();
       syncCurrentSessionWithAdminDatabase();
+
+      // Sinkronkan ke Supabase
+      if (supabaseClient && targetUser.email) {
+        supabaseClient.from('users').update({ blast_quota: targetUser.quota }).eq('email', targetUser.email).then(() => {});
+      }
     }
 
     function upgradeUserToVIP(userIndex) {
@@ -14644,7 +14678,35 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       saveAdminUsersToStorage();
       renderAdminUsers();
       syncCurrentSessionWithAdminDatabase();
-      alert(`Berhasil upgrade ${targetUser.name} ke Dikerjain VIP (+20 kuota blast)!`);
+
+      // Sinkronkan ke Supabase
+      if (supabaseClient && targetUser.email) {
+        supabaseClient.from('users').update({
+          tier: 'VIP',
+          blast_quota: targetUser.quota,
+          role: (targetUser.email === 'dimitriahmad000@gmail.com' ? 'owner' : 'admin')
+        }).eq('email', targetUser.email).then(() => {
+          console.log('[SUPABASE] User upgraded to VIP in cloud:', targetUser.email);
+        });
+      }
+      alert(`Berhasil upgrade ${targetUser.name} ke Dikerjain VIP (+20 kuota blast & status cloud aktif)!`);
+    }
+
+    function toggleUserStatus(userIndex) {
+      const u = adminState.users[userIndex];
+      if (!u) return;
+      const isSuspended = (u.status && u.status.includes('Suspended'));
+      const newStatus = isSuspended ? 'Active' : 'Suspended';
+      u.status = newStatus;
+      saveAdminUsersToStorage();
+      renderAdminUsers();
+
+      // Sinkronkan ke Supabase
+      if (supabaseClient && u.email) {
+        supabaseClient.from('users').update({ status: newStatus }).eq('email', u.email).then(() => {
+          console.log('[SUPABASE] User status updated:', u.email, newStatus);
+        });
+      }
     }
 
     function deleteAdminUser(userIndex) {
@@ -14655,6 +14717,13 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         saveAdminUsersToStorage();
         renderAdminUsers();
         updateAdminKPIs();
+
+        // Hapus dari Supabase
+        if (supabaseClient && u.email) {
+          supabaseClient.from('users').delete().eq('email', u.email).then(() => {
+            console.log('[SUPABASE] User deleted from cloud:', u.email);
+          });
+        }
       }
     }
 
@@ -14671,6 +14740,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const tierInput = document.getElementById('modalUserTierInput');
       const quotaInput = document.getElementById('modalUserQuotaInput');
       const statusInput = document.getElementById('modalUserStatusInput');
+      const roleInput = document.getElementById('modalUserRoleInput');
 
       if (isEdit && userIndex >= 0 && adminState.users[userIndex]) {
         const u = adminState.users[userIndex];
@@ -14680,6 +14750,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         tierInput.value = u.tier || 'VIP';
         quotaInput.value = u.quota !== undefined ? u.quota : 20;
         statusInput.value = u.status || 'Active';
+        if (roleInput) roleInput.value = u.role || (u.email === 'dimitriahmad000@gmail.com' ? 'owner' : 'user');
       } else {
         titleEl.innerText = 'Tambah Pelamar Baru';
         nameInput.value = '';
@@ -14687,6 +14758,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         tierInput.value = 'VIP';
         quotaInput.value = '20';
         statusInput.value = 'Active';
+        if (roleInput) roleInput.value = 'user';
       }
 
       modal.classList.remove('hidden');
@@ -14704,6 +14776,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const tier = document.getElementById('modalUserTierInput').value;
       const quota = parseInt(document.getElementById('modalUserQuotaInput').value, 10) || 0;
       const status = document.getElementById('modalUserStatusInput').value;
+      const role = document.getElementById('modalUserRoleInput')?.value || (email === 'dimitriahmad000@gmail.com' ? 'owner' : 'user');
 
       if (!name || !email) {
         alert('Mohon isi nama dan email dengan lengkap!');
@@ -14721,10 +14794,11 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         u.tierName = tierName;
         u.quota = quota;
         u.status = status;
+        u.role = role;
       } else {
         // Add new
         adminState.users.unshift({
-          name, email, tier, tierName, quota, status
+          name, email, tier, tierName, quota, status, role
         });
       }
 
@@ -14732,6 +14806,21 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       renderAdminUsers();
       updateAdminKPIs();
       syncCurrentSessionWithAdminDatabase();
+
+      // Sinkronkan ke Supabase PostgreSQL Cloud
+      if (supabaseClient) {
+        supabaseClient.from('users').upsert({
+          email: email,
+          full_name: name,
+          tier: tier,
+          blast_quota: quota,
+          role: role,
+          last_login_at: new Date().toISOString()
+        }, { onConflict: 'email' }).then(() => {
+          console.log('[SUPABASE] User upserted from Admin:', email, tier, quota, role);
+        });
+      }
+
       closeAdminUserModal();
     }
 
@@ -14938,7 +15027,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const webhookInput = document.getElementById('adminWebhookUrlInput');
       if (webhookInput) webhookInput.value = GOOGLE_SHEETS_WEBHOOK_URL;
-      if (window.location.hash === '#admin') {
+      if (window.location.hash === '#lord' || window.location.hash === '#admin' || window.location.pathname.endsWith('/lord')) {
         sessionStorage.setItem('dims_admin_unlocked', 'true');
         if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
@@ -14946,21 +15035,21 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     });
 
     window.addEventListener('hashchange', () => {
-      if (window.location.hash === '#admin') {
+      if (window.location.hash === '#lord' || window.location.hash === '#admin') {
         sessionStorage.setItem('dims_admin_unlocked', 'true');
         if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
       }
     });
 
-    // Secret shortcut for Admin (Cmd+Shift+A or Ctrl+Shift+A)
+    // Secret shortcut for Lord / Owner (Cmd+Shift+L or Cmd+Shift+A)
     window.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'L' || e.key === 'l' || e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         sessionStorage.setItem('dims_admin_unlocked', 'true');
         if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
-        alert('Mode Owner Terbuka: Selamat datang di Dashboard Eksekutif Lolos Kerja.');
+        alert('Mode Lord Terbuka: Selamat datang di Command Center Eksekutif Dimitri HQ.');
       }
     });
 
@@ -14968,7 +15057,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
       setTimeout(() => {
         initAdminPortal();
-        if (window.location.hash === '#admin') switchTab('admin-module');
+        if (window.location.hash === '#lord' || window.location.hash === '#admin' || window.location.pathname.endsWith('/lord')) switchTab('admin-module');
       }, 100);
     }
   </script>
@@ -15282,15 +15371,25 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun</label>
-          <select id="modalUserStatusInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
-            <option value="Active">Active</option>
-            <option value="Active (VIP)">Active (VIP)</option>
-            <option value="Active (Owner)">Active (Owner)</option>
-            <option value="Active (Partner)">Active (Partner)</option>
-            <option value="Free">Free</option>
-          </select>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Status Akun</label>
+            <select id="modalUserStatusInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+              <option value="Active">Active</option>
+              <option value="Active (VIP)">Active (VIP)</option>
+              <option value="Active (Owner)">Active (Owner)</option>
+              <option value="Suspended">Suspended</option>
+              <option value="Free">Free</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Peran (Role)</label>
+            <select id="modalUserRoleInput" class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium bg-white">
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="owner">Owner / Lord</option>
+            </select>
+          </div>
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2">
