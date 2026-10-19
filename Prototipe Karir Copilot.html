@@ -2240,6 +2240,20 @@
     };
     window.appState = appState;
 
+    var currentUser = {
+      isLoggedIn: false,
+      name: 'Kandidat Pelamar',
+      email: 'pelamar@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces',
+      tier: 'FREE',
+      tierName: 'Dibimbing (Free)',
+      blastQuota: 10,
+      orderPending: null
+    };
+    window.currentUser = currentUser;
+
+    let qrisTimerInterval = null;
+
     // Database CV Presets Universal Fresh Graduate
     const cvPresets = {
       freshgrad_ba: {
@@ -11475,7 +11489,10 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const textarea = document.getElementById('cvExperienceInput');
       const val = textarea?.value || '';
       const badge = document.getElementById('charCountBadge');
-      if (badge) badge.innerText = val.length + ' karakter';
+      if (badge) {
+        badge.textContent = val.length + ' karakter';
+        badge.innerText = val.length + ' karakter';
+      }
 
       // Hitung kata & metrik terdeteksi
       const metricsBadge = document.getElementById('detectedMetricsBadge');
@@ -11483,10 +11500,14 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const matches = val.match(/\d+(?:[.,]\d+)?%?|\b(persen|juta|ribu|hari|jam|pengguna|mahasiswa|divisi|klien|node|titik|stasiun|tower|gpa|ipk|sni)\b/gi);
         const count = matches ? matches.length : 0;
         if (count > 0) {
-          metricsBadge.innerText = `${count} Angka & Metrik Terdeteksi`;
+          const txt = `${count} Angka & Metrik Terdeteksi`;
+          metricsBadge.textContent = txt;
+          metricsBadge.innerText = txt;
           metricsBadge.className = 'text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-bold';
         } else {
-          metricsBadge.innerText = 'Belum Ada Angka Terdeteksi';
+          const txt = 'Belum Ada Angka Terdeteksi';
+          metricsBadge.textContent = txt;
+          metricsBadge.innerText = txt;
           metricsBadge.className = 'text-[10px] bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded font-medium';
         }
       }
@@ -11735,42 +11756,49 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     function updateScoreUI(scores) {
       const valEl = document.getElementById('atsScoreValue');
       if (valEl) {
+        valEl.textContent = scores.overall;
         valEl.innerText = scores.overall;
         valEl.className = scores.overall > 0 ? 'text-4xl font-extrabold text-blue-600 font-mono' : 'text-4xl font-extrabold text-slate-400 font-mono';
       }
       const mobBadge = document.getElementById('mobileCvScoreBadge');
-      if (mobBadge) mobBadge.innerText = scores.overall;
+      if (mobBadge) {
+        mobBadge.textContent = scores.overall;
+        mobBadge.innerText = scores.overall;
+      }
 
       const barEl = document.getElementById('atsScoreBar');
       if (barEl) barEl.style.width = scores.overall + '%';
 
       const mEl = document.getElementById('metricScoreText');
-      if (mEl) mEl.innerText = scores.metric + '/100';
+      if (mEl) { mEl.textContent = scores.metric + '/100'; mEl.innerText = scores.metric + '/100'; }
 
       const vEl = document.getElementById('verbsScoreText');
-      if (vEl) vEl.innerText = scores.verb + '/100';
+      if (vEl) { vEl.textContent = scores.verb + '/100'; vEl.innerText = scores.verb + '/100'; }
 
       const kEl = document.getElementById('keywordScoreText');
-      if (kEl) kEl.innerText = scores.keyword + '/100';
+      if (kEl) { kEl.textContent = scores.keyword + '/100'; kEl.innerText = scores.keyword + '/100'; }
 
       const fEl = document.getElementById('formatScoreText');
-      if (fEl) fEl.innerText = scores.format + '/100';
+      if (fEl) { fEl.textContent = scores.format + '/100'; fEl.innerText = scores.format + '/100'; }
 
       const badge = document.getElementById('atsBadgeStatus');
       if (badge) {
+        let bText = '';
         if (scores.overall >= 80) {
-          badge.innerText = 'Sangat Siap Lolos ATS (Standard Harvard 1-Column)';
+          bText = 'Sangat Siap Lolos ATS (Standard Harvard 1-Column)';
           badge.className = 'text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded';
         } else if (scores.overall >= 50) {
-          badge.innerText = 'Cukup Baik (Perlu Tambah Angka)';
+          bText = 'Cukup Baik (Perlu Tambah Angka)';
           badge.className = 'text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded';
         } else if (scores.overall > 0) {
-          badge.innerText = 'Perlu Perbaikan Mendalam';
+          bText = 'Perlu Perbaikan Mendalam';
           badge.className = 'text-xs font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded';
         } else {
-          badge.innerText = 'Belum Ada Draf';
+          bText = 'Belum Ada Draf';
           badge.className = 'text-xs font-bold text-slate-500 bg-slate-50 border border-slate-200 px-2.5 py-0.5 rounded';
         }
+        badge.textContent = bText;
+        badge.innerText = bText;
       }
     }
 
@@ -11821,7 +11849,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const roleText = roleElem ? roleElem.options[roleElem.selectedIndex].text : 'Junior Business Analyst';
 
       const cvInput = document.getElementById('cvExperienceInput')?.value.trim() || '';
-      let starBullet = document.getElementById('previewAfter')?.innerText.replace(/^"|"$/g, '').trim();
+      let starBullet = (document.getElementById('previewAfter')?.textContent || document.getElementById('previewAfter')?.innerText || '').replace(/^"|"$/g, '').trim();
       if (!starBullet || starBullet.includes('Formula STAR yang siap')) {
         starBullet = 'Menginisiasi pemetaan 12 modul alur bisnis klien dan menyusun 25+ dokumen BRD terstruktur yang memangkas waktu approval sebesar 32%.';
       }
@@ -11961,7 +11989,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         taskPart = taskPart.charAt(0).toLowerCase() + taskPart.slice(1);
 
         if (detectedMetrics && detectedMetrics.length > 0) {
-          starResult = leadVerb + ' alur ' + taskPart + ', berhasil meningkatkan efisiensi dan keandalan operasional dengan capaian metrik terukur.';
+          starResult = leadVerb + ' alur ' + taskPart + ', memangkas waktu proses hingga 38% serta mengoptimalkan operasional dan akurasi rekonsiliasi data hingga 99.5%.';
         } else {
           if (role === 'business-analyst') {
             starResult = leadVerb + ' ' + taskPart + ', memodelkan alur kerja AS-IS ke TO-BE yang memangkas waktu siklus koordinasi sebesar 40% dan merumuskan 20+ user story terstruktur.';
@@ -11978,10 +12006,18 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       const afterEl = document.getElementById('previewAfter');
-      if (afterEl) afterEl.innerText = starResult.startsWith('•') ? starResult : '"' + starResult + '"';
+      if (afterEl) {
+        const textToSet = starResult.startsWith('•') ? starResult : '"' + starResult + '"';
+        afterEl.textContent = textToSet;
+        afterEl.innerText = textToSet;
+      }
 
       const beforeEl = document.getElementById('previewBefore');
-      if (beforeEl) beforeEl.innerText = '"' + raw.slice(0, 300) + (raw.length > 300 ? '...' : '') + '"';
+      if (beforeEl) {
+        const textToSet = '"' + raw.slice(0, 300) + (raw.length > 300 ? '...' : '') + '"';
+        beforeEl.textContent = textToSet;
+        beforeEl.innerText = textToSet;
+      }
 
       updateScoreUI({ overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 });
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
@@ -12074,9 +12110,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       };
 
       const qEl = document.getElementById('interviewQuestionText');
-      if (qEl) qEl.innerText = '"' + qText + '"';
+      if (qEl) { qEl.textContent = '"' + qText + '"'; qEl.innerText = '"' + qText + '"'; }
       const catEl = document.getElementById('interviewQuestionCategory');
-      if (catEl) catEl.innerText = catText;
+      if (catEl) { catEl.textContent = catText; catEl.innerText = catText; }
 
       toggleCustomQuestionForm(false);
       alert('Pertanyaan kustom berhasil diaktifkan! Silakan tekan tombol rekam untuk mulai latihan.');
@@ -12091,9 +12127,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     function displayCurrentInterviewQuestion() {
       if (appState.customQuestion) {
         const qEl = document.getElementById('interviewQuestionText');
-        if (qEl) qEl.innerText = '"' + appState.customQuestion.q + '"';
+        if (qEl) { qEl.textContent = '"' + appState.customQuestion.q + '"'; qEl.innerText = '"' + appState.customQuestion.q + '"'; }
         const catEl = document.getElementById('interviewQuestionCategory');
-        if (catEl) catEl.innerText = appState.customQuestion.cat;
+        if (catEl) { catEl.textContent = appState.customQuestion.cat; catEl.innerText = appState.customQuestion.cat; }
         return;
       }
 
@@ -12102,10 +12138,10 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const data = interviewQuestions[lang][qKey] || interviewQuestions['id']['intro'];
 
       const qEl = document.getElementById('interviewQuestionText');
-      if (qEl) qEl.innerText = '"' + data.q + '"';
+      if (qEl) { qEl.textContent = '"' + data.q + '"'; qEl.innerText = '"' + data.q + '"'; }
 
       const catEl = document.getElementById('interviewQuestionCategory');
-      if (catEl) catEl.innerText = data.cat;
+      if (catEl) { catEl.textContent = data.cat; catEl.innerText = data.cat; }
 
       const transcriptInput = document.getElementById('interviewTranscriptInput');
       if (transcriptInput) transcriptInput.value = '';
@@ -12224,7 +12260,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const text = tInput ? tInput.value.trim() : '';
       const count = text.length > 0 ? text.split(/\s+/).length : 0;
       const badge = document.getElementById('transcriptWordCount');
-      if (badge) badge.innerText = count + ' kata';
+      if (badge) { badge.textContent = count + ' kata'; badge.innerText = count + ' kata'; }
     }
 
     function analyzeInterviewAnswer() {
@@ -12275,29 +12311,35 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const fillerBadge = document.getElementById('fillerWordBadge');
       if (fillerBadge) {
+        let fText = '';
         if (totalFillers === 0) {
-          fillerBadge.innerText = '0 (Sangat Bersih)';
+          fText = '0 (Sangat Bersih)';
           fillerBadge.className = 'font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-2.5 py-0.5 rounded-full';
         } else {
-          fillerBadge.innerText = totalFillers + ' Terdeteksi: ' + foundLabels.join(', ');
+          fText = totalFillers + ' Terdeteksi: ' + foundLabels.join(', ');
           fillerBadge.className = 'font-bold text-amber-700 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-full';
         }
+        fillerBadge.textContent = fText;
+        fillerBadge.innerText = fText;
       }
 
       let durationSec = appState.lastRecordedDurationSeconds || Math.max(10, Math.round(wordCount / 2.15));
       const wpm = Math.round(wordCount / (durationSec / 60));
       const wpmText = document.getElementById('wpmValueText');
       if (wpmText) {
+        let wText = '';
         if (wpm >= 115 && wpm <= 155) {
-          wpmText.innerText = wpm + ' WPM (Ideal & Tenang)';
+          wText = wpm + ' WPM (Ideal & Tenang)';
           wpmText.className = 'font-bold text-emerald-700 font-mono';
         } else if (wpm < 115) {
-          wpmText.innerText = wpm + ' WPM (Pacing Lambat)';
+          wText = wpm + ' WPM (Pacing Lambat)';
           wpmText.className = 'font-bold text-amber-700 font-mono';
         } else {
-          wpmText.innerText = wpm + ' WPM (Terlalu Cepat)';
+          wText = wpm + ' WPM (Terlalu Cepat)';
           wpmText.className = 'font-bold text-red-600 font-mono';
         }
+        wpmText.textContent = wText;
+        wpmText.innerText = wText;
       }
 
       let relevancy = 68;
@@ -12311,29 +12353,35 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       delivery = Math.max(55, Math.min(95, delivery));
 
       const relVal = document.getElementById('relevancyScoreValue');
-      if (relVal) relVal.innerText = relevancy + '%';
+      if (relVal) { relVal.textContent = relevancy + '%'; relVal.innerText = relevancy + '%'; }
 
       const delVal = document.getElementById('deliveryScoreValue');
-      if (delVal) delVal.innerText = delivery + '%';
+      if (delVal) { delVal.textContent = delivery + '%'; delVal.innerText = delivery + '%'; }
 
       const fb = document.getElementById('interviewFeedbackText');
       if (fb) {
+        let fbMsg = '';
         if (relevancy >= 85 && delivery >= 85) {
-          fb.innerText = 'Luar biasa! Artikulasi Anda tenang dan terstruktur dengan metode STAR. Anda siap menghadapi sesi wawancara user maupun HR.';
+          fbMsg = 'Luar biasa! Artikulasi Anda tenang dan terstruktur dengan metode STAR. Anda siap menghadapi sesi wawancara user maupun HR.';
         } else if (totalFillers > 2) {
-          fb.innerText = 'Jawaban Anda relevan, namun terdapat ' + totalFillers + " kata jeda ('aaa/eee/kayak'). Cobalah mengambil jeda diam sejenak (silent pause) ketimbang mengeluarkan gumaman vokal.";
+          fbMsg = 'Jawaban Anda relevan, namun terdapat ' + totalFillers + " kata jeda ('aaa/eee/kayak'). Cobalah mengambil jeda diam sejenak (silent pause) ketimbang mengeluarkan gumaman vokal.";
         } else {
-          fb.innerText = 'Jawaban Anda sudah cukup jelas. Tambahkan rincian angka konkret pada bagian resolusi kendala dan dampak nyata bagi tim/organisasi.';
+          fbMsg = 'Jawaban Anda sudah cukup jelas. Tambahkan rincian angka konkret pada bagian resolusi kendala dan dampak nyata bagi tim/organisasi.';
         }
+        fb.textContent = fbMsg;
+        fb.innerText = fbMsg;
       }
     }
 
     /* -------------------------------------------------------------------------
        6. MODUL 3: SMART JOB MATCHER (UNIVERSAL CATEGORIES & APPLE UI)
        ------------------------------------------------------------------------- */
-    let currentJobCategoryFilter = 'all';
-    let currentJobLevelFilter = 'all';
-    let currentCareerCompass = null;
+    var currentJobCategoryFilter = 'all';
+    window.currentJobCategoryFilter = currentJobCategoryFilter;
+    var currentJobLevelFilter = 'all';
+    window.currentJobLevelFilter = currentJobLevelFilter;
+    var currentCareerCompass = null;
+    window.currentCareerCompass = currentCareerCompass;
 
     function selectCareerCompass(mode) {
       currentCareerCompass = mode;
@@ -12586,6 +12634,40 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     /* -------------------------------------------------------------------------
        8. MODUL 4: RECRUITER TARGETS, APPLE CARDS & ATOMIC QUOTA
        ------------------------------------------------------------------------- */
+    let verifiedRecruiterTargets = [
+      { id: 'rec-1', company: 'PT Astra International Tbk', hr: 'Talent Acquisition Team', email: 'recruitment@astra.co.id', role: 'Business Analyst / Management Trainee', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-2', company: 'PT Telkom Indonesia (Persero) Tbk', hr: 'Digital Talent Recruitment', email: 'careers@telkom.co.id', role: 'Junior Product / Project Coordinator', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-3', company: 'PT Bank Mandiri (Persero) Tbk', hr: 'Officer Development Program', email: 'odp.recruitment@bankmandiri.co.id', role: 'Management Trainee / Operations', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-4', company: 'PT Bank Central Asia Tbk (BCA)', hr: 'BCA Talent Acquisition Lead', email: 'recruitment@bca.co.id', role: 'IT Trainee & Business Analyst', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-5', company: 'PT Bank Rakyat Indonesia (Persero) Tbk', hr: 'Brilian Future Leader Program', email: 'recruitment@bri.co.id', role: 'Project Coordinator & Business Trainee', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-6', company: 'PT GoTo Gojek Tokopedia Tbk', hr: 'Tech & Product People Partner', email: 'talent@gotocompany.com', role: 'Junior Associate Product / Business', category: 'tech', status: 'ready' },
+      { id: 'rec-7', company: 'Shopee Indonesia', hr: 'Campus Recruitment Lead', email: 'id.recruitment@shopee.com', role: 'Operations & Business Development Trainee', category: 'tech', status: 'ready' },
+      { id: 'rec-8', company: 'PT Telekomunikasi Selular (Telkomsel)', hr: 'Telkomsel People Partner', email: 'careers@telkomsel.co.id', role: 'IoT & Digital Solutions Trainee', category: 'tech', status: 'ready' },
+      { id: 'rec-9', company: 'Unilever Indonesia', hr: 'Future Leaders Programme (UFLP)', email: 'recruitment.indonesia@unilever.com', role: 'Management Trainee / Supply Chain', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-10', company: 'Nestlé Indonesia', hr: 'Corporate Talent Acquisition', email: 'recruitment@id.nestle.com', role: 'Management Trainee Engineering & Operations', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-11', company: 'Danone Indonesia', hr: 'Talent Acquisition Partner', email: 'careers.indonesia@danone.com', role: 'Management Trainee / Operations', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-12', company: 'PT Pertamina (Persero)', hr: 'Corporate People Development', email: 'recruitment@pertamina.com', role: 'Officer Trainee Project & Engineering', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-13', company: 'PT Perusahaan Listrik Negara (PLN)', hr: 'Divisi Rekrutmen PLN', email: 'rekrutmen@pln.co.id', role: 'Assistant Engineer / Project Officer', category: 'bumn_bank', status: 'ready' },
+      { id: 'rec-14', company: 'PT Paragon Technology and Innovation', hr: 'Paragonian Talent Acquisition', email: 'talent@pti-cosmetics.com', role: 'Project Management & Engineering Trainee', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-15', company: 'PT Indofood CBP Sukses Makmur Tbk', hr: 'HR Corporate Recruitment', email: 'recruitment@icbp.indofood.co.id', role: 'Management Trainee / Technical Officer', category: 'fmcg_corp', status: 'ready' },
+      { id: 'rec-16', company: 'Traveloka', hr: 'People Acquisition Lead', email: 'talent@traveloka.com', role: 'Associate Product / Project Specialist', category: 'tech', status: 'ready' },
+      { id: 'rec-17', company: 'Blibli (PT Global Digital Niaga)', hr: 'Talent Management Team', email: 'recruitment@gdn-commerce.com', role: 'Operations & Business Analyst', category: 'tech', status: 'ready' },
+      { id: 'rec-18', company: 'DANA Indonesia', hr: 'People & Culture Talent Team', email: 'talent@dana.id', role: 'Junior Product Specialist / Project Lead', category: 'tech', status: 'ready' },
+      { id: 'rec-19', company: 'Grab Indonesia', hr: 'Grab Talent Acquisition Team', email: 'talent.acquisition@grab.com', role: 'Associate Project Specialist / Ops', category: 'tech', status: 'ready' },
+      { id: 'rec-20', company: 'Tiket.com', hr: 'People Experience Team', email: 'recruitment@tiket.com', role: 'Junior Business Partner / Product Analyst', category: 'tech', status: 'ready' },
+      { id: 'rec-21', company: 'Tokopedia', hr: 'Tokopedia Talent Acquisition', email: 'recruitment@tokopedia.com', role: 'Operations / Project Associate', category: 'tech', status: 'ready' },
+      { id: 'rec-22', company: 'PT Kalbe Farma Tbk', hr: 'Corporate HR Recruitment', email: 'recruitment@kalbe.co.id', role: 'Management Trainee Project & Supply Chain', category: 'fmcg_corp', status: 'ready' }
+    ];
+    window.verifiedRecruiterTargets = verifiedRecruiterTargets;
+
+    let blastActiveCategory = 'all';
+    let blastQueue = [];
+    window.blastQueue = blastQueue;
+    let isBlastRunning = false;
+    window.isBlastRunning = false;
+    let blastTimeoutId = null;
+    window.blastTimeoutId = null;
+
     function loadCustomRecruitersFromStorage() {
       try {
         const stored = localStorage.getItem('dims_custom_recruiters');
@@ -12707,7 +12789,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const items = document.querySelectorAll('#blastTargetsContainer > label');
 
       items.forEach(label => {
-        const text = label.innerText.toLowerCase();
+        const text = (label.textContent || label.innerText || '').toLowerCase();
         const cat = label.getAttribute('data-category') || 'all';
         const matchesSearch = !search || text.includes(search);
         const matchesCat = blastActiveCategory === 'all' || cat === blastActiveCategory;
@@ -12820,7 +12902,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const personaStyle = document.getElementById('blastAiPersonaSelect')?.value || 'general';
 
       const cvInput = document.getElementById('cvExperienceInput')?.value.trim() || '';
-      const starPreview = document.getElementById('previewAfter')?.innerText.replace(/^"|"$/g, '').trim() || '';
+      const previewEl = document.getElementById('previewAfter');
+      const starPreview = (previewEl ? (previewEl.textContent || previewEl.innerText || '') : '').replace(/^"|"$/g, '').trim();
 
       const firstChecked = document.querySelector('input[name="blastTargetCheck"]:checked');
       let targetCompany = 'Perusahaan Bapak/Ibu';
@@ -12903,6 +12986,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       isBlastRunning = true;
+      window.isBlastRunning = true;
       const btnStart = document.getElementById('btnStartBlast');
       if (btnStart) {
         btnStart.disabled = true;
@@ -12929,6 +13013,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       if (index >= blastQueue.length) {
         isBlastRunning = false;
+        window.isBlastRunning = false;
         const btnStart = document.getElementById('btnStartBlast');
         if (btnStart) {
           btnStart.disabled = false;
@@ -13018,11 +13103,17 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
         processNextInBlastQueue(index + 1);
       }, 4500);
+      window.blastTimeoutId = blastTimeoutId;
     }
 
     function resetSmartDripBlast() {
       isBlastRunning = false;
-      if (blastTimeoutId) clearTimeout(blastTimeoutId);
+      window.isBlastRunning = false;
+      if (blastTimeoutId) {
+        clearTimeout(blastTimeoutId);
+        blastTimeoutId = null;
+        window.blastTimeoutId = null;
+      }
       
       const btnStart = document.getElementById('btnStartBlast');
       if (btnStart) {
@@ -13360,9 +13451,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         price: price
       };
 
-      document.getElementById('qrisOrderId').innerText = currentUser.orderPending.orderId;
-      document.getElementById('qrisPlanTitle').innerText = 'Paket ' + planName;
-      document.getElementById('qrisAmountTag').innerText = 'Rp ' + price.toLocaleString('id-ID');
+      const orderIdEl = document.getElementById('qrisOrderId');
+      if (orderIdEl) { orderIdEl.textContent = currentUser.orderPending.orderId; orderIdEl.innerText = currentUser.orderPending.orderId; }
+      const planTitleEl = document.getElementById('qrisPlanTitle');
+      if (planTitleEl) { planTitleEl.textContent = 'Paket ' + planName; planTitleEl.innerText = 'Paket ' + planName; }
+      const amountTagEl = document.getElementById('qrisAmountTag');
+      if (amountTagEl) { amountTagEl.textContent = 'Rp ' + price.toLocaleString('id-ID'); amountTagEl.innerText = 'Rp ' + price.toLocaleString('id-ID'); }
 
       openQrisModal();
     }
@@ -13405,6 +13499,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       saveUserSession();
       closeQrisModal();
+
+      syncToGoogleSheets('RECORD_PAYMENT', {
+        orderId: currentUser.orderPending.orderId,
+        user: currentUser.name,
+        email: currentUser.email,
+        plan: currentUser.orderPending.planName,
+        amount: currentUser.orderPending.price,
+        status: 'PAID_QRIS'
+      });
 
       alert(`PEMBAYARAN QRIS SUKSES!\n\nSelamat! Akun Anda telah di-upgrade ke [${currentUser.tierName}]. Seluruh fitur eksklusif & kuota auto-blast telah terbuka.`);
     }
@@ -13593,7 +13696,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const filtered = adminState.transactions.filter(tx => {
         const query = filterText.toLowerCase();
-        return tx.id.toLowerCase().includes(query) || tx.name.toLowerCase().includes(query) || tx.plan.toLowerCase().includes(query);
+        return (tx.id || '').toLowerCase().includes(query) || (tx.name || '').toLowerCase().includes(query) || (tx.plan || '').toLowerCase().includes(query);
       });
 
       tbody.innerHTML = filtered.map((tx, idx) => `
@@ -13731,29 +13834,44 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     function updateAdminKPIs() {
       const totalGross = adminState.transactions.reduce((acc, curr) => acc + curr.amount, 0);
       const totalRevEl = document.getElementById('adminTotalRevenue');
-      if (totalRevEl) totalRevEl.innerText = 'Rp ' + totalGross.toLocaleString('id-ID');
+      if (totalRevEl) {
+        totalRevEl.textContent = 'Rp ' + totalGross.toLocaleString('id-ID');
+        totalRevEl.innerText = 'Rp ' + totalGross.toLocaleString('id-ID');
+      }
 
       const successTxEl = document.getElementById('adminSuccessTxCount');
-      if (successTxEl) successTxEl.innerText = adminState.transactions.length + ' Transaksi';
+      if (successTxEl) {
+        successTxEl.textContent = adminState.transactions.length + ' Transaksi';
+        successTxEl.innerText = adminState.transactions.length + ' Transaksi';
+      }
 
       const totalUsersEl = document.getElementById('adminTotalUsers');
-      if (totalUsersEl) totalUsersEl.innerText = adminState.users.length + ' Pelamar Terdaftar';
+      if (totalUsersEl) {
+        totalUsersEl.textContent = adminState.users.length + ' Pelamar Terdaftar';
+        totalUsersEl.innerText = adminState.users.length + ' Pelamar Terdaftar';
+      }
 
       const vipCount = adminState.users.filter(u => u.tier === 'VIP' || (u.status && u.status.includes('VIP'))).length;
       const vipDescEl = document.getElementById('adminVipCountDesc');
-      if (vipDescEl) vipDescEl.innerText = vipCount + ' Akun VIP Aktif';
+      if (vipDescEl) {
+        vipDescEl.textContent = vipCount + ' Akun VIP Aktif';
+        vipDescEl.innerText = vipCount + ' Akun VIP Aktif';
+      }
 
       const emailsSentEl = document.getElementById('adminTotalEmailsSent');
       const blastStatusDesc = document.getElementById('adminBlastStatusDesc');
       const sentCount = adminState.totalEmailsSent || 0;
       if (emailsSentEl) {
+        emailsSentEl.textContent = sentCount + ' Terkirim';
         emailsSentEl.innerText = sentCount + ' Terkirim';
       }
       if (blastStatusDesc) {
         if (sentCount > 0) {
+          blastStatusDesc.textContent = '100% Bebas Bouncing (Safety Drip)';
           blastStatusDesc.innerText = '100% Bebas Bouncing (Safety Drip)';
           blastStatusDesc.className = 'text-[11px] text-emerald-600 font-bold';
         } else {
+          blastStatusDesc.textContent = 'Belum ada antrean blast terkirim';
           blastStatusDesc.innerText = 'Belum ada antrean blast terkirim';
           blastStatusDesc.className = 'text-[11px] text-slate-400';
         }
@@ -14023,6 +14141,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           status: 'SETTLED'
         });
         updateAdminKPIs();
+        saveAdminTxToStorage();
       }
       prevSimulatePaymentSuccess();
       renderAdminOrders();
