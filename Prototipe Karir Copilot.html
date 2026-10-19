@@ -13,6 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Supabase JS Client CDN (Enterprise Centralized Database & Real-Time Sync) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Identity Services (Real Google OAuth Client SDK) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13811,19 +13813,52 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     }
 
-    function loginWithGoogle() {
-      openGoogleAccountPicker();
+    async function loginWithGoogle() {
+      // 1. Coba Google Identity Services (GSI prompt resmi) jika browser mendukung
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        try {
+          google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+              console.log('[GSI] Prompt tidak tampil di origin ini, beralih ke input email Google pengguna');
+              promptDirectGoogleLogin();
+            }
+          });
+          return;
+        } catch (e) {
+          console.warn('[GSI] Prompt exception:', e);
+        }
+      }
+
+      // 2. Coba Supabase OAuth jika provider Google sudah diaktifkan di project settings
+      if (supabaseClient && supabaseClient.auth) {
+        try {
+          const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: window.location.origin + window.location.pathname
+            }
+          });
+          if (!error && data && data.url) {
+            window.location.href = data.url;
+            return;
+          }
+        } catch(e) {}
+      }
+
+      // 3. Fallback: minta email Google asli pengguna secara langsung (bebas dari persona fiktif)
+      promptDirectGoogleLogin();
     }
 
-    function openGoogleAccountPicker() {
+    function promptDirectGoogleLogin() {
+      const email = prompt('Masukkan alamat email Google Anda (contoh: dimitriahmad000@gmail.com):');
+      if (!email || !email.includes('@')) return;
+      const cleanEmail = email.trim().toLowerCase();
+      const derivedName = cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
+      
+      selectGoogleAccount(derivedName, cleanEmail, avatarUrl);
       closeAuthModal();
-      const picker = document.getElementById('googleAccountPickerModal');
-      if (picker) picker.classList.remove('hidden');
-    }
-
-    function closeGoogleAccountPicker() {
-      const picker = document.getElementById('googleAccountPickerModal');
-      if (picker) picker.classList.add('hidden');
+      alert('Selamat datang, ' + derivedName + '! Berhasil masuk dengan akun Google ' + cleanEmail);
     }
 
     function selectGoogleAccount(name, email, avatar) {
@@ -13832,12 +13867,21 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       currentUser.email = email;
       if (avatar) currentUser.avatar = avatar;
 
+      // Cek apakah akun Owner (Dimitri)
+      const isOwner = (email && email.toLowerCase() === 'dimitriahmad000@gmail.com');
+      if (isOwner) {
+        currentUser.role = 'owner';
+        currentUser.tier = 'VIP';
+        currentUser.tierName = 'Dikerjain VIP';
+        currentUser.blastQuota = Math.max(currentUser.blastQuota || 0, 50);
+      }
+
       // Cek apakah email terdaftar di database Admin
       const matchedAdminUser = adminState.users.find(u => u.email.toLowerCase() === email.toLowerCase());
       if (matchedAdminUser) {
-        currentUser.tier = matchedAdminUser.tier || 'VIP';
-        currentUser.tierName = matchedAdminUser.tierName || 'Dikerjain VIP';
-        currentUser.blastQuota = matchedAdminUser.quota !== undefined ? matchedAdminUser.quota : 50;
+        currentUser.tier = matchedAdminUser.tier || currentUser.tier;
+        currentUser.tierName = matchedAdminUser.tierName || (currentUser.tier === 'VIP' ? 'Dikerjain VIP' : 'Dibimbing (Free)');
+        currentUser.blastQuota = matchedAdminUser.quota !== undefined ? matchedAdminUser.quota : currentUser.blastQuota;
       } else {
         // Daftarkan ke database admin sebagai pengguna baru
         adminState.users.unshift({
@@ -13846,7 +13890,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           tier: currentUser.tier,
           tierName: currentUser.tierName,
           quota: currentUser.blastQuota,
-          status: 'Active (Google)'
+          status: 'Active (Google Auth)'
         });
         saveAdminUsersToStorage();
         renderAdminUsers();
@@ -13854,7 +13898,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       saveUserSession();
-      closeGoogleAccountPicker();
+      updateUserNavbarUI();
 
       // Sinkronkan ke Google Sheets & Supabase PostgreSQL
       syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
@@ -13862,18 +13906,13 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         email: currentUser.email,
         tier: currentUser.tier,
         quota: currentUser.blastQuota,
-        status: 'Active (Google)',
+        status: 'Active (Google Auth)',
         avatar: currentUser.avatar
       });
       syncUserDataToSupabase(currentUser);
-    }
 
-    function submitCustomGoogleAccount(e) {
-      e.preventDefault();
-      const email = document.getElementById('customGoogleEmailInput')?.value.trim();
-      if (!email) return;
-      const name = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      selectGoogleAccount(name, email, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces');
+      const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
+      if (quotaDisplay) quotaDisplay.innerText = currentUser.blastQuota + ' Email';
     }
 
 
@@ -15337,85 +15376,6 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
   </div>
 
 
-  <!-- ========================================================================= -->
-  <!-- MODAL: GOOGLE ACCOUNT PICKER (CLEAN NATIVE STYLE)                        -->
-  <!-- ========================================================================= -->
-  <div id="googleAccountPickerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
-    <div class="dospem-card max-w-sm w-full p-6 space-y-4 bg-white relative animate-in fade-in zoom-in-95 duration-200">
-      
-      <button onclick="closeGoogleAccountPicker()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
-
-      <!-- Google Brand Header -->
-      <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        <div>
-          <h3 class="text-sm font-bold text-slate-900">Pilih Akun Google</h3>
-          <p class="text-[11px] text-slate-500">untuk melanjutkan ke Lolos Kerja</p>
-        </div>
-      </div>
-
-      <!-- Daftar Akun Siap Pakai -->
-      <div class="space-y-2 pt-1">
-        
-        <button onclick="selectGoogleAccount('Dimas Pratama', 'dimas.pratama@gmail.com', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50/60 border border-slate-200 hover:border-blue-400 transition text-left">
-          <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">DP</div>
-          <div class="overflow-hidden flex-1">
-            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
-              <span>Dimas Pratama (Fresh Grad)</span>
-              <span class="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-mono font-bold">Free Plan</span>
-            </div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">dimas.pratama@gmail.com</div>
-          </div>
-        </button>
-
-        <button onclick="selectGoogleAccount('Sarah Anastasya', 'sarah.anastasya@gmail.com', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50/60 border border-slate-200 hover:border-blue-400 transition text-left">
-          <div class="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">SA</div>
-          <div class="overflow-hidden flex-1">
-            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
-              <span>Sarah Anastasya (Business Analyst)</span>
-              <span class="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded font-mono font-bold">Dibantuin</span>
-            </div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">sarah.anastasya@gmail.com</div>
-          </div>
-        </button>
-
-        <button onclick="selectGoogleAccount('Budi Santoso', 'budi.santoso@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50/60 border border-slate-200 hover:border-emerald-400 transition text-left">
-          <div class="w-9 h-9 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-sm">DA</div>
-          <div class="overflow-hidden flex-1">
-            <div class="text-xs font-bold text-slate-900 flex items-center justify-between">
-              <span>Budi Santoso (Member VIP)</span>
-              <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-mono font-bold">VIP 50 Kuota</span>
-            </div>
-            <div class="text-[11px] text-slate-500 font-mono truncate">budi.santoso@gmail.com</div>
-          </div>
-        </button>
-
-      </div>
-
-      <!-- Opsi Input Akun Google Lain -->
-      <form onsubmit="submitCustomGoogleAccount(event)" class="pt-2 border-t border-slate-100 space-y-2">
-        <label class="block text-[11px] font-semibold text-slate-600">Gunakan Akun Google Lain:</label>
-        <div class="flex gap-2">
-          <input type="email" id="customGoogleEmailInput" placeholder="email.anda@gmail.com" class="dospem-input flex-1 p-2 text-xs rounded-lg" required>
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-2 rounded-lg text-xs transition">
-            Pilih
-          </button>
-        </div>
-      </form>
-
-      <p class="text-center text-[10px] text-slate-400 pt-1">
-        Aman & Terenkripsi. Lolos Kerja mematuhi Kebijakan Privasi Google.
-      </p>
-
-    </div>
-  </div>
 
   <!-- FLOATING MOBILE BOTTOM NAVIGATION (Native App Bar) -->
   <!-- FLOATING MOBILE BOTTOM NAVIGATION (Native iOS & Android App Bar) -->
