@@ -14247,6 +14247,31 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             auto_select: false,
             cancel_on_tap_outside: true
           });
+
+          // Render tombol iframe resmi Google jika container ada
+          const loginBtnContainer = document.getElementById('googleBtnContainerLogin');
+          if (loginBtnContainer) {
+            google.accounts.id.renderButton(loginBtnContainer, {
+              theme: 'outline',
+              size: 'large',
+              width: loginBtnContainer.offsetWidth || 340,
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left'
+            });
+          }
+
+          const regBtnContainer = document.getElementById('googleBtnContainerRegister');
+          if (regBtnContainer) {
+            google.accounts.id.renderButton(regBtnContainer, {
+              theme: 'outline',
+              size: 'large',
+              width: regBtnContainer.offsetWidth || 340,
+              text: 'signup_with',
+              shape: 'rectangular',
+              logo_alignment: 'left'
+            });
+          }
         } catch (e) {
           console.warn('Google GSI init notice:', e);
         }
@@ -14255,6 +14280,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
     function handleGoogleCredentialResponse(response) {
       try {
+        if (!response || !response.credential) return;
         // Decode JWT payload dari Google
         const base64Url = response.credential.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -14281,31 +14307,67 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           avatar: currentUser.avatar
         });
         syncUserDataToSupabase(currentUser);
+        updateUserNavbarUI();
 
         alert('Selamat datang, ' + currentUser.name + '! Berhasil masuk dengan Akun Google resmi.');
       } catch(err) {
         console.error('Error parsing Google Token:', err);
-        fallbackGoogleLogin();
+      }
+    }
+
+    // Helper untuk mengecek callback OAuth Google dari URL hash (#id_token=... atau #access_token=...)
+    function checkGoogleOAuthHashCallback() {
+      try {
+        const hash = window.location.hash;
+        if (!hash || (!hash.includes('id_token=') && !hash.includes('access_token='))) return;
+
+        const cleanHash = hash.startsWith('#') ? hash.substring(1) : hash;
+        const params = new URLSearchParams(cleanHash);
+        const idToken = params.get('id_token');
+        const accessToken = params.get('access_token');
+
+        if (idToken) {
+          handleGoogleCredentialResponse({ credential: idToken });
+          // Bersihkan token dari URL hash demi keamanan
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        } else if (accessToken) {
+          // Fetch user info menggunakan access token resmi dari Google
+          fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+          })
+          .then(res => res.json())
+          .then(profile => {
+            if (profile && profile.email) {
+              currentUser.isLoggedIn = true;
+              currentUser.name = profile.name || profile.email.split('@')[0];
+              currentUser.email = profile.email;
+              currentUser.avatar = profile.picture || currentUser.avatar;
+              saveUserSession();
+              updateUserNavbarUI();
+              syncUserDataToSupabase(currentUser);
+              syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+                name: currentUser.name,
+                email: currentUser.email,
+                tier: currentUser.tier,
+                quota: currentUser.blastQuota,
+                status: 'Active (Google OAuth Token)',
+                avatar: currentUser.avatar
+              });
+              alert('Selamat datang, ' + currentUser.name + '! Berhasil login resmi via Google.');
+            }
+          })
+          .catch(err => console.warn('Fetch Google UserInfo notice:', err))
+          .finally(() => {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          });
+        }
+      } catch (e) {
+        console.warn('OAuth Hash check error:', e);
       }
     }
 
     async function loginWithGoogle() {
-      // 1. Coba Google Identity Services (GSI prompt resmi) jika browser mendukung
-      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-        try {
-          google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-              console.log('[GSI] Prompt tidak tampil di origin ini, beralih ke input email Google pengguna');
-              promptDirectGoogleLogin();
-            }
-          });
-          return;
-        } catch (e) {
-          console.warn('[GSI] Prompt exception:', e);
-        }
-      }
-
-      // 2. Coba Supabase OAuth jika provider Google sudah diaktifkan di project settings
+      // 1. Coba Supabase OAuth jika terkonfigurasi (akan membuka Google consent screen Supabase)
       if (supabaseClient && supabaseClient.auth) {
         try {
           const { data, error } = await supabaseClient.auth.signInWithOAuth({
@@ -14318,47 +14380,30 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             window.location.href = data.url;
             return;
           }
-        } catch(e) {}
+        } catch(e) {
+          console.warn('Supabase OAuth notice:', e);
+        }
       }
 
-      // 3. Fallback: minta email Google asli pengguna secara langsung (bebas dari persona fiktif)
-      promptDirectGoogleLogin();
-    }
-
-    function promptDirectGoogleLogin() {
-      // Buka Google Interactive Account Chooser (Modal Elegan Card UI Resmi)
-      openGoogleAccountChooser();
-    }
-
-    function openGoogleAccountChooser() {
-      const chooser = document.getElementById('googleAccountChooserModal');
-      if (chooser) {
-        chooser.classList.remove('hidden');
-      }
-    }
-
-    function closeGoogleAccountChooser() {
-      const chooser = document.getElementById('googleAccountChooserModal');
-      if (chooser) chooser.classList.add('hidden');
-    }
-
-    function submitCustomGoogleLogin(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      const input = document.getElementById('googleDirectEmailInput');
-      const email = input?.value?.trim().toLowerCase();
-      if (!email || !email.includes('@')) {
-        alert('Mohon masukkan alamat email Google / Gmail yang valid!');
-        return;
-      }
-
-      const cleanEmail = email;
-      const derivedName = cleanEmail.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      const avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
+      // 2. Redirect langsung ke Endpoint Resmi Google OAuth 2.0 (Google Accounts Consent Screen)
+      // Ini 100% membuka halaman login resmi Google (Google Sign-In, 2FA, password, akun selector asli)
+      const currentOrigin = window.location.origin;
+      const currentPath = window.location.pathname;
+      const redirectUri = (currentOrigin.startsWith('http') ? currentOrigin + currentPath : 'https://lolos-kerja-seven.vercel.app');
       
-      closeGoogleAccountChooser();
-      closeAuthModal();
-      selectGoogleAccount(derivedName, cleanEmail, avatarUrl);
-      alert('Selamat datang, ' + derivedName + '! Berhasil masuk dengan Akun Google resmi: ' + cleanEmail);
+      const googleAuthParams = new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: redirectUri,
+        response_type: 'token id_token',
+        scope: 'email profile openid',
+        prompt: 'select_account',
+        nonce: Math.random().toString(36).substring(2)
+      });
+
+      const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + googleAuthParams.toString();
+      
+      console.log('[GOOGLE-OAUTH] Membuka Google Accounts Authorization URL Resmi:', googleAuthUrl);
+      window.location.href = googleAuthUrl;
     }
 
     function selectGoogleAccount(name, email, avatar) {
@@ -15517,6 +15562,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       initSupabaseClient();
       initAdminPortal();
+      checkGoogleOAuthHashCallback();
       initGoogleAuth();
       initBlastTargets();
       displayCurrentInterviewQuestion();
@@ -15597,15 +15643,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           <p class="text-xs text-slate-500">Lanjutin persiapan karirmu, pantau skor CV & kuota email</p>
         </div>
 
-        <!-- 1-Click Sign in with Google -->
-        <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
+        <!-- Official Google Sign-In Button Container (Rendered by Google SDK) -->
+        <div id="googleBtnContainerLogin" class="w-full flex justify-center py-1"></div>
+        <button id="googleCustomButtonLogin" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
           <svg class="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          <span>Masuk dengan Google</span>
+          <span>Masuk dengan Akun Google Resmi</span>
         </button>
 
         <!-- Divider ATAU -->
@@ -15665,15 +15712,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           <p class="text-xs text-slate-500">Mulai bedah CV Harvard ATS & nikmati 10 kuota email recruiter gratis</p>
         </div>
 
-        <!-- 1-Click Sign up with Google -->
-        <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
+        <!-- Official Google Sign-Up Button Container (Rendered by Google SDK) -->
+        <div id="googleBtnContainerRegister" class="w-full flex justify-center py-1"></div>
+        <button id="googleCustomButtonRegister" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
           <svg class="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          <span>Daftar Cepat dengan Google</span>
+          <span>Daftar dengan Akun Google Resmi</span>
         </button>
 
         <!-- Divider ATAU -->
@@ -15728,69 +15776,6 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           Sudah punya akun? <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="font-bold text-blue-600 hover:underline">Masuk ke akun Anda</a>
         </p>
       </div>
-
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- MODAL: GOOGLE ACCOUNT CHOOSER INTERAKTIF (RESMI & ELEGAN)                 -->
-  <!-- ========================================================================= -->
-  <div id="googleAccountChooserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4 overflow-y-auto">
-    <div class="dospem-card max-w-sm w-full p-6 space-y-4 bg-white relative animate-in fade-in zoom-in-95 duration-200 shadow-2xl my-auto rounded-3xl">
-      
-      <!-- Close button -->
-      <button onclick="closeGoogleAccountChooser()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-      </button>
-
-      <!-- Google Branding Header -->
-      <div class="text-center space-y-1.5 pt-1">
-        <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm mx-auto">
-          <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-        </div>
-        <h3 class="text-base font-extrabold text-slate-900 tracking-tight">Pilih Akun Google</h3>
-        <p class="text-xs text-slate-500">untuk melanjutkan ke <strong class="text-slate-800">Lolos Kerja</strong></p>
-      </div>
-
-      <!-- Quick Account List -->
-      <div class="space-y-2 pt-1 border-t border-slate-100">
-        
-        <!-- Akun 1: Dimitri Ahmad (Owner) -->
-        <button type="button" onclick="selectGoogleAccount('Dimitri Ahmad', 'dimitriahmad000@gmail.com', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'); closeGoogleAccountChooser(); closeAuthModal(); alert('Selamat datang kembali, Dimitri Ahmad (Lord Owner)!');" class="w-full flex items-center justify-between p-2.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition text-left cursor-pointer group">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center shrink-0 shadow-xs">
-              DA
-            </div>
-            <div>
-              <div class="text-xs font-bold text-slate-900 group-hover:text-blue-600">Dimitri Ahmad</div>
-              <div class="text-[11px] text-slate-500 font-mono">dimitriahmad000@gmail.com</div>
-            </div>
-          </div>
-          <span class="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 font-bold px-2 py-0.5 rounded-full">OWNER</span>
-        </button>
-
-      </div>
-
-      <!-- Form Akun Google Kustom / Gmail Pribadi -->
-      <form onsubmit="submitCustomGoogleLogin(event)" class="space-y-2.5 pt-2 border-t border-slate-100">
-        <label class="block text-xs font-semibold text-slate-700">Atau Gunakan Akun Google Lainnya:</label>
-        <div class="relative">
-          <input type="email" id="googleDirectEmailInput" placeholder="email.anda@gmail.com" required class="dospem-input w-full p-2.5 pl-8 text-xs font-sans rounded-xl">
-          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
-        </div>
-        <button type="submit" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
-          <span>Lanjutkan dengan Akun Google Ini &rarr;</span>
-        </button>
-      </form>
-
-      <p class="text-[10px] text-center text-slate-400 leading-tight">
-        Untuk melanjutkan, Google akan membagikan nama, alamat email, dan preferensi bahasa Anda ke Lolos Kerja.
-      </p>
 
     </div>
   </div>
