@@ -403,8 +403,8 @@
           Panduan Agen
         </button>
 
-        <!-- Monitoring Portal Direct Tab -->
-        <button onclick="switchTab('admin-module')" id="tab-admin-module" class="tab-btn px-3 py-1.5 rounded-lg transition text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold flex items-center gap-1.5 border border-emerald-200 shadow-sm cursor-pointer">
+        <!-- Monitoring Portal Direct Tab (Hidden for public, only visible for Owner/Admin) -->
+        <button onclick="switchTab('admin-module')" id="tab-admin-module" class="tab-btn px-3 py-1.5 rounded-lg transition text-emerald-700 bg-emerald-50 hover:bg-emerald-100 font-bold hidden items-center gap-1.5 border border-emerald-200 shadow-sm cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>Portal Monitoring</span>
         </button>
@@ -460,7 +460,7 @@
       <button onclick="switchTab('blast-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">4. Smart Drip Auto-Blast</button>
       <button onclick="switchTab('pricing-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-blue-600 font-bold hover:bg-blue-50">5. Biaya & Paket</button>
       <button onclick="switchTab('plan-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-500 hover:bg-slate-50">6. Rencana Eksekusi Agen</button>
-      <button onclick="switchTab('admin-module'); toggleMobileMenu();" class="w-full text-left py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold flex items-center justify-between border border-emerald-200 mt-2">
+      <button onclick="switchTab('admin-module'); toggleMobileMenu();" id="mobile-tab-admin-module" class="w-full text-left py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold hidden items-center justify-between border border-emerald-200 mt-2">
         <span class="flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>7. Portal Monitoring & Admin</span>
@@ -11347,6 +11347,26 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     });
 
     function switchTab(tabId) {
+      if (tabId === 'admin-module') {
+        const isOwner = (currentUser && currentUser.isLoggedIn && (
+          (currentUser.email && currentUser.email.toLowerCase() === 'dimitriahmad000@gmail.com') ||
+          (currentUser.name && currentUser.name.toLowerCase().includes('dimitri')) ||
+          currentUser.role === 'admin' ||
+          currentUser.role === 'owner'
+        )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#admin';
+
+        if (!isOwner) {
+          const pin = prompt('Akses Khusus Pemilik (Owner/Admin):\nMasukkan PIN Keamanan untuk membuka Portal Monitoring:');
+          if (pin === '1908' || pin === 'admin' || pin === 'dimitri' || pin === 'dummy') {
+            sessionStorage.setItem('dims_admin_unlocked', 'true');
+            if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
+          } else {
+            alert('Akses Ditolak: PIN Keamanan salah. Portal Monitoring hanya untuk Owner.');
+            return;
+          }
+        }
+      }
+
       appState.currentTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => {
         el.classList.remove('active');
@@ -13323,6 +13343,24 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         if (loggedOutView) loggedOutView.classList.remove('hidden');
         if (loggedInView) loggedInView.classList.add('hidden');
       }
+
+      // Owner / Admin Access Detection: Only show Portal Monitoring to authorized Owner
+      const isOwnerAccount = (currentUser && currentUser.isLoggedIn && (
+        (currentUser.email && currentUser.email.toLowerCase() === 'dimitriahmad000@gmail.com') ||
+        (currentUser.name && currentUser.name.toLowerCase().includes('dimitri')) ||
+        currentUser.role === 'admin' ||
+        currentUser.role === 'owner'
+      )) || sessionStorage.getItem('dims_admin_unlocked') === 'true' || window.location.hash === '#admin';
+
+      const adminTabBtn = document.getElementById('tab-admin-module');
+      const mobileAdminTabBtn = document.getElementById('mobile-tab-admin-module');
+      if (isOwnerAccount) {
+        if (adminTabBtn) { adminTabBtn.classList.remove('hidden'); adminTabBtn.classList.add('flex'); }
+        if (mobileAdminTabBtn) { mobileAdminTabBtn.classList.remove('hidden'); mobileAdminTabBtn.classList.add('flex'); }
+      } else {
+        if (adminTabBtn) { adminTabBtn.classList.add('hidden'); adminTabBtn.classList.remove('flex'); }
+        if (mobileAdminTabBtn) { mobileAdminTabBtn.classList.add('hidden'); mobileAdminTabBtn.classList.remove('flex'); }
+      }
     }
 
     function openAuthModal() {
@@ -14252,12 +14290,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const webhookInput = document.getElementById('adminWebhookUrlInput');
       if (webhookInput) webhookInput.value = GOOGLE_SHEETS_WEBHOOK_URL;
       if (window.location.hash === '#admin') {
+        sessionStorage.setItem('dims_admin_unlocked', 'true');
+        if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
       }
     });
 
     window.addEventListener('hashchange', () => {
       if (window.location.hash === '#admin') {
+        sessionStorage.setItem('dims_admin_unlocked', 'true');
+        if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
       }
     });
@@ -14266,6 +14308,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
+        sessionStorage.setItem('dims_admin_unlocked', 'true');
+        if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
         alert('Mode Owner Terbuka: Selamat datang di Dashboard Eksekutif Lolos Kerja.');
       }
