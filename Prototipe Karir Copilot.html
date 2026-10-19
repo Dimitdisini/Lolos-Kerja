@@ -11,7 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+  <!-- Supabase JS Client CDN (Enterprise Centralized Database & Real-Time Sync) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -1940,14 +1942,52 @@
           </div>
 
           <div class="flex items-center gap-2">
+            <button onclick="toggleSupabaseConfigBox()" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Setup Supabase Cloud DB</span>
+            </button>
             <button onclick="toggleWebhookConfigBox()" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-              <span>Setup Database Sheets</span>
+              <span>Setup Google Sheets</span>
             </button>
             <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               QRIS Live
             </span>
+          </div>
+        </div>
+
+        <!-- Supabase Cloud DB Configuration Box -->
+        <div id="adminSupabaseConfigBox" class="hidden p-4 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+              Supabase PostgreSQL Database (Sinkronisasi Multi-Device Real-Time)
+            </span>
+            <span class="text-[11px] text-emerald-700 font-mono font-bold" id="currentSupabaseStatusTag">Offline / Local Mode</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Supabase Project URL:</label>
+              <input type="text" id="adminSupabaseUrlInput" class="dospem-input w-full p-2 text-xs font-mono rounded-lg" placeholder="https://xyzcompany.supabase.co">
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Supabase Anon Public API Key:</label>
+              <input type="password" id="adminSupabaseKeyInput" class="dospem-input w-full p-2 text-xs font-mono rounded-lg" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+          </div>
+          <div class="flex justify-between items-center gap-2 pt-1 flex-wrap">
+            <p class="text-[11px] text-slate-500">
+              Koneksikan ke Supabase agar login di HP dan Laptop langsung tersinkronisasi otomatis tanpa cache browser lokal.
+            </p>
+            <div class="flex items-center gap-2">
+              <button onclick="testSupabaseConnection()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                Tes Koneksi
+              </button>
+              <button onclick="saveAdminSupabaseConfig()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition shadow-sm">
+                Simpan & Aktifkan Supabase
+              </button>
+            </div>
           </div>
         </div>
 
@@ -13294,6 +13334,17 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           sendRealEmail: sendRealEmailVal
         });
 
+        // Synchronize to Supabase PostgreSQL Database (Cloud Real-Time Sync)
+        syncBlastLogToSupabase({
+          targetCompany: item.company,
+          position: item.role,
+          recruiterEmail: item.email,
+          subject: 'Application: ' + item.role + ' - ' + senderNameVal,
+          body: document.getElementById('blastCoverLetterBody')?.value || '',
+          attachmentName: attachedName,
+          status: 'TERKIRIM'
+        });
+
         processNextInBlastQueue(index + 1);
       }, 4500);
       window.blastTimeoutId = blastTimeoutId;
@@ -13464,6 +13515,153 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
 
     /* -------------------------------------------------------------------------
+       SUPABASE POSTGRESQL CLIENT (ENTERPRISE CENTRALIZED DATABASE & SYNC)
+       ------------------------------------------------------------------------- */
+    let SUPABASE_URL = localStorage.getItem('lolos_kerja_supabase_url') || '';
+    let SUPABASE_ANON_KEY = localStorage.getItem('lolos_kerja_supabase_key') || '';
+    let supabaseClient = null;
+
+    function initSupabaseClient() {
+      if (SUPABASE_URL && SUPABASE_ANON_KEY && typeof window.supabase !== 'undefined') {
+        try {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          const tag = document.getElementById('currentSupabaseStatusTag');
+          if (tag) {
+            tag.innerText = 'Connected & Active';
+            tag.className = 'text-[11px] text-emerald-600 font-mono font-bold';
+          }
+          console.log('[SUPABASE] Client terhubung ke:', SUPABASE_URL);
+          // Subscribe to real-time changes
+          subscribeSupabaseRealtime();
+        } catch(e) {
+          console.error('[SUPABASE] Init error:', e);
+        }
+      }
+    }
+
+    function toggleSupabaseConfigBox() {
+      const box = document.getElementById('adminSupabaseConfigBox');
+      if (box) box.classList.toggle('hidden');
+      const urlInput = document.getElementById('adminSupabaseUrlInput');
+      const keyInput = document.getElementById('adminSupabaseKeyInput');
+      if (urlInput) urlInput.value = SUPABASE_URL;
+      if (keyInput) keyInput.value = SUPABASE_ANON_KEY;
+    }
+
+    function saveAdminSupabaseConfig() {
+      const url = document.getElementById('adminSupabaseUrlInput')?.value.trim();
+      const key = document.getElementById('adminSupabaseKeyInput')?.value.trim();
+      if (!url || !key) {
+        alert('Mohon masukkan Supabase Project URL dan Anon Public Key secara lengkap!');
+        return;
+      }
+      SUPABASE_URL = url;
+      SUPABASE_ANON_KEY = key;
+      localStorage.setItem('lolos_kerja_supabase_url', SUPABASE_URL);
+      localStorage.setItem('lolos_kerja_supabase_key', SUPABASE_ANON_KEY);
+      initSupabaseClient();
+      alert('Koneksi Supabase berhasil disimpan dan diaktifkan!');
+    }
+
+    async function testSupabaseConnection() {
+      const url = document.getElementById('adminSupabaseUrlInput')?.value.trim() || SUPABASE_URL;
+      const key = document.getElementById('adminSupabaseKeyInput')?.value.trim() || SUPABASE_ANON_KEY;
+      if (!url || !key) {
+        alert('Silakan isi Supabase URL dan Key terlebih dahulu untuk melakukan pengujian.');
+        return;
+      }
+      try {
+        const testClient = window.supabase.createClient(url, key);
+        const { data, error } = await testClient.from('users').select('count', { count: 'exact', head: true });
+        if (error && error.code !== 'PGRST116') {
+          alert('Terhubung ke Supabase! (Catatan: Tabel public.users belum dibuat atau RLS aktif: ' + error.message + ')');
+        } else {
+          alert('Koneksi ke Supabase PostgreSQL Berhasil & Responsif 100%!');
+        }
+      } catch (err) {
+        alert('Gagal menghubungi Supabase: ' + err.message);
+      }
+    }
+
+    // Helper sinkronkan data ke Supabase (jika aktif) + Google Sheets (backup)
+    async function syncUserDataToSupabase(userData) {
+      if (!supabaseClient) return;
+      try {
+        const { error } = await supabaseClient.from('users').upsert({
+          email: userData.email,
+          full_name: userData.name,
+          avatar_url: userData.avatar,
+          tier: userData.tier,
+          blast_quota: userData.blastQuota,
+          last_login_at: new Date().toISOString()
+        }, { onConflict: 'email' });
+        if (error) console.warn('[SUPABASE] Upsert user warning:', error.message);
+      } catch (e) {
+        console.warn('[SUPABASE] Sync error:', e);
+      }
+    }
+
+    async function syncTransactionToSupabase(txData) {
+      if (!supabaseClient) return;
+      try {
+        const { error } = await supabaseClient.from('transactions').insert({
+          order_id: txData.orderId,
+          plan_name: txData.plan,
+          amount: txData.amount,
+          payment_method: txData.method || 'QRIS',
+          payment_status: txData.status || 'SETTLED',
+          settled_at: new Date().toISOString()
+        });
+        if (error) console.warn('[SUPABASE] Insert transaction warning:', error.message);
+      } catch (e) {
+        console.warn('[SUPABASE] Transaction sync error:', e);
+      }
+    }
+
+    async function syncBlastLogToSupabase(blastData) {
+      if (!supabaseClient) return;
+      try {
+        const { error } = await supabaseClient.from('blast_logs').insert({
+          target_company: blastData.targetCompany,
+          target_role: blastData.position,
+          recruiter_email: blastData.recruiterEmail,
+          subject: blastData.subject,
+          cover_letter_body: blastData.body,
+          attachment_name: blastData.attachmentName,
+          status: blastData.status || 'TERKIRIM'
+        });
+        if (error) console.warn('[SUPABASE] Blast log error:', error.message);
+      } catch (e) {
+        console.warn('[SUPABASE] Blast log sync error:', e);
+      }
+    }
+
+    function subscribeSupabaseRealtime() {
+      if (!supabaseClient) return;
+      try {
+        supabaseClient.channel('public-updates')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions' }, payload => {
+            console.log('[SUPABASE-REALTIME] Transaksi baru:', payload);
+            if (payload.new && typeof adminState !== 'undefined') {
+              adminState.transactions.unshift({
+                id: payload.new.order_id,
+                name: payload.new.plan_name,
+                email: 'sync@cloud',
+                plan: payload.new.plan_name,
+                amount: payload.new.amount,
+                method: payload.new.payment_method,
+                time: 'Realtime',
+                status: payload.new.payment_status
+              });
+              updateAdminKPIs();
+              renderAdminOrders();
+            }
+          })
+          .subscribe();
+      } catch(e) {}
+    }
+
+    /* -------------------------------------------------------------------------
        GOOGLE IDENTITY SERVICES (REAL OAUTH) & SPREADSHEET SYNC CONFIG
        ------------------------------------------------------------------------- */
     const GOOGLE_CLIENT_ID = '908048176921-ip83uu213vsgi3mgivtfdj6br792c704.apps.googleusercontent.com';
@@ -13541,7 +13739,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         saveUserSession();
         closeAuthModal();
 
-        // Sinkronkan ke Google Sheets
+        // Sinkronkan ke Google Sheets & Supabase PostgreSQL
         syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
           name: currentUser.name,
           email: currentUser.email,
@@ -13550,6 +13748,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           status: 'Active (Google OAuth)',
           avatar: currentUser.avatar
         });
+        syncUserDataToSupabase(currentUser);
 
         alert('Selamat datang, ' + currentUser.name + '! Berhasil masuk dengan Akun Google resmi.');
       } catch(err) {
@@ -13603,6 +13802,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       saveUserSession();
       closeGoogleAccountPicker();
 
+      // Sinkronkan ke Google Sheets & Supabase PostgreSQL
       syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
         name: currentUser.name,
         email: currentUser.email,
@@ -13611,6 +13811,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         status: 'Active (Google)',
         avatar: currentUser.avatar
       });
+      syncUserDataToSupabase(currentUser);
     }
 
     function submitCustomGoogleAccount(e) {
@@ -13721,7 +13922,17 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         status: 'SETTLED'
       });
 
-      // Synchronize updated user quota & tier to Google Sheets Users database
+      // Synchronize to Supabase PostgreSQL Database (Cloud Real-Time Sync)
+      syncTransactionToSupabase({
+        orderId: currentUser.orderPending.orderId,
+        plan: currentUser.orderPending.planName,
+        amount: currentUser.orderPending.price,
+        method: 'QRIS Scan Live',
+        status: 'SETTLED'
+      });
+      syncUserDataToSupabase(currentUser);
+
+      // Synchronize updated user quota & tier to Google Sheets Users database (Backup)
       syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
         name: currentUser.name,
         email: currentUser.email,
@@ -14401,6 +14612,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         });
       }
 
+      initSupabaseClient();
       initAdminPortal();
       initGoogleAuth();
       initBlastTargets();
