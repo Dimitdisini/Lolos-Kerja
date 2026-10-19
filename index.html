@@ -491,14 +491,14 @@
           <span class="font-semibold">Karier Impian Fresh Graduate • Bebas Ghosting HRD</span>
         </div>
 
-        <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.15] text-slate-900 max-w-4xl mx-auto">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-slate-900 max-w-3xl mx-auto">
           Capek Kirim Ratusan CV Tanpa Pernah Ada Panggilan?<br>
           <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-amber-600 bg-clip-text text-transparent">
             Bukan Kamu yang Kurang, Cara Lamarmu yang Perlu Dirombak.
           </span>
         </h1>
 
-        <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
           94% CV gugur di sistem screening ATS sebelum sempat disentuh HRD. Lolos Kerja mendampingimu dari nol: menyulap draf pengalaman minim jadi prestasi terukur berformula STAR Google X-Y-Z, melatih simulasi wawancara suara sampai hilang rasa grogi, hingga mendistribusikan lamaran ke HRD perusahaan impian.
         </p>
 
@@ -1224,6 +1224,47 @@
           <button onclick="resetJobFilters()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-semibold transition">Reset</button>
         </div>
       </div>
+      <!-- PANDUAN PENENTU KARIR FRESH GRADUATE (BELUM TAHU MAU KERJA APA?) -->
+      <div class="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 border border-blue-200/80 rounded-2xl space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+            <span class="text-xs font-bold text-slate-900">Belum Tahu Mau Melamar Posisi Apa?</span>
+            <span class="text-[10px] font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Kompas Karir Pemula</span>
+          </div>
+          <span class="text-[11px] text-slate-500">Pilih rumpun minat atau jurusan kuliahmu untuk melihat lowongan yang relevan:</span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 pt-0.5">
+          <button type="button" onclick="selectCareerCompass('all_majors')" id="compass-all_majors" class="career-compass-btn text-left p-2.5 rounded-xl border border-blue-300 bg-white hover:bg-blue-50/80 transition-all shadow-xs group">
+            <div class="text-[11px] font-bold text-blue-700 flex items-center justify-between">
+              <span>Buka Semua Jurusan</span>
+              <span class="text-[9px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-mono">FAVORIT</span>
+            </div>
+            <div class="text-[10px] text-slate-500 mt-1 leading-snug">MT, ODP Perbankan, BUMN & Generalist</div>
+          </button>
+
+          <button type="button" onclick="selectCareerCompass('business')" id="compass-business" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-[11px] font-bold text-slate-800">Bisnis & Operasional</div>
+            <div class="text-[10px] text-slate-500 mt-1 leading-snug">Manajemen, BD, Logistik & Admin</div>
+          </button>
+
+          <button type="button" onclick="selectCareerCompass('marketing')" id="compass-marketing" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-[11px] font-bold text-slate-800">Marketing & Media</div>
+            <div class="text-[10px] text-slate-500 mt-1 leading-snug">Social Media, Content, PR & Ads</div>
+          </button>
+
+          <button type="button" onclick="selectCareerCompass('tech')" id="compass-tech" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-[11px] font-bold text-slate-800">Teknologi & Data</div>
+            <div class="text-[10px] text-slate-500 mt-1 leading-snug">IT Support, Junior Dev & Data Analyst</div>
+          </button>
+
+          <button type="button" onclick="selectCareerCompass('finance')" id="compass-finance" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-[11px] font-bold text-slate-800">Keuangan & Pajak</div>
+            <div class="text-[10px] text-slate-500 mt-1 leading-snug">Akuntansi, Billing, Audit & Finansial</div>
+          </button>
+        </div>
+      </div>
 
       <!-- APPLE UI SEGMENTED CONTROL PILLS (UNIVERSAL CATEGORIES) -->
       <div class="space-y-3">
@@ -1798,10 +1839,10 @@
             <span>Total Pendapatan (Gross)</span>
             <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">Rp</span>
           </div>
-          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalRevenue">Rp 3.842.000</div>
-          <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold">
+          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalRevenue">Rp 0</div>
+          <div class="flex items-center gap-1.5 text-[11px] text-emerald-600 font-bold" id="adminRevenueGrowthDesc">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-            <span>+24.8% dari minggu lalu</span>
+            <span>Live Settlement QRIS</span>
           </div>
         </div>
 
@@ -1811,8 +1852,8 @@
             <span>Transaksi QRIS Sukses</span>
             <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">TX</span>
           </div>
-          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminSuccessTxCount">48 Transaksi</div>
-          <div class="text-[11px] text-slate-400">Tingkat konversi checkout 78.4%</div>
+          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminSuccessTxCount">0 Transaksi</div>
+          <div class="text-[11px] text-slate-400" id="adminConversionRateDesc">Tercatat di Google Sheets</div>
         </div>
 
         <!-- Registered Candidates -->
@@ -1821,8 +1862,8 @@
             <span>Kandidat Terdaftar</span>
             <span class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">USR</span>
           </div>
-          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalUsers">324 Pelamar</div>
-          <div class="text-[11px] text-indigo-600 font-bold">62 Akun VIP Aktif</div>
+          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalUsers">0 Pelamar</div>
+          <div class="text-[11px] text-indigo-600 font-bold" id="adminVipCountDesc">Sinkronisasi Database</div>
         </div>
 
         <!-- Blast Delivered -->
@@ -1831,8 +1872,8 @@
             <span>Email Lamaran Terkirim</span>
             <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">EM</span>
           </div>
-          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalEmailsSent">862 Terkirim</div>
-          <div class="text-[11px] text-emerald-600 font-bold">100% Bebas Bouncing (Safety Drip)</div>
+          <div class="text-2xl font-black text-slate-900 tracking-tight" id="adminTotalEmailsSent">0 Terkirim</div>
+          <div class="text-[11px] text-slate-400" id="adminBlastStatusDesc">Belum ada antrean blast terkirim</div>
         </div>
       </div>
 
@@ -12292,6 +12333,48 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
        ------------------------------------------------------------------------- */
     let currentJobCategoryFilter = 'all';
     let currentJobLevelFilter = 'all';
+    let currentCareerCompass = null;
+
+    function selectCareerCompass(mode) {
+      currentCareerCompass = mode;
+      
+      // Update compass button styles
+      document.querySelectorAll('.career-compass-btn').forEach(btn => {
+        btn.classList.remove('ring-2', 'ring-blue-600', 'bg-blue-50/90');
+        btn.classList.add('border-slate-200');
+      });
+      const activeBtn = document.getElementById('compass-' + mode);
+      if (activeBtn) {
+        activeBtn.classList.add('ring-2', 'ring-blue-600', 'bg-blue-50/90');
+        activeBtn.classList.remove('border-slate-200');
+      }
+
+      if (mode === 'all_majors') {
+        currentJobCategoryFilter = 'all';
+        document.querySelectorAll('#appleJobCategoryPills .job-category-pill').forEach(p => {
+          if (p.getAttribute('data-cat') === 'all') {
+            p.className = 'job-category-pill text-xs px-4 py-1.5 rounded-full font-bold transition-all shadow-sm apple-pill-active';
+          } else {
+            p.className = 'job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900';
+          }
+        });
+
+        const filtered = curatedJobsDatabase.filter(job => {
+          const t = (job.title || '').toLowerCase();
+          const c = (job.category || '').toLowerCase();
+          return /trainee|odp|management|associate|officer|assistant|coordinator|general|operas|business|admin|consult/i.test(t) ||
+                 /trainee|ops|business/i.test(c);
+        });
+        renderJobs(filtered);
+        return;
+      }
+
+      // If specific cluster
+      if (mode === 'business') setJobCategoryPill('business');
+      else if (mode === 'marketing') setJobCategoryPill('marketing');
+      else if (mode === 'tech') setJobCategoryPill('tech');
+      else if (mode === 'finance') setJobCategoryPill('finance');
+    }
 
     function setJobCategoryPill(cat) {
       currentJobCategoryFilter = cat;
@@ -12353,6 +12436,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const directJobUrl = job.link || ('https://www.linkedin.com/jobs/search/?keywords=' + encodeURIComponent(job.title + ' ' + job.company));
         const uCat = job.universalCategory || getUniversalJobCategory(job);
         const catBadgeInfo = categoryLabels[uCat] || categoryLabels['business'];
+        const isAllMajors = /trainee|odp|management|associate|officer|assistant|coordinator|general|operas|business|admin|consult/i.test(job.title) || catBadgeInfo.label.includes('Operations & MT');
 
         let matchScoreHtml = '';
         if (isCvAnalyzed) {
@@ -12393,6 +12477,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
             <div class="flex items-center gap-2 flex-wrap text-[11px]">
               <span class="px-2 py-0.5 rounded-full font-bold border ${catBadgeInfo.color}">${catBadgeInfo.label}</span>
+              ${isAllMajors ? '<span class="px-2 py-0.5 rounded-full font-bold border bg-emerald-50 text-emerald-800 border-emerald-300 text-[10px]">Buka Semua Jurusan</span>' : ''}
               <span class="text-slate-500 flex items-center gap-1 font-medium">
                 <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                 ${job.location || 'Indonesia'}
@@ -12476,6 +12561,14 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           p.className = 'job-level-pill text-[11px] px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium';
         }
       });
+
+      if (currentCareerCompass) {
+        document.querySelectorAll('.career-compass-btn').forEach(btn => {
+          btn.classList.remove('ring-2', 'ring-blue-600', 'bg-blue-50/90');
+          btn.classList.add('border-slate-200');
+        });
+        currentCareerCompass = null;
+      }
 
       renderJobs(curatedJobsDatabase);
     }
@@ -12893,6 +12986,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
           if (quotaDisplay) quotaDisplay.innerText = currentUser.blastQuota + ' Email';
           updateUserNavbarUI();
+        }
+
+        // Track live email delivered in Admin KPI
+        if (typeof adminState !== 'undefined') {
+          adminState.totalEmailsSent = (adminState.totalEmailsSent || 0) + 1;
+          try {
+            localStorage.setItem('lolos_kerja_admin_emails_sent', adminState.totalEmailsSent);
+          } catch(e) {}
+          if (typeof updateAdminKPIs === 'function') updateAdminKPIs();
         }
 
         const sendRealEmailVal = document.getElementById('blastSendRealEmailToggle') ? document.getElementById('blastSendRealEmailToggle').checked : true;
@@ -13346,13 +13448,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       try {
         const savedUsers = localStorage.getItem('lolos_kerja_admin_users');
         const savedTx = localStorage.getItem('lolos_kerja_admin_transactions');
+        const savedSent = localStorage.getItem('lolos_kerja_admin_emails_sent');
         return {
           currentSubTab: 'orders',
           users: savedUsers ? JSON.parse(savedUsers) : defaultAdminUsers,
-          transactions: savedTx ? JSON.parse(savedTx) : defaultAdminTransactions
+          transactions: savedTx ? JSON.parse(savedTx) : defaultAdminTransactions,
+          totalEmailsSent: savedSent !== null ? parseInt(savedSent, 10) : 0
         };
       } catch(e) {
-        return { currentSubTab: 'orders', users: defaultAdminUsers, transactions: defaultAdminTransactions };
+        return { currentSubTab: 'orders', users: defaultAdminUsers, transactions: defaultAdminTransactions, totalEmailsSent: 0 };
       }
     }
 
@@ -13634,6 +13738,26 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const totalUsersEl = document.getElementById('adminTotalUsers');
       if (totalUsersEl) totalUsersEl.innerText = adminState.users.length + ' Pelamar Terdaftar';
+
+      const vipCount = adminState.users.filter(u => u.tier === 'VIP' || (u.status && u.status.includes('VIP'))).length;
+      const vipDescEl = document.getElementById('adminVipCountDesc');
+      if (vipDescEl) vipDescEl.innerText = vipCount + ' Akun VIP Aktif';
+
+      const emailsSentEl = document.getElementById('adminTotalEmailsSent');
+      const blastStatusDesc = document.getElementById('adminBlastStatusDesc');
+      const sentCount = adminState.totalEmailsSent || 0;
+      if (emailsSentEl) {
+        emailsSentEl.innerText = sentCount + ' Terkirim';
+      }
+      if (blastStatusDesc) {
+        if (sentCount > 0) {
+          blastStatusDesc.innerText = '100% Bebas Bouncing (Safety Drip)';
+          blastStatusDesc.className = 'text-[11px] text-emerald-600 font-bold';
+        } else {
+          blastStatusDesc.innerText = 'Belum ada antrean blast terkirim';
+          blastStatusDesc.className = 'text-[11px] text-slate-400';
+        }
+      }
     }
 
     function adjustUserQuota(userIndex, amount) {
