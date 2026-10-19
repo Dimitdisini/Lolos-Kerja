@@ -13427,13 +13427,6 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     function initUserSession() {
-      // Pembersihan otomatis residu session akun lama
-      try {
-        const savedRaw = localStorage.getItem('lolos_kerja_user');
-        if (savedRaw && (savedRaw.toLowerCase().includes('dimitri') || savedRaw.toLowerCase().includes('dimss'))) {
-          localStorage.removeItem('lolos_kerja_user');
-        }
-      } catch (e) {}
       const saved = localStorage.getItem('lolos_kerja_user');
       if (saved) {
         try {
@@ -13445,6 +13438,25 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
       syncCurrentSessionWithAdminDatabase();
       updateUserNavbarUI();
+
+      // Cloud Fetch dari Supabase PostgreSQL (Multi-Device Auto-Sync)
+      if (currentUser.isLoggedIn && currentUser.email && typeof supabaseClient !== 'undefined' && supabaseClient) {
+        supabaseClient.from('users').select('*').eq('email', currentUser.email).maybeSingle()
+          .then(({ data, error }) => {
+            if (data && !error) {
+              currentUser.tier = data.tier || currentUser.tier;
+              currentUser.tierName = data.tier === 'VIP' ? 'Dikerjain VIP' : (data.tier === 'DIBANTUIN' ? 'Dibantuin' : (data.tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)'));
+              currentUser.blastQuota = data.blast_quota !== undefined ? data.blast_quota : currentUser.blastQuota;
+              if (data.role) currentUser.role = data.role;
+              saveUserSession();
+              updateUserNavbarUI();
+              const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
+              if (quotaDisplay) quotaDisplay.innerText = currentUser.blastQuota + ' Email';
+              console.log('[SUPABASE] Session pengguna berhasil disinkronkan dari PostgreSQL Cloud:', data.email);
+            }
+          })
+          .catch(err => console.warn('[SUPABASE] Cloud profile fetch notice:', err));
+      }
     }
 
     function saveUserSession() {
@@ -13517,8 +13529,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     /* -------------------------------------------------------------------------
        SUPABASE POSTGRESQL CLIENT (ENTERPRISE CENTRALIZED DATABASE & SYNC)
        ------------------------------------------------------------------------- */
-    let SUPABASE_URL = localStorage.getItem('lolos_kerja_supabase_url') || '';
-    let SUPABASE_ANON_KEY = localStorage.getItem('lolos_kerja_supabase_key') || '';
+    let SUPABASE_URL = localStorage.getItem('lolos_kerja_supabase_url') || 'https://kmgfgqwauctfjpdvwofu.supabase.co';
+    let SUPABASE_ANON_KEY = localStorage.getItem('lolos_kerja_supabase_key') || 'sb_publishable_z5xGEUqgmNN8-AXyiVdXFQ_mmpbD7-i';
     let supabaseClient = null;
 
     function initSupabaseClient() {
