@@ -14196,7 +14196,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     /* -------------------------------------------------------------------------
        GOOGLE IDENTITY SERVICES (REAL OAUTH) & SPREADSHEET SYNC CONFIG
        ------------------------------------------------------------------------- */
-    const GOOGLE_CLIENT_ID = '908048176921-ip83uu213vsgi3mgivtfdj6br792c704.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID = '926035516685-s2924ns240b302fca5n6ve894vmadovk.apps.googleusercontent.com';
     let GOOGLE_SHEETS_WEBHOOK_URL = localStorage.getItem('lolos_kerja_sheets_webhook') || 'https://script.google.com/macros/s/AKfycby_UPE1c4vk2UZ7eOBBAglljG5IvF0UCfvzOryaDyl7-EvC7A25inxyjOdwa4BK8iGpDw/exec';
 
     function setGoogleSheetsWebhookUrl(url) {
@@ -14367,25 +14367,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     async function loginWithGoogle() {
-      // 1. Coba Supabase OAuth jika terkonfigurasi (akan membuka Google consent screen Supabase)
-      if (supabaseClient && supabaseClient.auth) {
-        try {
-          const { data, error } = await supabaseClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-              redirectTo: window.location.origin + window.location.pathname
-            }
-          });
-          if (!error && data && data.url) {
-            window.location.href = data.url;
-            return;
-          }
-        } catch(e) {
-          console.warn('Supabase OAuth notice:', e);
-        }
-      }
-
-      // 2. Redirect langsung ke Endpoint Resmi Google OAuth 2.0 (Google Accounts Consent Screen)
+      // Redirect langsung ke Endpoint Resmi Google OAuth 2.0 (Google Accounts Consent Screen)
       // Ini 100% membuka halaman login resmi Google (Google Sign-In, 2FA, password, akun selector asli)
       const currentOrigin = window.location.origin;
       const currentPath = window.location.pathname;
