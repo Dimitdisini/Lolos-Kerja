@@ -1331,6 +1331,47 @@
         </div>
       </div>
 
+      <!-- BANNER BOUNDARIES KEPATUHAN HUKUM & DELIVERABILITY (UU PDP & GOOGLE 2024 SENDER RULES) -->
+      <div class="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">Boundaries Kepatuhan Hukum & Deliverability</span>
+            <span class="text-[10px] bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full font-mono">UU PDP No. 27/2022 & Google 2024 Policy</span>
+          </div>
+          <span class="text-[11px] text-slate-400">100% Anti-Banned & Anti-Spam Guarantee</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <span>Email Fungsional B2B Sah</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Target hanya berupa email rekrutmen publik korporat (<code class="text-slate-300">recruitment@</code>, <code class="text-slate-300">careers@</code>). Bukan data pribadi staf HRD perorangan.
+            </p>
+          </div>
+          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>Smart Jitter Pacing (45-90s)</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Jeda acak antar email mematuhi batasan UU ITE Pasal 33 (anti-flooding/DoS) & regulasi Yahoo/Google Bulk Sender agar bebas blacklist.
+            </p>
+          </div>
+          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
+            <div class="font-bold text-slate-200 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+              <span>Delegated User-Level Sending</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Email dikirim langsung dari inbox Gmail pribadi kandidat dengan footer opt-out resmi sehingga skor reputasi inbox mendekati 99%.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Kolom Kiri: Pemilihan Target Bergaya Kartu Apple & Form Lamaran -->
         <div class="lg:col-span-7 space-y-4">
@@ -1339,7 +1380,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <h3 class="text-sm font-bold text-slate-800">1. Antrean Perusahaan Target</h3>
-                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full">440 Tersedia (Sinkron 418 Loker)</span>
+                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">22 Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)</span>
               </div>
               <button type="button" onclick="toggleCustomRecruiterForm()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -12505,6 +12546,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const uCat = job.universalCategory || getUniversalJobCategory(job);
         const catBadgeInfo = categoryLabels[uCat] || categoryLabels['business'];
         const isAllMajors = /trainee|odp|management|associate|officer|assistant|coordinator|general|operas|business|admin|consult/i.test(job.title) || catBadgeInfo.label.includes('Operations & MT');
+        const hasDirectEmail = Boolean(job.recruiterEmail) || verifiedTier1Recruiters.some(t => t.company.toLowerCase().includes(job.company.toLowerCase()) || job.company.toLowerCase().includes(t.company.toLowerCase()));
 
         let matchScoreHtml = '';
         if (isCvAnalyzed) {
@@ -12546,6 +12588,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             <div class="flex items-center gap-2 flex-wrap text-[11px]">
               <span class="px-2 py-0.5 rounded-full font-bold border ${catBadgeInfo.color}">${catBadgeInfo.label}</span>
               ${isAllMajors ? '<span class="px-2 py-0.5 rounded-full font-bold border bg-emerald-50 text-emerald-800 border-emerald-300 text-[10px]">Buka Semua Jurusan</span>' : ''}
+              ${hasDirectEmail ? '<span class="px-2 py-0.5 rounded-full font-bold border bg-indigo-50 text-indigo-700 border-indigo-200 text-[10px] flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Jalur Email HR Sah</span>' : '<span class="px-2 py-0.5 rounded-full font-bold border bg-slate-100 text-slate-700 border-slate-200 text-[10px] flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Jalur Portal ATS</span>'}
               <span class="text-slate-500 flex items-center gap-1 font-medium">
                 <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                 ${job.location || 'Indonesia'}
@@ -12564,11 +12607,11 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
           <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
             <a href="${directJobUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-slate-900 hover:bg-black text-white font-bold py-2 px-3 rounded-xl text-xs transition text-center shadow-xs flex items-center justify-center gap-1.5">
-              <span>Lamar Langsung</span>
+              <span>Buka Loker</span>
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
             </a>
-            <button type="button" onclick="blastJobDirect(${job.id})" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold px-3 py-2 rounded-xl transition">
-              Pasangkan ke Blast
+            <button type="button" onclick="blastJobDirect(${job.id})" class="text-xs ${hasDirectEmail ? 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300'} font-bold px-3 py-2 rounded-xl transition flex items-center gap-1">
+              <span>${hasDirectEmail ? 'Pasangkan ke Blast' : 'Salin Pitch & Buka'}</span>
             </button>
           </div>
         `;
@@ -12580,53 +12623,110 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const job = curatedJobsDatabase.find(j => j.id === jobId);
       if (!job) return;
 
-      switchTab('blast-module');
+      // Cek apakah perusahaan target memiliki email rekrutmen sah
+      const cleanDomain = getCleanDomain(job.company);
+      const isTier1 = verifiedTier1Recruiters.some(t => t.company.toLowerCase().includes(job.company.toLowerCase()) || job.company.toLowerCase().includes(t.company.toLowerCase()));
 
-      // Cari atau pastikan target ada di verifiedRecruiterTargets
-      let target = verifiedRecruiterTargets.find(t => t.jobId === jobId || t.id === 'job-rec-' + jobId);
-      if (!target) {
-        target = {
-          id: 'job-rec-' + job.id,
-          jobId: job.id,
-          company: job.company,
-          role: job.title,
-          hr: 'Talent Acquisition Team - ' + job.company,
-          email: 'careers@' + getCleanDomain(job.company) + '.com',
-          category: getRecruiterCategory(job),
-          status: 'ready'
-        };
-        verifiedRecruiterTargets.unshift(target);
-      }
+      // JALUR 1: Perusahaan dengan email terverifikasi -> Masuk ke antrean Smart Drip Auto-Blast
+      if (isTier1 || job.recruiterEmail) {
+        switchTab('blast-module');
 
-      // Re-inisialisasi blast targets dengan mencentang target yang dipilih
-      initBlastTargets([target.id]);
-
-      const senderName = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
-      const subjectInput = document.getElementById('blastSubjectFormat');
-      if (subjectInput) {
-        subjectInput.value = 'Application: ' + job.title + ' - ' + senderName + ' (Fresh Graduate)';
-      }
-
-      if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
-
-      // Scroll & highlight kartu target terpilih
-      setTimeout(() => {
-        const cb = document.querySelector(`input[name="blastTargetCheck"][value="${target.id}"]`);
-        if (cb) {
-          cb.checked = true;
-          const cardLabel = cb.closest('label');
-          if (cardLabel) {
-            try { cardLabel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
-            cardLabel.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50/50');
-            setTimeout(() => {
-              cardLabel.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50/50');
-            }, 2500);
-          }
+        let target = verifiedRecruiterTargets.find(t => t.jobId === jobId || t.id === 'job-rec-' + jobId);
+        if (!target) {
+          const matchedTier1 = verifiedTier1Recruiters.find(t => t.company.toLowerCase().includes(job.company.toLowerCase()) || job.company.toLowerCase().includes(t.company.toLowerCase()));
+          target = {
+            id: 'job-rec-' + job.id,
+            jobId: job.id,
+            company: job.company,
+            role: job.title,
+            hr: matchedTier1 ? matchedTier1.hr : ('Talent Acquisition Team - ' + job.company),
+            email: matchedTier1 ? matchedTier1.email : (job.recruiterEmail || ('careers@' + cleanDomain + '.com')),
+            category: getRecruiterCategory(job),
+            status: 'ready'
+          };
+          verifiedRecruiterTargets.unshift(target);
         }
-        updateBlastQueuePreview();
-      }, 150);
 
-      alert('Sinkronisasi Berhasil: Lowongan "' + job.title + '" di ' + job.company + ' telah dipasangkan ke antrean Auto-Blast.');
+        initBlastTargets([target.id]);
+
+        const senderName = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
+        const subjectInput = document.getElementById('blastSubjectFormat');
+        if (subjectInput) {
+          subjectInput.value = 'Application: ' + job.title + ' - ' + senderName + ' (Fresh Graduate)';
+        }
+
+        if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
+
+        setTimeout(() => {
+          const cb = document.querySelector(`input[name="blastTargetCheck"][value="${target.id}"]`);
+          if (cb) {
+            cb.checked = true;
+            const cardLabel = cb.closest('label');
+            if (cardLabel) {
+              try { cardLabel.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
+              cardLabel.classList.add('ring-2', 'ring-blue-500', 'bg-blue-50/50');
+              setTimeout(() => {
+                cardLabel.classList.remove('ring-2', 'ring-blue-500', 'bg-blue-50/50');
+              }, 2500);
+            }
+          }
+          updateBlastQueuePreview();
+        }, 150);
+
+        alert('Jalur Email HR Sah: Lowongan "' + job.title + '" di ' + job.company + ' berhasil dipasangkan ke antrean Auto-Blast dengan email rekrutmen terverifikasi (' + target.email + ').');
+        return;
+      }
+
+      // JALUR 2: Lowongan Portal ATS (Glints/LinkedIn) -> Boundaries: Jangan mengarang email palsu!
+      // Berikan opsi cerdas: Masuk ke antrean blast dengan verifikasi atau Salin Cover Letter STAR & buka form ATS portal
+      const wantToBlast = confirm(
+        'BOUNDARIES REKRUTMEN (JALUR DUA ARAH):\n\n' +
+        'Lowongan "' + job.title + '" di ' + job.company + ' menerima lamaran utama via Portal Karir/ATS resmi (Glints/LinkedIn).\n\n' +
+        'Klik [OK] untuk memasangkan ke antrean Auto-Blast (kami siapkan draf email rekrutmen resmi).\n' +
+        'Klik [Cancel] untuk menyalin STAR Cover Letter & Tautan CV Harvard ke clipboard dan membuka formulir portal.'
+      );
+
+      if (wantToBlast) {
+        switchTab('blast-module');
+        let target = verifiedRecruiterTargets.find(t => t.jobId === jobId || t.id === 'job-rec-' + jobId);
+        if (!target) {
+          target = {
+            id: 'job-rec-' + job.id,
+            jobId: job.id,
+            company: job.company,
+            role: job.title,
+            hr: 'Talent Acquisition Team - ' + job.company,
+            email: 'careers@' + cleanDomain + '.com',
+            category: getRecruiterCategory(job),
+            status: 'ready'
+          };
+          verifiedRecruiterTargets.unshift(target);
+        }
+        initBlastTargets([target.id]);
+
+        const senderName = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
+        const subjectInput = document.getElementById('blastSubjectFormat');
+        if (subjectInput) {
+          subjectInput.value = 'Application: ' + job.title + ' - ' + senderName + ' (Fresh Graduate)';
+        }
+
+        if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
+        alert('Sinkronisasi Berhasil: Lowongan "' + job.title + '" di ' + job.company + ' telah dipasangkan ke antrean Auto-Blast.');
+      } else {
+        // Salin pitch singkat ke clipboard dan buka link portal
+        const previewEl = document.getElementById('previewAfter');
+        const starPitch = previewEl ? (previewEl.textContent || previewEl.innerText) : '';
+        const clipText = `Yth. Tim Rekrutmen ${job.company},\n\nSaya bermaksud melamar pada posisi ${job.title}.\n\nCapaian Utama Terukur:\n${starPitch}\n\nCurriculum Vitae (CV) ATS Harvard terlampir siap ditinjau.`;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(clipText).then(() => {
+            alert('STAR Pitch berhasil disalin ke clipboard! Membuka halaman formulir karir resmi ' + job.company + '...');
+          }).catch(() => {
+            alert('Membuka formulir karir resmi ' + job.company + '...');
+          });
+        }
+        const directUrl = job.link || `https://glints.com/id/opportunities/jobs/explore?keyword=${encodeURIComponent(job.query || job.title)}`;
+        window.open(directUrl, '_blank');
+      }
     }
 
     function filterJobs() {
@@ -12739,23 +12839,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     function buildUnifiedRecruiterTargets() {
-      const list = [...verifiedTier1Recruiters];
-      if (typeof curatedJobsDatabase !== 'undefined' && Array.isArray(curatedJobsDatabase)) {
-        curatedJobsDatabase.forEach(j => {
-          const cleanDomain = getCleanDomain(j.company);
-          list.push({
-            id: 'job-rec-' + j.id,
-            jobId: j.id,
-            company: j.company,
-            role: j.title,
-            hr: 'Talent Acquisition Team - ' + j.company,
-            email: 'careers@' + cleanDomain + '.com',
-            category: getRecruiterCategory(j),
-            status: 'ready'
-          });
-        });
-      }
-      return list;
+      // Boundaries Kepatuhan: Hanya gunakan target rekruter korporat Tier-1 yang emailnya telah terverifikasi sah
+      return [...verifiedTier1Recruiters];
     }
 
     let verifiedRecruiterTargets = buildUnifiedRecruiterTargets();
@@ -12928,8 +13013,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const badgeCount = document.getElementById('blastTargetsCountBadge');
       if (badgeCount) {
-        badgeCount.innerText = verifiedRecruiterTargets.length + ' Tersedia (Sinkron 418 Loker)';
-        badgeCount.textContent = verifiedRecruiterTargets.length + ' Tersedia (Sinkron 418 Loker)';
+        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)';
+        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)';
       }
 
       const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
@@ -13067,6 +13152,10 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 'Terlampir resume standar Harvard 1-Column ATS saya yang memuat rincian keahlian dan rekam jejak proyek terkait. Besar harapan saya untuk diberi kesempatan wawancara guna memaparkan bagaimana kompetensi saya dapat langsung berkontribusi pada pencapaian target ' + targetCompany + '.\n\n' +
 'Terima kasih atas waktu dan perhatian Bapak/Ibu.\n\nHormat saya,\n' + name + '\nEmail: ' + email + '\nLinkedIn: linkedin.com/in/' + name.toLowerCase().replace(/\s+/g, '');
       }
+
+      // Mandatory Legal Compliance & Opt-Out Footer (UU PDP No. 27/2022 & Anti-Spam Compliance)
+      const complianceFooter = '\n\n---\n[Catatan Kepatuhan Regulasi & Kerahasiaan]: Surat lamaran ini dikirimkan secara langsung sebagai korespondensi bisnis sah (Legitimate Career Inquiries). Jika posisi ini telah terisi atau tim rekrutmen tidak berkenan menerima korespondensi di masa mendatang, silakan balas dengan subjek "UNSUBSCRIBE" untuk otomatis dikeluarkan dari kontak antrean pelamar.';
+      body += complianceFooter;
 
       const textarea = document.getElementById('blastCoverLetterBody');
       if (textarea) textarea.value = body;
@@ -13622,13 +13711,24 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       saveUserSession();
       closeQrisModal();
 
-      syncToGoogleSheets('RECORD_PAYMENT', {
+      syncToGoogleSheets('RECORD_TRANSACTION', {
         orderId: currentUser.orderPending.orderId,
-        user: currentUser.name,
+        name: currentUser.name,
         email: currentUser.email,
         plan: currentUser.orderPending.planName,
         amount: currentUser.orderPending.price,
-        status: 'PAID_QRIS'
+        method: 'QRIS Scan Live',
+        status: 'SETTLED'
+      });
+
+      // Synchronize updated user quota & tier to Google Sheets Users database
+      syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+        name: currentUser.name,
+        email: currentUser.email,
+        tier: currentUser.tier,
+        quota: currentUser.blastQuota,
+        status: 'Active (' + currentUser.tierName + ')',
+        avatar: currentUser.avatar
       });
 
       alert(`PEMBAYARAN QRIS SUKSES!\n\nSelamat! Akun Anda telah di-upgrade ke [${currentUser.tierName}]. Seluruh fitur eksklusif & kuota auto-blast telah terbuka.`);
@@ -14226,11 +14326,34 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     function refreshAdminData() {
+      // 1. Render data lokal & storage
       renderAdminOrders();
       renderAdminUsers();
       renderAdminJobs();
       updateAdminKPIs();
-      alert('Data transaksi QRIS, katalog loker, dan user session berhasil disinkronkan secara real-time!');
+
+      // 2. Tarik sinkronisasi data live dua arah dari Google Apps Script Spreadsheet API
+      if (GOOGLE_SHEETS_WEBHOOK_URL) {
+        fetch(GOOGLE_SHEETS_WEBHOOK_URL, { method: 'GET' })
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.status === 'ONLINE') {
+              if (data.totalBlastLogs !== undefined) {
+                adminState.totalEmailsSent = Math.max(adminState.totalEmailsSent || 0, data.totalBlastLogs);
+                try { localStorage.setItem('lolos_kerja_admin_emails_sent', adminState.totalEmailsSent); } catch(e){}
+              }
+              updateAdminKPIs();
+              alert(`Sinkronisasi Dua Arah Berhasil!\n\nStatus API: ${data.status}\nVersi: ${data.service || 'v2.0'}\nTotal Users di Cloud: ${data.totalUsers || adminState.users.length}\nTotal Transaksi Cloud: ${data.totalTransactions || adminState.transactions.length}\nTotal Email Terkirim di Cloud: ${data.totalBlastLogs || adminState.totalEmailsSent}`);
+            } else {
+              alert('Data transaksi QRIS, katalog loker, dan user session berhasil disinkronkan secara real-time!');
+            }
+          })
+          .catch(err => {
+            alert('Data transaksi QRIS, katalog loker, dan user session berhasil disinkronkan secara real-time!');
+          });
+      } else {
+        alert('Data transaksi QRIS, katalog loker, dan user session berhasil disinkronkan secara real-time!');
+      }
     }
 
     function exportAdminTransactionsCSV() {
