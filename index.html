@@ -1458,6 +1458,32 @@
               </div>
             </div>
 
+            <!-- BADGE ROLE SINKRONISASI AKTIF DARI MODUL 1 / JURUSAN -->
+            <div class="p-3 bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-slate-50 border border-blue-200 rounded-xl flex items-center justify-between gap-3 flex-wrap">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div>
+                  <div class="text-[10px] text-slate-500 font-medium">Role Target Lamaran Terpilih:</div>
+                  <div class="text-xs font-extrabold text-blue-900 flex items-center gap-1.5" id="blastCurrentRoleTitle">
+                    <span>Junior Business Analyst / Product Specialist</span>
+                    <span class="text-[9px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-mono font-bold">TERPASANG</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-500 hidden sm:inline">Ubah Rumpun Posisi:</span>
+                <select id="blastRoleSelector" onchange="applyRoleToBlastTargets(this.value)" class="dospem-input text-xs font-bold text-blue-900 bg-white border border-blue-300 rounded-lg px-2.5 py-1.5 shadow-xs cursor-pointer">
+                  <option value="business-analyst">1. Business Analyst & PM</option>
+                  <option value="software-eng">2. Software & AI Engineering</option>
+                  <option value="digital-marketing">3. Digital Marketing & Growth</option>
+                  <option value="finance-accounting">4. Finance & Accounting</option>
+                  <option value="operations-trainee">5. Operations & MT Generalist</option>
+                </select>
+              </div>
+            </div>
+
             <!-- Toolbar Pencarian & Filter Target -->
             <div class="space-y-2 pt-1">
               <div class="relative">
@@ -1468,7 +1494,7 @@
               <div class="flex items-center justify-between gap-2 flex-wrap">
                 <!-- Filter Chips -->
                 <div class="flex items-center gap-1.5 flex-wrap" id="blastCategoryChips">
-                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua</button>
+                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Mitra (22)</button>
                   <button type="button" onclick="setBlastCategoryFilter('tech')" id="btn-blast-cat-tech" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Tech & Startup</button>
                   <button type="button" onclick="setBlastCategoryFilter('bumn_bank')" id="btn-blast-cat-bumn_bank" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">BUMN & Perbankan</button>
                   <button type="button" onclick="setBlastCategoryFilter('fmcg_corp')" id="btn-blast-cat-fmcg_corp" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">FMCG & Korporat</button>
@@ -11605,6 +11631,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       updateScoreUI(preset.scores);
       updateCharCount();
+      if (typeof applyRoleToBlastTargets === 'function') applyRoleToBlastTargets(preset.role);
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
     }
 
@@ -11882,9 +11909,13 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       updateScoreUI({ overall, metric: metricScore, verb: verbScore, keyword: keywordScore, format: formatScore });
 
       const beforeEl = document.getElementById('previewBefore');
-      if (beforeEl) beforeEl.innerText = '"' + textarea.value.slice(0, 300) + (textarea.value.length > 300 ? '...' : '') + '"';
-      
       if (typeof generateHarvardAtsCv === 'function') generateHarvardAtsCv();
+      if (typeof applyRoleToBlastTargets === 'function' && role) {
+        const selector = document.getElementById('blastRoleSelector');
+        if (selector && selector.value !== role) {
+          applyRoleToBlastTargets(role);
+        }
+      }
     }
 
     function updateScoreUI(scores) {
@@ -12864,31 +12895,339 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     /* -------------------------------------------------------------------------
-       8. MODUL 4: RECRUITER TARGETS, APPLE CARDS & ATOMIC QUOTA
+       8. MODUL 4: DYNAMIC ROLE-BASED RECRUITER TARGETS (22 MITRA TIER-1)
        ------------------------------------------------------------------------- */
     const verifiedTier1Recruiters = [
-      { id: 'rec-1', company: 'PT Astra International Tbk', hr: 'Talent Acquisition Team', email: 'recruitment@astra.co.id', role: 'Business Analyst / Management Trainee', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-2', company: 'PT Telkom Indonesia (Persero) Tbk', hr: 'Digital Talent Recruitment', email: 'careers@telkom.co.id', role: 'Junior Product / Project Coordinator', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-3', company: 'PT Bank Mandiri (Persero) Tbk', hr: 'Officer Development Program', email: 'odp.recruitment@bankmandiri.co.id', role: 'Management Trainee / Operations', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-4', company: 'PT Bank Central Asia Tbk (BCA)', hr: 'BCA Talent Acquisition Lead', email: 'recruitment@bca.co.id', role: 'IT Trainee & Business Analyst', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-5', company: 'PT Bank Rakyat Indonesia (Persero) Tbk', hr: 'Brilian Future Leader Program', email: 'recruitment@bri.co.id', role: 'Project Coordinator & Business Trainee', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-6', company: 'PT GoTo Gojek Tokopedia Tbk', hr: 'Tech & Product People Partner', email: 'talent@gotocompany.com', role: 'Junior Associate Product / Business', category: 'tech', status: 'ready' },
-      { id: 'rec-7', company: 'Shopee Indonesia', hr: 'Campus Recruitment Lead', email: 'id.recruitment@shopee.com', role: 'Operations & Business Development Trainee', category: 'tech', status: 'ready' },
-      { id: 'rec-8', company: 'PT Telekomunikasi Selular (Telkomsel)', hr: 'Telkomsel People Partner', email: 'careers@telkomsel.co.id', role: 'IoT & Digital Solutions Trainee', category: 'tech', status: 'ready' },
-      { id: 'rec-9', company: 'Unilever Indonesia', hr: 'Future Leaders Programme (UFLP)', email: 'recruitment.indonesia@unilever.com', role: 'Management Trainee / Supply Chain', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-10', company: 'Nestlé Indonesia', hr: 'Corporate Talent Acquisition', email: 'recruitment@id.nestle.com', role: 'Management Trainee Engineering & Operations', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-11', company: 'Danone Indonesia', hr: 'Talent Acquisition Partner', email: 'careers.indonesia@danone.com', role: 'Management Trainee / Operations', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-12', company: 'PT Pertamina (Persero)', hr: 'Corporate People Development', email: 'recruitment@pertamina.com', role: 'Officer Trainee Project & Engineering', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-13', company: 'PT Perusahaan Listrik Negara (PLN)', hr: 'Divisi Rekrutmen PLN', email: 'rekrutmen@pln.co.id', role: 'Assistant Engineer / Project Officer', category: 'bumn_bank', status: 'ready' },
-      { id: 'rec-14', company: 'PT Paragon Technology and Innovation', hr: 'Paragonian Talent Acquisition', email: 'talent@pti-cosmetics.com', role: 'Project Management & Engineering Trainee', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-15', company: 'PT Indofood CBP Sukses Makmur Tbk', hr: 'HR Corporate Recruitment', email: 'recruitment@icbp.indofood.co.id', role: 'Management Trainee / Technical Officer', category: 'fmcg_corp', status: 'ready' },
-      { id: 'rec-16', company: 'Traveloka', hr: 'People Acquisition Lead', email: 'talent@traveloka.com', role: 'Associate Product / Project Specialist', category: 'tech', status: 'ready' },
-      { id: 'rec-17', company: 'Blibli (PT Global Digital Niaga)', hr: 'Talent Management Team', email: 'recruitment@gdn-commerce.com', role: 'Operations & Business Analyst', category: 'tech', status: 'ready' },
-      { id: 'rec-18', company: 'DANA Indonesia', hr: 'People & Culture Talent Team', email: 'talent@dana.id', role: 'Junior Product Specialist / Project Lead', category: 'tech', status: 'ready' },
-      { id: 'rec-19', company: 'Grab Indonesia', hr: 'Grab Talent Acquisition Team', email: 'talent.acquisition@grab.com', role: 'Associate Project Specialist / Ops', category: 'tech', status: 'ready' },
-      { id: 'rec-20', company: 'Tiket.com', hr: 'People Experience Team', email: 'recruitment@tiket.com', role: 'Junior Business Partner / Product Analyst', category: 'tech', status: 'ready' },
-      { id: 'rec-21', company: 'Tokopedia', hr: 'Tokopedia Talent Acquisition', email: 'recruitment@tokopedia.com', role: 'Operations / Project Associate', category: 'tech', status: 'ready' },
-      { id: 'rec-22', company: 'PT Kalbe Farma Tbk', hr: 'Corporate HR Recruitment', email: 'recruitment@kalbe.co.id', role: 'Management Trainee Project & Supply Chain', category: 'fmcg_corp', status: 'ready' }
+      {
+        id: 'rec-1',
+        company: 'PT Astra International Tbk',
+        hr: 'Talent Acquisition Team',
+        email: 'recruitment@astra.co.id',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Astra Graduate Program (AGP) - Business Analyst',
+          'software-eng': 'Astra Digital Trainee - Junior Software Engineer',
+          'digital-marketing': 'Brand & Digital Marketing Associate',
+          'finance-accounting': 'Astra Financial Management & Accounting Officer',
+          'operations-trainee': 'Astra Management Trainee (Operations & Supply Chain)'
+        }
+      },
+      {
+        id: 'rec-2',
+        company: 'PT Telkom Indonesia (Persero) Tbk',
+        hr: 'Digital Talent Recruitment Lead',
+        email: 'careers@telkom.co.id',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Digital Business Specialist / Product Coordinator',
+          'software-eng': 'Telkom Digital Talent - Junior Software Engineer',
+          'digital-marketing': 'Digital Marketing & Community Specialist',
+          'finance-accounting': 'Corporate Financial Analyst Trainee',
+          'operations-trainee': 'Great People Trainee Program (GPTP) - Operations'
+        }
+      },
+      {
+        id: 'rec-3',
+        company: 'PT Bank Mandiri (Persero) Tbk',
+        hr: 'Officer Development Program (ODP) Team',
+        email: 'odp.recruitment@bankmandiri.co.id',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'ODP Business Development & Process Analyst',
+          'software-eng': 'ODP Information Technology & Digital Banking',
+          'digital-marketing': 'Consumer Marketing & Digital Acquisition Trainee',
+          'finance-accounting': 'ODP Wholesale Banking & Risk Management',
+          'operations-trainee': 'ODP Branch Operations & Service Quality'
+        }
+      },
+      {
+        id: 'rec-4',
+        company: 'PT Bank Central Asia Tbk (BCA)',
+        hr: 'BCA Talent Acquisition Lead',
+        email: 'recruitment@bca.co.id',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Business Analyst Specialist Development Program (BASDP)',
+          'software-eng': 'BCA IT Trainee / Application Developer',
+          'digital-marketing': 'Relationship Officer & Growth Specialist',
+          'finance-accounting': 'Management Development Program (MDP) - Accounting',
+          'operations-trainee': 'Management Development Program (MDP) - Operations'
+        }
+      },
+      {
+        id: 'rec-5',
+        company: 'PT Bank Rakyat Indonesia (Persero) Tbk',
+        hr: 'Brilian Future Leader Program',
+        email: 'recruitment@bri.co.id',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'BFLP General Staff - Business Analyst',
+          'software-eng': 'BFLP IT Staff - Software Engineer & Data Trainee',
+          'digital-marketing': 'BFLP Digital Marketing & Merchant Acquisition',
+          'finance-accounting': 'BFLP Finance, Audit & Accounting Specialist',
+          'operations-trainee': 'BFLP Operations & Micro Banking Officer'
+        }
+      },
+      {
+        id: 'rec-6',
+        company: 'PT GoTo Gojek Tokopedia Tbk',
+        hr: 'Tech & Product People Partner',
+        email: 'talent@gotocompany.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Associate Product Specialist',
+          'software-eng': 'Associate Software Engineer (Backend / Mobile)',
+          'digital-marketing': 'Performance Marketing & Growth Associate',
+          'finance-accounting': 'Finance & Settlement Operations Analyst',
+          'operations-trainee': 'Business & Merchant Operations Associate'
+        }
+      },
+      {
+        id: 'rec-7',
+        company: 'Shopee Indonesia',
+        hr: 'Campus Recruitment Lead',
+        email: 'id.recruitment@shopee.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Business Development & Commercial Analyst',
+          'software-eng': 'Junior Software Engineer (Web / Backend)',
+          'digital-marketing': 'Marketing & Campaign Specialist',
+          'finance-accounting': 'Accounting & Tax Compliance Specialist',
+          'operations-trainee': 'Global Leaders Program (GLP) - Operations'
+        }
+      },
+      {
+        id: 'rec-8',
+        company: 'PT Telekomunikasi Selular (Telkomsel)',
+        hr: 'Telkomsel People Partner',
+        email: 'careers@telkomsel.co.id',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Digital Solutions & Product Analyst',
+          'software-eng': 'IoT & Cloud Platform Junior Engineer',
+          'digital-marketing': 'Digital Brand & Channel Growth Associate',
+          'finance-accounting': 'Revenue Assurance & Financial Analyst',
+          'operations-trainee': 'Telkomsel Trainee Program - Operations'
+        }
+      },
+      {
+        id: 'rec-9',
+        company: 'Unilever Indonesia',
+        hr: 'Future Leaders Programme (UFLP)',
+        email: 'recruitment.indonesia@unilever.com',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'UFLP Customer Development & Commercial Strategy',
+          'software-eng': 'IT & Data Science Graduate Trainee',
+          'digital-marketing': 'UFLP Marketing & Brand Communications',
+          'finance-accounting': 'UFLP Finance & Business Partnering',
+          'operations-trainee': 'UFLP Supply Chain & Plant Operations'
+        }
+      },
+      {
+        id: 'rec-10',
+        company: 'Nestlé Indonesia',
+        hr: 'Corporate Talent Acquisition',
+        email: 'recruitment@id.nestle.com',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Commercial Excellence & Business Analyst Trainee',
+          'software-eng': 'IT Operations & Business Solutions Specialist',
+          'digital-marketing': 'Brand Activation & Consumer Insights Specialist',
+          'finance-accounting': 'Management Trainee Corporate Finance',
+          'operations-trainee': 'Management Trainee Technical & Supply Chain'
+        }
+      },
+      {
+        id: 'rec-11',
+        company: 'Danone Indonesia',
+        hr: 'Talent Acquisition Partner',
+        email: 'careers.indonesia@danone.com',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Business Development & Strategy Trainee',
+          'software-eng': 'Digital Solutions & IS Trainee',
+          'digital-marketing': 'Digital Brand Associate & Consumer Insights',
+          'finance-accounting': 'Danone Management Trainee - Finance',
+          'operations-trainee': 'Danone Management Trainee - Operations'
+        }
+      },
+      {
+        id: 'rec-12',
+        company: 'PT Pertamina (Persero)',
+        hr: 'Corporate People Development',
+        email: 'recruitment@pertamina.com',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Officer Trainee Business Planning & Commercial',
+          'software-eng': 'IT Junior Specialist (Digital Transformation)',
+          'digital-marketing': 'Corporate Communications & Marketing Officer',
+          'finance-accounting': 'Officer Trainee Finance & Accounting',
+          'operations-trainee': 'Officer Trainee Logistics & Supply Chain'
+        }
+      },
+      {
+        id: 'rec-13',
+        company: 'PT Perusahaan Listrik Negara (PLN)',
+        hr: 'Divisi Rekrutmen PLN',
+        email: 'rekrutmen@pln.co.id',
+        category: 'bumn_bank',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Assistant Officer Business Process & Risk Analysis',
+          'software-eng': 'Junior Programmer & System Analyst PLN',
+          'digital-marketing': 'Customer Service & Brand Experience Officer',
+          'finance-accounting': 'Assistant Officer Financial Accounting & Budget',
+          'operations-trainee': 'Assistant Engineer / Operations Management Officer'
+        }
+      },
+      {
+        id: 'rec-14',
+        company: 'PT Paragon Technology and Innovation',
+        hr: 'Paragonian Talent Acquisition',
+        email: 'talent@pti-cosmetics.com',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Paragon Management Trainee - Commercial',
+          'software-eng': 'Paragon IT & Software Development Specialist',
+          'digital-marketing': 'Paragon Management Trainee - Brand Development',
+          'finance-accounting': 'Paragon Management Trainee - Finance & Accounting',
+          'operations-trainee': 'Paragon Management Trainee - Supply Chain'
+        }
+      },
+      {
+        id: 'rec-15',
+        company: 'PT Indofood CBP Sukses Makmur Tbk',
+        hr: 'HR Corporate Recruitment',
+        email: 'recruitment@icbp.indofood.co.id',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Management Trainee Commercial & Sales Strategy',
+          'software-eng': 'Junior IT Application & Network Engineer',
+          'digital-marketing': 'Brand Communication & Digital Media Trainee',
+          'finance-accounting': 'Management Trainee Accounting & Budgeting',
+          'operations-trainee': 'Management Trainee Manufacturing & Operations'
+        }
+      },
+      {
+        id: 'rec-16',
+        company: 'Traveloka',
+        hr: 'People Acquisition Lead',
+        email: 'talent@traveloka.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Associate Product Specialist',
+          'software-eng': 'Associate Software Engineer (Web / Mobile)',
+          'digital-marketing': 'Growth & Performance Marketing Specialist',
+          'finance-accounting': 'Finance & Commercial Operations Analyst',
+          'operations-trainee': 'Market Operations & Partner Specialist'
+        }
+      },
+      {
+        id: 'rec-17',
+        company: 'Blibli (PT Global Digital Niaga)',
+        hr: 'Talent Management Team',
+        email: 'recruitment@gdn-commerce.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Business & Category Analyst',
+          'software-eng': 'Junior Software Engineer (Fullstack / QA)',
+          'digital-marketing': 'Digital Marketing & Social Media Specialist',
+          'finance-accounting': 'Finance & Accounting Operations Analyst',
+          'operations-trainee': 'Future Leadership Program - Operations'
+        }
+      },
+      {
+        id: 'rec-18',
+        company: 'DANA Indonesia',
+        hr: 'People & Culture Talent Team',
+        email: 'talent@dana.id',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Product Specialist / Business Analyst',
+          'software-eng': 'Associate Software Development Engineer',
+          'digital-marketing': 'Brand Campaign & User Acquisition Specialist',
+          'finance-accounting': 'Settlement, Reconciliation & Finance Analyst',
+          'operations-trainee': 'Merchant Operations & Compliance Specialist'
+        }
+      },
+      {
+        id: 'rec-19',
+        company: 'Grab Indonesia',
+        hr: 'Grab Talent Acquisition Team',
+        email: 'talent.acquisition@grab.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Business Process & Strategy Associate',
+          'software-eng': 'Junior Backend / Mobile Software Engineer',
+          'digital-marketing': 'Consumer Marketing & Social Media Specialist',
+          'finance-accounting': 'Finance Operations & Business Partnering Associate',
+          'operations-trainee': 'Operations & Logistics Associate'
+        }
+      },
+      {
+        id: 'rec-20',
+        company: 'Tiket.com',
+        hr: 'People Experience Team',
+        email: 'recruitment@tiket.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Business Partner / Product Analyst',
+          'software-eng': 'Associate Software Engineer (Backend/Frontend)',
+          'digital-marketing': 'Performance Marketing & SEO Specialist',
+          'finance-accounting': 'Finance Analyst & Revenue Accounting',
+          'operations-trainee': 'Customer Experience & Operations Associate'
+        }
+      },
+      {
+        id: 'rec-21',
+        company: 'Tokopedia',
+        hr: 'Tokopedia Talent Acquisition',
+        email: 'recruitment@tokopedia.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Associate Product Management',
+          'software-eng': 'Junior Software Engineer (Go / React)',
+          'digital-marketing': 'Merchant Campaign & Growth Associate',
+          'finance-accounting': 'Corporate Finance & Tax Accounting',
+          'operations-trainee': 'Operations & Fulfillment Associate'
+        }
+      },
+      {
+        id: 'rec-22',
+        company: 'PT Kalbe Farma Tbk',
+        hr: 'Corporate HR Recruitment',
+        email: 'recruitment@kalbe.co.id',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Commercial Excellence & Business Analyst Officer',
+          'software-eng': 'IT Application & Infrastructure Officer',
+          'digital-marketing': 'Brand Executive & Digital Content Specialist',
+          'finance-accounting': 'Accounting, Tax & Cost Control Officer',
+          'operations-trainee': 'Management Trainee Supply Chain & Operations'
+        }
+      }
     ];
 
     function getCleanDomain(company) {
@@ -12912,12 +13251,64 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       return 'tech';
     }
 
-    function buildUnifiedRecruiterTargets() {
-      // Boundaries Kepatuhan: Hanya gunakan target rekruter korporat Tier-1 yang emailnya telah terverifikasi sah
-      return [...verifiedTier1Recruiters];
+    function getActiveCandidateRoleKey() {
+      const selector = document.getElementById('blastRoleSelector');
+      if (selector && selector.value) return selector.value;
+      const targetRoleElem = document.getElementById('targetRole');
+      if (targetRoleElem && targetRoleElem.value) return targetRoleElem.value;
+      return 'business-analyst';
     }
 
-    let verifiedRecruiterTargets = buildUnifiedRecruiterTargets();
+    function buildUnifiedRecruiterTargets(targetRoleKey) {
+      const roleKey = targetRoleKey || getActiveCandidateRoleKey();
+      return verifiedTier1Recruiters.map(t => {
+        const resolvedRole = (t.roleMap && t.roleMap[roleKey]) ? t.roleMap[roleKey] : 'Business Analyst & Project Trainee';
+        return {
+          id: t.id,
+          company: t.company,
+          hr: t.hr,
+          email: t.email,
+          category: t.category,
+          status: t.status,
+          role: resolvedRole
+        };
+      });
+    }
+
+    let verifiedRecruiterTargets = buildUnifiedRecruiterTargets('business-analyst');
+    window.verifiedRecruiterTargets = verifiedRecruiterTargets;
+
+    function applyRoleToBlastTargets(roleKey) {
+      const roleTitles = {
+        'business-analyst': 'Junior Business Analyst / Product Specialist',
+        'software-eng': 'Junior Software Engineer / AI Tech',
+        'digital-marketing': 'Digital Marketing & Growth Lead',
+        'finance-accounting': 'Finance, Tax & Accounting Analyst',
+        'operations-trainee': 'Management / Operations Trainee (MT)'
+      };
+
+      const titleEl = document.getElementById('blastCurrentRoleTitle');
+      if (titleEl) {
+        titleEl.innerHTML = `<span>${roleTitles[roleKey] || 'Target Role Terpilih'}</span> <span class="text-[9px] bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-mono font-bold">TERPASANG</span>`;
+      }
+
+      const selector = document.getElementById('blastRoleSelector');
+      if (selector && selector.value !== roleKey) selector.value = roleKey;
+
+      const targetRoleElem = document.getElementById('targetRole');
+      if (targetRoleElem && targetRoleElem.value !== roleKey) {
+        targetRoleElem.value = roleKey;
+        if (typeof runCVAnalysis === 'function') runCVAnalysis();
+      }
+
+      // Rebuild recruiter target roles
+      const currentCheckedIds = Array.from(document.querySelectorAll('input[name="blastTargetCheck"]:checked')).map(cb => cb.value);
+      verifiedRecruiterTargets = buildUnifiedRecruiterTargets(roleKey);
+      window.verifiedRecruiterTargets = verifiedRecruiterTargets;
+      
+      initBlastTargets(currentCheckedIds);
+      regenerateBlastCoverLetter();
+    }
     window.verifiedRecruiterTargets = verifiedRecruiterTargets;
 
     let blastActiveCategory = 'all';
