@@ -417,10 +417,10 @@
 
         <!-- Dynamic Auth Navbar Area (Managed by updateUserNavbarUI) -->
         <div id="userLoggedOutView" class="flex items-center gap-2">
-          <button type="button" onclick="openAuthModal()" class="text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition cursor-pointer">
+          <button type="button" onclick="openAuthModal('login')" class="text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition cursor-pointer">
             Masuk
           </button>
-          <button type="button" onclick="openAuthModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer">
+          <button type="button" onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer">
             Coba Gratis
           </button>
         </div>
@@ -13515,14 +13515,56 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     }
 
-    function openAuthModal() {
+    function openAuthModal(defaultTab = 'login') {
       const modal = document.getElementById('authModal');
-      if (modal) modal.classList.remove('hidden');
+      if (modal) {
+        modal.classList.remove('hidden');
+        switchAuthTab(defaultTab);
+      }
     }
 
     function closeAuthModal() {
       const modal = document.getElementById('authModal');
       if (modal) modal.classList.add('hidden');
+    }
+
+    function switchAuthTab(tab) {
+      const loginTabBtn = document.getElementById('authTabBtnLogin');
+      const regTabBtn = document.getElementById('authTabBtnRegister');
+      const loginView = document.getElementById('authTabLoginView');
+      const regView = document.getElementById('authTabRegisterView');
+      
+      if (tab === 'register') {
+        if (loginTabBtn) {
+          loginTabBtn.className = 'flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 rounded-lg transition cursor-pointer';
+        }
+        if (regTabBtn) {
+          regTabBtn.className = 'flex-1 py-2 text-xs font-bold text-emerald-600 bg-white shadow-sm rounded-lg transition cursor-pointer';
+        }
+        if (loginView) loginView.classList.add('hidden');
+        if (regView) regView.classList.remove('hidden');
+      } else {
+        if (loginTabBtn) {
+          loginTabBtn.className = 'flex-1 py-2 text-xs font-bold text-blue-600 bg-white shadow-sm rounded-lg transition cursor-pointer';
+        }
+        if (regTabBtn) {
+          regTabBtn.className = 'flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 rounded-lg transition cursor-pointer';
+        }
+        if (loginView) loginView.classList.remove('hidden');
+        if (regView) regView.classList.add('hidden');
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btnElem) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btnElem.innerHTML = `<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>`;
+      } else {
+        input.type = 'password';
+        btnElem.innerHTML = `<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`;
+      }
     }
 
 
@@ -13835,15 +13877,225 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
 
-    function handleEmailLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('authEmailInput')?.value || 'user@example.com';
+    async function handleEmailRegister(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const name = document.getElementById('registerNameInput')?.value?.trim();
+      const email = document.getElementById('registerEmailInput')?.value?.trim().toLowerCase();
+      const password = document.getElementById('registerPasswordInput')?.value;
+      const confirmPassword = document.getElementById('registerPasswordConfirmInput')?.value;
+
+      if (!name || name.length < 2) {
+        alert('Mohon masukkan nama lengkap Anda (minimal 2 karakter).');
+        return;
+      }
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        alert('Mohon masukkan format alamat email yang valid.');
+        return;
+      }
+      if (!password || password.length < 6) {
+        alert('Kata sandi harus minimal 6 karakter demi keamanan akun Anda.');
+        return;
+      }
+      if (password !== confirmPassword) {
+        alert('Konfirmasi kata sandi tidak cocok. Mohon periksa kembali kata sandi Anda.');
+        return;
+      }
+
+      // Cek apakah email sudah terdaftar di Supabase atau adminState
+      let existingUser = null;
+      if (supabaseClient) {
+        try {
+          const { data } = await supabaseClient.from('users').select('*').eq('email', email).maybeSingle();
+          if (data) existingUser = data;
+        } catch(err) {
+          console.warn('[SUPABASE] Check existing user notice:', err);
+        }
+      }
+      if (!existingUser && typeof adminState !== 'undefined' && adminState.users) {
+        existingUser = adminState.users.find(u => u.email.toLowerCase() === email);
+      }
+
+      if (existingUser) {
+        alert('Email ini sudah terdaftar sebelumnya. Silakan beralih ke tab Masuk untuk login.');
+        switchAuthTab('login');
+        const authEmailInput = document.getElementById('authEmailInput');
+        if (authEmailInput) authEmailInput.value = email;
+        return;
+      }
+
+      // Daftarkan Pengguna Baru
+      const isOwner = email === 'dimitriahmad000@gmail.com';
+      const newRole = isOwner ? 'owner' : 'user';
+      const newTier = isOwner ? 'VIP' : 'FREE';
+      const newTierName = isOwner ? 'Dikerjain VIP' : 'Dibimbing (Free)';
+      const newQuota = isOwner ? 50 : 10;
+      const avatarUrl = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces';
+
+      // 1. Simpan ke Supabase PostgreSQL
+      if (supabaseClient) {
+        try {
+          const { error } = await supabaseClient.from('users').insert({
+            email: email,
+            full_name: name,
+            avatar_url: avatarUrl,
+            role: newRole,
+            tier: newTier,
+            blast_quota: newQuota,
+            created_at: new Date().toISOString(),
+            last_login_at: new Date().toISOString()
+          });
+          if (error) console.warn('[SUPABASE] User registration insert warning:', error.message);
+        } catch(err) {
+          console.warn('[SUPABASE] User register error:', err);
+        }
+      }
+
+      // 2. Tambahkan ke database lokal Admin Portal
+      if (typeof adminState !== 'undefined' && adminState.users) {
+        adminState.users.unshift({
+          name: name,
+          email: email,
+          tier: newTier,
+          tierName: newTierName,
+          quota: newQuota,
+          status: 'Active (Email Registered)'
+        });
+        saveAdminUsersToStorage();
+        renderAdminUsers();
+        updateAdminKPIs();
+      }
+
+      // 3. Set Active User Session
       currentUser.isLoggedIn = true;
-      currentUser.name = email.split('@')[0];
+      currentUser.name = name;
       currentUser.email = email;
+      currentUser.role = newRole;
+      currentUser.tier = newTier;
+      currentUser.tierName = newTierName;
+      currentUser.blastQuota = newQuota;
+      currentUser.avatar = avatarUrl;
+
       saveUserSession();
+      updateUserNavbarUI();
+
+      // Sinkronkan ke Google Sheets Webhook
+      syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+        name: name,
+        email: email,
+        tier: newTier,
+        quota: newQuota,
+        status: 'Active (Email Registered)',
+        avatar: avatarUrl
+      });
+
+      const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
+      if (quotaDisplay) quotaDisplay.innerText = currentUser.blastQuota + ' Email';
+
       closeAuthModal();
-      alert('Selamat datang kembali, ' + currentUser.name + '!');
+      alert(`Registrasi Berhasil!\nSelamat datang, ${name}! Akun Anda telah aktif dengan bonus kuota ${newQuota} pengiriman email recruiter.`);
+    }
+
+    async function handleEmailLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const emailInput = document.getElementById('authEmailInput')?.value?.trim();
+      const passwordInput = document.getElementById('authPasswordInput')?.value;
+
+      if (!emailInput) {
+        alert('Silakan masukkan alamat email Anda.');
+        return;
+      }
+      if (!passwordInput || passwordInput.length < 6) {
+        alert('Silakan masukkan kata sandi Anda (minimal 6 karakter).');
+        return;
+      }
+
+      const email = emailInput.toLowerCase();
+      let matchedUser = null;
+
+      // 1. Cek di Supabase PostgreSQL
+      if (supabaseClient) {
+        try {
+          const { data, error } = await supabaseClient.from('users').select('*').eq('email', email).maybeSingle();
+          if (data && !error) {
+            matchedUser = {
+              name: data.full_name || email.split('@')[0],
+              email: data.email,
+              tier: data.tier || 'FREE',
+              blastQuota: data.blast_quota !== undefined ? data.blast_quota : 10,
+              role: data.role || 'user',
+              avatar: data.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'
+            };
+            // Update last_login_at
+            supabaseClient.from('users').update({ last_login_at: new Date().toISOString() }).eq('email', email).then(() => {});
+          }
+        } catch(err) {
+          console.warn('[SUPABASE] Login check warning:', err);
+        }
+      }
+
+      // 2. Fallback cek di local adminState.users jika Supabase belum menemukan
+      if (!matchedUser && typeof adminState !== 'undefined' && adminState.users) {
+        const local = adminState.users.find(u => u.email.toLowerCase() === email);
+        if (local) {
+          matchedUser = {
+            name: local.name,
+            email: local.email,
+            tier: local.tier || 'FREE',
+            blastQuota: local.quota !== undefined ? local.quota : 10,
+            role: (local.email === 'dimitriahmad000@gmail.com') ? 'owner' : 'user',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'
+          };
+        }
+      }
+
+      // 3. Jika pengguna baru yang belum terdaftar sama sekali
+      if (!matchedUser) {
+        const autoRegister = confirm(`Email "${email}" belum terdaftar di sistem.\n\nApakah Anda ingin langsung membuat akun baru dengan email ini dan mendapatkan bonus 10 kuota email?`);
+        if (autoRegister) {
+          switchAuthTab('register');
+          const regEmail = document.getElementById('registerEmailInput');
+          const regName = document.getElementById('registerNameInput');
+          const regPass = document.getElementById('registerPasswordInput');
+          const regPassConfirm = document.getElementById('registerPasswordConfirmInput');
+          if (regEmail) regEmail.value = email;
+          if (regName) regName.value = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          if (regPass) regPass.value = passwordInput;
+          if (regPassConfirm) regPassConfirm.value = passwordInput;
+          return;
+        } else {
+          return;
+        }
+      }
+
+      // 4. Set Sesi Pengguna
+      currentUser.isLoggedIn = true;
+      currentUser.name = matchedUser.name;
+      currentUser.email = matchedUser.email;
+      currentUser.tier = matchedUser.tier;
+      currentUser.tierName = matchedUser.tier === 'VIP' ? 'Dikerjain VIP' : (matchedUser.tier === 'DIBANTUIN' ? 'Dibantuin' : (matchedUser.tier === 'FLASH' ? 'Paket 24 Jam' : 'Dibimbing (Free)'));
+      currentUser.blastQuota = matchedUser.blastQuota;
+      currentUser.role = matchedUser.role;
+      currentUser.avatar = matchedUser.avatar;
+
+      saveUserSession();
+      updateUserNavbarUI();
+
+      // Sinkronkan ke Google Sheets & Supabase
+      syncToGoogleSheets('REGISTER_OR_LOGIN_USER', {
+        name: currentUser.name,
+        email: currentUser.email,
+        tier: currentUser.tier,
+        quota: currentUser.blastQuota,
+        status: 'Active (Email Login)',
+        avatar: currentUser.avatar
+      });
+      syncUserDataToSupabase(currentUser);
+
+      const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
+      if (quotaDisplay) quotaDisplay.innerText = currentUser.blastQuota + ' Email';
+
+      closeAuthModal();
+      alert(`Selamat datang kembali, ${currentUser.name}!`);
     }
 
     function logoutUser() {
@@ -13856,7 +14108,18 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     function openProfileDrawer() {
-      alert(`Status Akun:\nNama: ${currentUser.name}\nEmail: ${currentUser.email}\nPaket Aktif: ${currentUser.tierName}\nSisa Kuota Auto-Blast: ${currentUser.blastQuota} Recruiter`);
+      const action = confirm(
+        `Status Akun Lolos Kerja:\n\n` +
+        `Nama: ${currentUser.name}\n` +
+        `Email: ${currentUser.email}\n` +
+        `Peran: ${currentUser.role || 'User'}\n` +
+        `Paket Aktif: ${currentUser.tierName}\n` +
+        `Sisa Kuota Auto-Blast: ${currentUser.blastQuota} Email\n\n` +
+        `Klik OK untuk Keluar Akun (Logout), atau Batal untuk menutup.`
+      );
+      if (action) {
+        logoutUser();
+      }
     }
 
     /* -------------------------------------------------------------------------
@@ -14674,74 +14937,168 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
   <!-- ========================================================================= -->
   <!-- MODAL 1: AUTHENTICATION (REPLIKA IDENTIK SCREENSHOT DOSPEM.ID)            -->
   <!-- ========================================================================= -->
-  <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
-    <div class="dospem-card max-w-sm w-full p-6 sm:p-8 space-y-5 bg-white relative animate-in fade-in zoom-in-95 duration-200">
+  <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4 overflow-y-auto">
+    <div class="dospem-card max-w-md w-full p-6 sm:p-7 space-y-4 bg-white relative animate-in fade-in zoom-in-95 duration-200 shadow-2xl my-auto">
       
       <!-- Close button -->
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer" title="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
       </button>
 
-      <!-- Mascot & Brand Logo (Dospem Style) -->
-      <div class="text-center space-y-2">
-        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 font-extrabold text-xl shadow-inner mx-auto">
-          LK
-        </div>
-        <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-100 to-blue-100 border-2 border-white shadow-md mx-auto flex items-center justify-center overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces" class="w-full h-full object-cover" alt="Mascot Avatar">
-        </div>
-        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Selamat datang kembali</h3>
-        <p class="text-xs text-slate-500">Lanjutin progres karirmu. AI-nya udah nungguin</p>
-      </div>
-
-      <!-- 1-Click Sign in with Google (Dospem Style) -->
-      <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm">
-        <svg class="w-4 h-4" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
-        <span>Masuk dengan Google</span>
-      </button>
-
-      <!-- Divider ATAU -->
-      <div class="relative flex items-center justify-center">
-        <div class="border-t border-slate-200 w-full"></div>
-        <span class="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider relative">ATAU</span>
-      </div>
-
-      <!-- Fallback Email & Password Form -->
-      <form onsubmit="handleEmailLogin(event)" class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
-          <input type="email" id="authEmailInput" placeholder="nama@example.com" required class="dospem-input w-full p-2.5 rounded-xl text-xs">
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <label class="block text-xs font-semibold text-slate-600">Password</label>
-            <a href="javascript:void(0)" onclick="alert('Silakan klik tombol Masuk dengan Google untuk login instan tanpa password.')" class="text-[11px] text-blue-600 hover:underline">Lupa password?</a>
-          </div>
-          <input type="password" id="authPasswordInput" placeholder="Minimal 6 karakter" required class="dospem-input w-full p-2.5 rounded-xl text-xs">
-        </div>
-
-        <!-- Simulated Cloudflare Turnstile Badge -->
-        <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs text-slate-600">
-          <label class="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked disabled class="rounded text-blue-600 focus:ring-blue-500">
-            <span class="text-[11px] font-medium">Verify you are human</span>
-          </label>
-          <span class="text-[10px] text-slate-400 font-mono">CLOUDFLARE</span>
-        </div>
-
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-md shadow-blue-500/20">
-          Masuk
+      <!-- Segmented Control Tab Switcher (Masuk vs Daftar Akun Baru) -->
+      <div class="flex items-center p-1 bg-slate-100 rounded-xl border border-slate-200">
+        <button id="authTabBtnLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold text-blue-600 bg-white shadow-sm rounded-lg transition cursor-pointer">
+          Masuk ke Akun
         </button>
-      </form>
+        <button id="authTabBtnRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 rounded-lg transition cursor-pointer">
+          Daftar Akun Baru
+        </button>
+      </div>
 
-      <p class="text-center text-xs text-slate-500 pt-1">
-        Belum punya akun? <a href="javascript:void(0)" onclick="loginWithGoogle()" class="font-bold text-blue-600 hover:underline">Daftar gratis</a>
-      </p>
+      <!-- ========================================== -->
+      <!-- TAB 1: MASUK (LOGIN VIEW)                  -->
+      <!-- ========================================== -->
+      <div id="authTabLoginView" class="space-y-4">
+        <!-- Mascot & Header -->
+        <div class="text-center space-y-1.5">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 font-extrabold text-lg shadow-inner mx-auto">
+            LK
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Selamat datang kembali</h3>
+          <p class="text-xs text-slate-500">Lanjutin persiapan karirmu, pantau skor CV & kuota email</p>
+        </div>
+
+        <!-- 1-Click Sign in with Google -->
+        <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Masuk dengan Google</span>
+        </button>
+
+        <!-- Divider ATAU -->
+        <div class="relative flex items-center justify-center">
+          <div class="border-t border-slate-200 w-full"></div>
+          <span class="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider relative">ATAU MASUK DENGAN EMAIL</span>
+        </div>
+
+        <!-- Email & Password Form -->
+        <form onsubmit="handleEmailLogin(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
+            <input type="email" id="authEmailInput" placeholder="nama@kampus.ac.id atau nama@gmail.com" required class="dospem-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-700">Kata Sandi</label>
+              <a href="javascript:void(0)" onclick="alert('Silakan login menggunakan Google Sign-In untuk akses instan tanpa perlu mengingat kata sandi.')" class="text-[11px] text-blue-600 hover:underline">Lupa password?</a>
+            </div>
+            <div class="relative">
+              <input type="password" id="authPasswordInput" placeholder="Masukkan kata sandi akun" required class="dospem-input w-full p-2.5 pr-10 rounded-xl text-xs">
+              <button type="button" onclick="togglePasswordVisibility('authPasswordInput', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Cloudflare Turnstile Badge -->
+          <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs text-slate-600">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked disabled class="rounded text-blue-600 focus:ring-blue-500">
+              <span class="text-[11px] font-medium">Cloudflare Turnstile Verified</span>
+            </label>
+            <span class="text-[10px] text-slate-400 font-mono">SECURE</span>
+          </div>
+
+          <button type="submit" id="authLoginSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-md shadow-blue-500/20 active:scale-[0.99] cursor-pointer">
+            Masuk ke Akun
+          </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 pt-1">
+          Belum punya akun? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="font-bold text-blue-600 hover:underline">Daftar akun gratis sekarang</a>
+        </p>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- TAB 2: DAFTAR AKUN BARU (REGISTER VIEW)    -->
+      <!-- ========================================== -->
+      <div id="authTabRegisterView" class="space-y-4 hidden">
+        <!-- Header -->
+        <div class="text-center space-y-1.5">
+          <div class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 font-extrabold text-lg shadow-inner mx-auto">
+            LK
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Buat Akun Lolos Kerja</h3>
+          <p class="text-xs text-slate-500">Mulai bedah CV Harvard ATS & nikmati 10 kuota email recruiter gratis</p>
+        </div>
+
+        <!-- 1-Click Sign up with Google -->
+        <button type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Daftar Cepat dengan Google</span>
+        </button>
+
+        <!-- Divider ATAU -->
+        <div class="relative flex items-center justify-center">
+          <div class="border-t border-slate-200 w-full"></div>
+          <span class="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider relative">ATAU DAFTAR DENGAN EMAIL</span>
+        </div>
+
+        <!-- Register Form -->
+        <form onsubmit="handleEmailRegister(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
+            <input type="text" id="registerNameInput" placeholder="Contoh: Dimitri Ahmad" required class="dospem-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
+            <input type="email" id="registerEmailInput" placeholder="nama@kampus.ac.id atau nama@gmail.com" required class="dospem-input w-full p-2.5 rounded-xl text-xs">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Kata Sandi</label>
+              <div class="relative">
+                <input type="password" id="registerPasswordInput" placeholder="Min. 6 karakter" required class="dospem-input w-full p-2.5 pr-9 rounded-xl text-xs">
+                <button type="button" onclick="togglePasswordVisibility('registerPasswordInput', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Ulangi Sandi</label>
+              <div class="relative">
+                <input type="password" id="registerPasswordConfirmInput" placeholder="Ulangi sandi" required class="dospem-input w-full p-2.5 pr-9 rounded-xl text-xs">
+                <button type="button" onclick="togglePasswordVisibility('registerPasswordConfirmInput', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Free Bonus Badge -->
+          <div class="p-2.5 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-center gap-2 text-xs text-emerald-800">
+            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="text-[11px] font-medium leading-tight">Bonus instan: Akses Bedah CV Harvard ATS + 10 Kuota Email Recruiter Resmi.</span>
+          </div>
+
+          <button type="submit" id="authRegisterSubmitBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-md shadow-emerald-500/20 active:scale-[0.99] cursor-pointer">
+            Daftar & Dapatkan Kuota Gratis
+          </button>
+        </form>
+
+        <p class="text-center text-xs text-slate-500 pt-1">
+          Sudah punya akun? <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="font-bold text-blue-600 hover:underline">Masuk ke akun Anda</a>
+        </p>
+      </div>
 
     </div>
   </div>

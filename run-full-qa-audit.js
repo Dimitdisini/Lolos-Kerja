@@ -156,6 +156,31 @@ async function runAudit() {
   window.startSmartDripBlast();
   assertTest('T28', 'Access Gate blocks unauthenticated user from blasting', lastAlert && lastAlert.includes('login akun terlebih dahulu'), lastAlert);
 
+  // Test Portal Auth Tab Switcher
+  window.switchAuthTab('register');
+  assertTest('T28_tab_reg', 'Auth Tab switches to Register View', !document.getElementById('authTabRegisterView').classList.contains('hidden') && document.getElementById('authTabLoginView').classList.contains('hidden'), 'Register View Active');
+  
+  window.switchAuthTab('login');
+  assertTest('T28_tab_login', 'Auth Tab switches to Login View', document.getElementById('authTabRegisterView').classList.contains('hidden') && !document.getElementById('authTabLoginView').classList.contains('hidden'), 'Login View Active');
+
+  // Test Email Registration Flow (New Freshgrad Candidate)
+  document.getElementById('registerNameInput').value = 'Rangga Daniswara';
+  document.getElementById('registerEmailInput').value = 'rangga.danis@telkomuniversity.ac.id';
+  document.getElementById('registerPasswordInput').value = 'rahasia123';
+  document.getElementById('registerPasswordConfirmInput').value = 'rahasia123';
+  await window.handleEmailRegister();
+  assertTest('T28_register', 'Email Registration creates account & sets 10 blast quota', window.currentUser.isLoggedIn === true && window.currentUser.email === 'rangga.danis@telkomuniversity.ac.id' && window.currentUser.blastQuota === 10, `User: ${window.currentUser.name}, Quota: ${window.currentUser.blastQuota}`);
+
+  // Test Logout Flow
+  window.logoutUser();
+  assertTest('T28_logout', 'User Logout clears session cleanly', window.currentUser.isLoggedIn === false, 'Logged out state verified');
+
+  // Test Email Login Flow
+  document.getElementById('authEmailInput').value = 'rangga.danis@telkomuniversity.ac.id';
+  document.getElementById('authPasswordInput').value = 'rahasia123';
+  await window.handleEmailLogin();
+  assertTest('T28_login', 'Email Login authenticates previously registered candidate', window.currentUser.isLoggedIn === true && window.currentUser.name === 'Rangga Daniswara', `Welcome back ${window.currentUser.name}`);
+
   // Authenticate user via Google login simulation
   window.selectGoogleAccount('Kandidat Pelamar', 'kandidat@gmail.com');
   assertTest('T29_auth', 'User authenticated via Google Login simulation', window.currentUser.isLoggedIn === true, window.currentUser.email);
