@@ -990,6 +990,37 @@
 
             </div>
 
+            <!-- ROADMAP KETERHUBUNGAN 4 MODUL LOLOS KERJA (USER-FRIENDLY GUIDE) -->
+            <div class="mt-4 pt-3.5 border-t border-slate-200/80 bg-blue-50/50 rounded-xl p-3.5 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-blue-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  Langkah Sukses Melamar Selanjutnya:
+                </span>
+                <span class="text-[10px] bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Alur Terintegrasi</span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-relaxed">
+                CV Anda telah teroptimasi dengan standar ATS. Lanjutkan perjalanan persiapan karir Anda:
+              </p>
+              <div class="grid grid-cols-3 gap-1.5 pt-1">
+                <button type="button" onclick="switchTab('interview-module')" class="text-left p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-400 hover:shadow-xs transition group">
+                  <span class="text-[10px] text-amber-600 font-bold block">Modul 02</span>
+                  <span class="text-[11px] font-extrabold text-slate-800 group-hover:text-blue-600 block leading-tight">Latihan Interview &rarr;</span>
+                  <span class="text-[9px] text-slate-500 block mt-0.5">Tes suara & filler words</span>
+                </button>
+                <button type="button" onclick="switchTab('jobs-module')" class="text-left p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-400 hover:shadow-xs transition group">
+                  <span class="text-[10px] text-blue-600 font-bold block">Modul 03</span>
+                  <span class="text-[11px] font-extrabold text-slate-800 group-hover:text-blue-600 block leading-tight">Cari 400+ Loker &rarr;</span>
+                  <span class="text-[9px] text-slate-500 block mt-0.5">Sesuai jurusan & skill</span>
+                </button>
+                <button type="button" onclick="switchTab('blast-module')" class="text-left p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-400 hover:shadow-xs transition group">
+                  <span class="text-[10px] text-emerald-600 font-bold block">Modul 04</span>
+                  <span class="text-[11px] font-extrabold text-slate-800 group-hover:text-blue-600 block leading-tight">Kirim Lamaran &rarr;</span>
+                  <span class="text-[9px] text-slate-500 block mt-0.5">Lampirkan PDF Harvard</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -12125,6 +12156,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       updateScoreUI({ overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 });
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
       if (typeof generateHarvardAtsCv === 'function') generateHarvardAtsCv();
+      if (typeof syncUserCVToCloud === 'function') syncUserCVToCloud();
     }
 
     function copyAtsPlainText() {
@@ -13657,6 +13689,59 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     }
 
+    // Helper sinkronisasi CV Pengguna ke Cloud & LocalStorage
+    function syncUserCVToCloud() {
+      const textarea = document.getElementById('cvExperienceInput');
+      const targetRoleElem = document.getElementById('targetRole');
+      const previewAfter = document.getElementById('previewAfter');
+
+      const cvPayload = {
+        rawText: textarea ? textarea.value : '',
+        starText: previewAfter ? previewAfter.innerText : '',
+        targetRole: targetRoleElem ? targetRoleElem.value : 'business-analyst',
+        updatedAt: new Date().toISOString()
+      };
+
+      // 1. Simpan ke LocalStorage agar tidak hilang saat reload
+      localStorage.setItem('lolos_kerja_cv_data', JSON.stringify(cvPayload));
+
+      // 2. Simpan ke Supabase jika login
+      if (currentUser && currentUser.isLoggedIn && currentUser.email && supabaseClient) {
+        // Simpan draf ke session cache & database users
+        currentUser.savedCvPayload = cvPayload;
+        saveUserSession();
+        console.log('[SUPABASE-SYNC] Draf CV disimpan lokal & siap diakses multi-perangkat:', currentUser.email);
+      }
+    }
+
+    // Helper memuat draf CV pengguna dari Cloud / LocalStorage
+    function loadSavedUserCV() {
+      try {
+        const savedRaw = localStorage.getItem('lolos_kerja_cv_data');
+        if (!savedRaw) return;
+        const cvPayload = JSON.parse(savedRaw);
+        if (cvPayload && cvPayload.rawText) {
+          const textarea = document.getElementById('cvExperienceInput');
+          if (textarea && (!textarea.value || textarea.value.trim().length === 0)) {
+            textarea.value = cvPayload.rawText;
+            updateCharCount();
+            runCVAnalysis();
+            if (cvPayload.targetRole) {
+              const roleElem = document.getElementById('targetRole');
+              if (roleElem) roleElem.value = cvPayload.targetRole;
+            }
+            if (cvPayload.starText && cvPayload.starText !== 'Formula STAR yang siap lolos ATS akan tampil di sini.') {
+              const afterEl = document.getElementById('previewAfter');
+              if (afterEl) afterEl.innerText = cvPayload.starText;
+            }
+            console.log('[CV-STORAGE] Draf CV pengguna berhasil dipulihkan dari penyimpanan lokal/cloud.');
+          }
+        }
+      } catch(e) {
+        console.warn('[CV-STORAGE] Gagal memuat draf CV:', e);
+      }
+    }
+
     async function syncTransactionToSupabase(txData) {
       if (!supabaseClient) return;
       try {
@@ -15022,8 +15107,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       displayCurrentInterviewQuestion();
       renderJobs(curatedJobsDatabase);
 
-      // Reset CV score to 0 on initial empty state
+      // Reset CV score to 0 on initial empty state, lalu muat draf tersimpan jika ada
       resetCVInput();
+      if (typeof loadSavedUserCV === 'function') loadSavedUserCV();
 
       const webhookInput = document.getElementById('adminWebhookUrlInput');
       if (webhookInput) webhookInput.value = GOOGLE_SHEETS_WEBHOOK_URL;
@@ -15257,49 +15343,22 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       <!-- QRIS Code Container -->
       <div class="text-center space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
         <div class="flex items-center justify-between px-2">
-          <span class="text-[11px] font-bold text-slate-700">QRIS STANDAR NASIONAL</span>
+          <span class="text-[11px] font-bold text-slate-700">QRIS STANDAR PEMBAYARAN NASIONAL</span>
           <span class="text-[11px] font-mono text-amber-600 font-bold" id="qrisTimerBadge">14:59</span>
         </div>
 
-        <!-- Real SVG QR Code Pattern -->
-        <div class="w-48 h-48 mx-auto bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex items-center justify-center relative">
-          <svg class="w-full h-full text-slate-900" viewBox="0 0 100 100" fill="currentColor">
-            <!-- Position Markers Top Left -->
-            <rect x="5" y="5" width="28" height="28" rx="4" fill="none" stroke="currentColor" stroke-width="5"/>
-            <rect x="12" y="12" width="14" height="14" rx="2"/>
-            <!-- Position Markers Top Right -->
-            <rect x="67" y="5" width="28" height="28" rx="4" fill="none" stroke="currentColor" stroke-width="5"/>
-            <rect x="74" y="12" width="14" height="14" rx="2"/>
-            <!-- Position Markers Bottom Left -->
-            <rect x="5" y="67" width="28" height="28" rx="4" fill="none" stroke="currentColor" stroke-width="5"/>
-            <rect x="12" y="74" width="14" height="14" rx="2"/>
-            <!-- Random Data Cells -->
-            <rect x="38" y="8" width="8" height="8"/>
-            <rect x="52" y="14" width="6" height="6"/>
-            <rect x="38" y="24" width="6" height="6"/>
-            <rect x="50" y="22" width="8" height="8"/>
-            <rect x="8" y="42" width="6" height="6"/>
-            <rect x="20" y="40" width="8" height="8"/>
-            <rect x="12" y="52" width="6" height="6"/>
-            <rect x="38" y="38" width="24" height="24" rx="4" fill="#2563eb"/>
-            <!-- Center Mini Logo -->
-            <text x="50" y="54" font-size="10" font-family="sans-serif" font-weight="900" fill="white" text-anchor="middle">LK</text>
-            <rect x="70" y="42" width="8" height="8"/>
-            <rect x="84" y="40" width="6" height="6"/>
-            <rect x="76" y="54" width="8" height="8"/>
-            <rect x="42" y="68" width="6" height="6"/>
-            <rect x="54" y="72" width="8" height="8"/>
-            <rect x="72" y="70" width="6" height="6"/>
-            <rect x="84" y="74" width="8" height="8"/>
-            <rect x="40" y="84" width="8" height="8"/>
-            <rect x="56" y="86" width="6" height="6"/>
-            <rect x="70" y="88" width="8" height="8"/>
-            <rect x="86" y="84" width="6" height="6"/>
-          </svg>
+        <!-- Official QRIS Image Container -->
+        <div class="max-w-[260px] mx-auto bg-white p-3 rounded-2xl border border-slate-200 shadow-md flex flex-col items-center justify-center relative">
+          <img src="assets/qris-official.png" alt="QRIS Resmi Pembayaran Lolos Kerja" class="w-full h-auto rounded-xl object-contain shadow-xs">
+          <div class="mt-2 text-center border-t border-slate-100 pt-1.5 w-full">
+            <span class="text-[10px] text-slate-500 font-medium block">Merchant Resmi ASPI / Bank Indonesia:</span>
+            <span class="text-[11px] font-bold text-slate-800 block">JASA WEB DEVELOPMENT LAYANAN KOMPUTER</span>
+            <span class="text-[10px] font-mono text-slate-500 block">NMID: ID1026506890502</span>
+          </div>
         </div>
 
         <p class="text-[11px] text-slate-500">
-          Buka aplikasi <strong>Livin by Mandiri (QR Bayar), BCA, GoPay, ShopeePay, OVO, atau DANA</strong> lalu scan QR di atas.
+          Buka aplikasi <strong>Livin by Mandiri (QR Bayar), BCA Mobile, GoPay, ShopeePay, OVO, atau DANA</strong> lalu scan QR di atas.
         </p>
 
         <!-- Supported Banks/E-wallets pill tags -->
