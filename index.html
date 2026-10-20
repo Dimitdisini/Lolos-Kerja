@@ -1407,6 +1407,31 @@
         </div>
       </div>
 
+      <!-- SUB-NAVIGATION: ANTREAN SIAP KIRIM VS PORTAL LAMARAN TERKIRIM -->
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3 flex-wrap gap-3">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="switchBlastView('queue')" id="btnBlastViewQueue" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-sm transition flex items-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span>Antrean Siap Kirim</span>
+            <span id="blastBadgeAvailableCount" class="bg-blue-500 text-white text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">394</span>
+          </button>
+          <button type="button" onclick="switchBlastView('applied')" id="btnBlastViewApplied" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-xs transition flex items-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>Portal Lamaran Terkirim</span>
+            <span id="blastBadgeAppliedCount" class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-mono font-bold">0</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium text-[11px]">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Update Harian Aktif (Auto-Sync)
+          </span>
+        </div>
+      </div>
+
+      <!-- VIEW 1: ANTREAN PENYIAPAN & PENGIRIMAN BLAST -->
+      <div id="blastQueueContainerView" class="space-y-6">
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Kolom Kiri: Pemilihan Target Bergaya Kartu Apple & Form Lamaran -->
         <div class="lg:col-span-7 space-y-4">
@@ -1650,6 +1675,36 @@
               </div>
             </div>
 
+          </div>
+        </div>
+      </div>
+      </div> <!-- End #blastQueueContainerView -->
+
+      <!-- VIEW 2: PORTAL LAMARAN TERKIRIM (APPLICATIONS PORTAL) -->
+      <div id="blastAppliedContainerView" class="hidden space-y-4">
+        <div class="dospem-card p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>Daftar Lamaran Terkirim</span>
+                <span class="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold" id="appliedCountHeaderBadge">0 Terkirim</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Lowongan yang sudah Anda lamar otomatis diarsipkan ke sini dan hilang dari antrean agar tidak terkirim dua kali.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="clearAppliedHistory()" class="text-xs text-slate-400 hover:text-red-600 font-semibold transition px-2 py-1">
+                Bersihkan Riwayat
+              </button>
+            </div>
+          </div>
+
+          <!-- List of Applied Jobs -->
+          <div id="appliedJobsListContainer" class="space-y-2.5">
+            <div class="text-center py-12 text-slate-400 space-y-2">
+              <svg class="w-12 h-12 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              <div class="text-xs font-semibold text-slate-600">Belum ada lamaran yang terkirim</div>
+              <p class="text-[11px] text-slate-400 max-w-sm mx-auto">Setiap kali Anda menjalankan Smart Drip Blast, lowongan yang berhasil dikirimkan akan otomatis berpindah ke sini dan hilang dari antrean.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -13633,28 +13688,175 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       regenerateBlastCoverLetter();
     }
 
+    // =========================================================================
+    // APPLICATION TRACKER / RIWAYAT TERKIRIM STATE & LOCAL STORAGE
+    // =========================================================================
+    var appliedJobsHistory = [];
+    window.appliedJobsHistory = appliedJobsHistory;
+
+    function loadAppliedJobsHistory() {
+      try {
+        const stored = localStorage.getItem('lolos_kerja_applied_jobs');
+        if (stored) {
+          appliedJobsHistory = JSON.parse(stored) || [];
+          window.appliedJobsHistory = appliedJobsHistory;
+        }
+      } catch (e) {
+        appliedJobsHistory = [];
+      }
+      updateAppliedUI();
+    }
+
+    function saveAppliedJobsHistory() {
+      try {
+        localStorage.setItem('lolos_kerja_applied_jobs', JSON.stringify(appliedJobsHistory));
+      } catch (e) {}
+      updateAppliedUI();
+    }
+
+    function clearAppliedHistory() {
+      if (appliedJobsHistory.length === 0) return;
+      if (!confirm('Apakah Anda yakin ingin membersihkan riwayat lamaran terkirim? Lowongan yang dibersihkan akan kembali muncul di antrean siap kirim.')) return;
+      appliedJobsHistory = [];
+      saveAppliedJobsHistory();
+      initBlastTargets();
+    }
+
+    function switchBlastView(view) {
+      const qView = document.getElementById('blastQueueContainerView');
+      const aView = document.getElementById('blastAppliedContainerView');
+      const btnQ = document.getElementById('btnBlastViewQueue');
+      const btnA = document.getElementById('btnBlastViewApplied');
+
+      if (view === 'applied') {
+        if (qView) qView.classList.add('hidden');
+        if (aView) aView.classList.remove('hidden');
+        if (btnQ) {
+          btnQ.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-xs transition flex items-center gap-2 cursor-pointer';
+        }
+        if (btnA) {
+          btnA.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 text-white shadow-sm transition flex items-center gap-2 cursor-pointer';
+        }
+        renderAppliedJobsList();
+      } else {
+        if (qView) qView.classList.remove('hidden');
+        if (aView) aView.classList.add('hidden');
+        if (btnQ) {
+          btnQ.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-sm transition flex items-center gap-2 cursor-pointer';
+        }
+        if (btnA) {
+          btnA.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-xs transition flex items-center gap-2 cursor-pointer';
+        }
+      }
+    }
+
+    function updateAppliedUI() {
+      const appliedCount = appliedJobsHistory.length;
+      const bApplied = document.getElementById('blastBadgeAppliedCount');
+      if (bApplied) bApplied.innerText = appliedCount;
+      const hBadge = document.getElementById('appliedCountHeaderBadge');
+      if (hBadge) hBadge.innerText = appliedCount + ' Terkirim';
+      renderAppliedJobsList();
+    }
+
+    function renderAppliedJobsList() {
+      const container = document.getElementById('appliedJobsListContainer');
+      if (!container) return;
+
+      if (appliedJobsHistory.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 space-y-2">
+            <svg class="w-12 h-12 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="text-xs font-semibold text-slate-600">Belum ada lamaran yang terkirim</div>
+            <p class="text-[11px] text-slate-400 max-w-sm mx-auto">Setiap kali Anda menjalankan Smart Drip Blast, lowongan yang berhasil dikirimkan akan otomatis berpindah ke sini dan hilang dari antrean.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = '';
+      appliedJobsHistory.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'p-3.5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 transition flex items-center justify-between gap-3 text-xs shadow-xs';
+        const initial = item.company ? item.company.charAt(0).toUpperCase() : 'C';
+
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
+              ${initial}
+            </div>
+            <div>
+              <div class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                <span>${item.company}</span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.2 rounded-full">TERKIRIM</span>
+              </div>
+              <div class="text-[11px] text-slate-500 font-medium">
+                Posisi: <strong class="text-slate-700">${item.role}</strong> &bull; HR: <span class="font-mono text-slate-600">${item.email}</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right shrink-0">
+            <span class="text-[10px] font-mono text-slate-400 block">${item.sentAt || 'Hari ini'}</span>
+            <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-1 justify-end mt-0.5">
+              <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              Lamaran Masuk Inbox
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function isJobAlreadyApplied(targetOrCompany, role, email) {
+      if (!targetOrCompany) return false;
+      var target = (typeof targetOrCompany === 'object') ? targetOrCompany : { company: targetOrCompany, role: role, email: email };
+      return appliedJobsHistory.some(a => {
+        if (target.id && a.id && a.id === target.id) return true;
+        if (target.email && a.email && a.email.toLowerCase().trim() === target.email.toLowerCase().trim()) return true;
+        if (target.company && a.company && target.role && a.role && a.company.toLowerCase().trim() === target.company.toLowerCase().trim() && a.role.toLowerCase().trim() === target.role.toLowerCase().trim()) return true;
+        return false;
+      });
+    }
+
     function initBlastTargets(autoCheckedIds = []) {
       loadCustomRecruitersFromStorage();
+      loadAppliedJobsHistory();
       const container = document.getElementById('blastTargetsContainer');
       if (!container) return;
       container.innerHTML = '';
 
-      const scrapedCount = verifiedRecruiterTargets.filter(t => t.subCategory === 'scraped_live').length;
-      const tier1Count = verifiedRecruiterTargets.filter(t => t.subCategory === 'tier1').length;
+      // FILTER OUT LOWONGAN YANG SUDAH DILAMAR (Otomatis Hilang dari Antrean!)
+      const availableTargets = verifiedRecruiterTargets.filter(t => !isJobAlreadyApplied(t));
 
       const badgeCount = document.getElementById('blastTargetsCountBadge');
       if (badgeCount) {
-        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Lowongan Siap Kirim';
-        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Lowongan Siap Kirim';
+        badgeCount.innerText = availableTargets.length + ' Lowongan Siap Dilamar';
+        badgeCount.textContent = availableTargets.length + ' Lowongan Siap Dilamar';
       }
 
+      const badgeAvail = document.getElementById('blastBadgeAvailableCount');
+      if (badgeAvail) badgeAvail.innerText = availableTargets.length;
+
       const totalPill = document.getElementById('blastCountTotalPill');
-      if (totalPill) totalPill.innerText = verifiedRecruiterTargets.length;
+      if (totalPill) totalPill.innerText = availableTargets.length;
 
       const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
       if (quotaDisplay) quotaDisplay.innerText = (currentUser.blastQuota !== undefined ? currentUser.blastQuota : 10) + ' Email';
 
-      verifiedRecruiterTargets.forEach((t, i) => {
+      if (availableTargets.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 text-slate-400 space-y-2">
+            <svg class="w-10 h-10 mx-auto text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <div class="text-xs font-bold text-slate-700">Semua Lowongan di Antrean Sudah Dilamar!</div>
+            <p class="text-[11px] text-slate-400">Hebat! Cek Portal Lamaran Terkirim untuk melihat daftar perusahaan yang sudah Anda hubungi.</p>
+          </div>
+        `;
+        filterBlastTargets();
+        updateBlastQueuePreview();
+        return;
+      }
+
+      availableTargets.forEach((t, i) => {
         const isChecked = autoCheckedIds.includes(t.id) || (autoCheckedIds.length === 0 && i < 3);
         const card = document.createElement('label');
         card.setAttribute('data-category', t.category || (t.custom ? 'custom' : 'all'));
@@ -13708,7 +13910,6 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       updateBlastQueuePreview();
       regenerateBlastCoverLetter();
     }
-
     function updateBlastQueuePreview() {
       const checkedBoxes = document.querySelectorAll('input[name="blastTargetCheck"]:checked');
       const count = checkedBoxes.length;
@@ -13866,6 +14067,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         document.getElementById('blastNextTimer').innerText = '';
 
         appendBlastLog('[SELESAI]: Seluruh ' + blastQueue.length + ' email lamaran berhasil terkirim ke Inbox utama recruiter.');
+        // Refresh antrean: lowongan yang terkirim otomatis lenyap dan pindah ke Portal Terkirim
+        initBlastTargets();
         alert('Selamat! ' + blastQueue.length + ' lamaran kerja berhasil dikirimkan via Smart Drip Engine.');
         return;
       }
@@ -13892,6 +14095,19 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       blastTimeoutId = setTimeout(() => {
         appendBlastLog('[TERKIRIM]: [250 OK] Email terkirim ke ' + item.hr + ' <' + item.email + '>. Subjek: Application: ' + item.role + '.');
+        
+        // REKORD OTOMATIS KE PORTAL LAMARAN TERKIRIM (OTOMATIS HILANG DARI ANTREAN)
+        if (!isJobAlreadyApplied(item)) {
+          appliedJobsHistory.unshift({
+            id: item.id,
+            company: item.company,
+            role: item.role,
+            hr: item.hr,
+            email: item.email,
+            sentAt: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          });
+          saveAppliedJobsHistory();
+        }
         
         // CRITICAL ATOMIC QUOTA DECREMENT: quota = quota - 1 with NO desynchronization
         if (currentUser.blastQuota !== undefined && currentUser.blastQuota > 0) {
