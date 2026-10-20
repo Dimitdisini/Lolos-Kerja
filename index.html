@@ -1415,7 +1415,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <h3 class="text-sm font-bold text-slate-800">1. Antrean Perusahaan Target</h3>
-                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full">22 Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)</span>
+                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">394 Target Siap Kirim</span>
               </div>
               <button type="button" onclick="toggleCustomRecruiterForm()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -1492,24 +1492,25 @@
               </div>
 
               <div class="flex items-center justify-between gap-2 flex-wrap">
-                <!-- Filter Chips -->
+                <!-- Filter Chips & Kontrol Kuota Target -->
                 <div class="flex items-center gap-1.5 flex-wrap" id="blastCategoryChips">
-                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Target</button>
-                  <button type="button" onclick="setBlastCategoryFilter('scraped_live')" id="btn-blast-cat-scraped_live" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Loker Scraping Live (<span id="blastCountScrapedPill">380+</span>)</button>
-                  <button type="button" onclick="setBlastCategoryFilter('tier1')" id="btn-blast-cat-tier1" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100">Mitra Tier-1 (22)</button>
-                  <button type="button" onclick="setBlastCategoryFilter('tech')" id="btn-blast-cat-tech" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Tech & Startup</button>
-                  <button type="button" onclick="setBlastCategoryFilter('bumn_bank')" id="btn-blast-cat-bumn_bank" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">BUMN & Perbankan</button>
-                  <button type="button" onclick="setBlastCategoryFilter('fmcg_corp')" id="btn-blast-cat-fmcg_corp" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">FMCG & Korporat</button>
-                  <button type="button" onclick="setBlastCategoryFilter('custom')" id="btn-blast-cat-custom" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Target Kustom</button>
+                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Lowongan (<span id="blastCountTotalPill">394</span>)</button>
+                  <button type="button" onclick="setBlastCategoryFilter('tech')" id="btn-blast-cat-tech" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Tech & Digital</button>
+                  <button type="button" onclick="setBlastCategoryFilter('bumn_bank')" id="btn-blast-cat-bumn_bank" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Perbankan & Finansial</button>
+                  <button type="button" onclick="setBlastCategoryFilter('fmcg_corp')" id="btn-blast-cat-fmcg_corp" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">FMCG, Retail & Korporat</button>
+                  <button type="button" onclick="setBlastCategoryFilter('custom')" id="btn-blast-cat-custom" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Target Sendiri</button>
                 </div>
 
-                <!-- Batch Actions -->
-                <div class="flex items-center gap-1.5">
-                  <button type="button" onclick="selectAllBlastTargets(true)" class="text-[11px] text-blue-600 hover:underline font-semibold">Pilih Semua</button>
+                <!-- Kontrol Pilihan Cepat (Mau Blast Berapa) -->
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-[11px] text-slate-400 font-medium">Pilih cepat:</span>
+                  <button type="button" onclick="selectTopNBlastTargets(5)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">5</button>
+                  <button type="button" onclick="selectTopNBlastTargets(10)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">10</button>
+                  <button type="button" onclick="selectTopNBlastTargets(20)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">20</button>
+                  <button type="button" onclick="selectTopNBlastTargets(50)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition">50</button>
+                  <button type="button" onclick="selectAllBlastTargets(true)" class="text-[11px] text-blue-600 hover:underline font-bold ml-1">Pilih Semua</button>
                   <span class="text-slate-300">&bull;</span>
                   <button type="button" onclick="selectAllBlastTargets(false)" class="text-[11px] text-slate-500 hover:underline">Batal</button>
-                  <span class="text-slate-300">&bull;</span>
-                  <button type="button" onclick="selectTopNBlastTargets(5)" class="text-[11px] text-indigo-600 hover:underline font-semibold">Top 5</button>
                 </div>
               </div>
             </div>
@@ -13643,12 +13644,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       const badgeCount = document.getElementById('blastTargetsCountBadge');
       if (badgeCount) {
-        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Siap Blast (' + tier1Count + ' Tier-1 & ' + scrapedCount + ' Loker Live)';
-        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Siap Blast (' + tier1Count + ' Tier-1 & ' + scrapedCount + ' Loker Live)';
+        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Lowongan Siap Kirim';
+        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Lowongan Siap Kirim';
       }
 
-      const scrapedPill = document.getElementById('blastCountScrapedPill');
-      if (scrapedPill) scrapedPill.innerText = scrapedCount;
+      const totalPill = document.getElementById('blastCountTotalPill');
+      if (totalPill) totalPill.innerText = verifiedRecruiterTargets.length;
 
       const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
       if (quotaDisplay) quotaDisplay.innerText = (currentUser.blastQuota !== undefined ? currentUser.blastQuota : 10) + ' Email';
@@ -13679,7 +13680,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         } else {
           badgeHtml = `
             <div class="text-right shrink-0">
-              <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full inline-block">Mitra Tier-1</span>
+              <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full inline-block">Lowongan Aktif</span>
               <span class="block text-[9px] text-slate-500 font-medium mt-0.5 max-w-[140px] truncate">${t.role}</span>
             </div>
           `;
@@ -13732,6 +13733,51 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     }
 
+    function generatePersonalizedCoverLetter(targetItem, personaStyle, name, email) {
+      const company = targetItem.company || 'Perusahaan Bapak/Ibu';
+      const position = targetItem.role || 'Posisi Target';
+      const hr = targetItem.hr || 'Tim Talent Acquisition';
+
+      const cvInput = document.getElementById('cvExperienceInput')?.value.trim() || '';
+      const previewEl = document.getElementById('previewAfter');
+      const starPreview = (previewEl ? (previewEl.textContent || previewEl.innerText || '') : '').replace(/^"|"$/g, '').trim();
+
+      let highlight = 'Memiliki pemahaman terstruktur, rekam jejak kerja terukur, serta kemampuan analisis dan eksekusi cepat untuk mendukung target tim ' + company + '.';
+      if (starPreview && !starPreview.includes('Formula STAR yang siap')) {
+        highlight = starPreview;
+      }
+
+      let body = '';
+      if (personaStyle === 'corporate') {
+        body = 'Kepada Yth.\n' + hr + '\n' + company + '\n\nDengan hormat,\n\n' +
+'Sehubungan dengan dibukanya kesempatan karir untuk posisi ' + position + ' di ' + company + ', bersama ini saya, ' + name + ', mengajukan diri untuk berkontribusi secara profesional.\n\n' +
+'Latar belakang dan kompetensi yang saya miliki telah melatih integritas kerja, pemikiran terstruktur, dan orientasi kuat pada hasil kerja yang akurat. Saya meyakini dapat beradaptasi secara optimal dengan standar keunggulan di ' + company + '.\n\n' +
+'Bersama surat ini, saya melampirkan Curriculum Vitae (CV) terformat rapi untuk ditinjau. Besar harapan saya untuk memperoleh kesempatan wawancara guna mendiskusikan bagaimana kualifikasi saya dapat menjawab kebutuhan tim ' + company + '.\n\n' +
+'Atas perhatian dan waktu Bapak/Ibu, saya ucapkan terima kasih.\n\nHormat saya,\n' + name + '\nKontak: ' + email;
+      } else if (personaStyle === 'creative') {
+        body = 'Halo ' + hr + ' & Tim ' + company + '!\n\n' +
+'Saya ' + name + ', dan saya sangat antusias melamar posisi ' + position + ' di ' + company + '. Saya melihat potensi besar untuk berkontribusi langsung pada efisiensi operasional dan perkembangan produk tim Anda.\n\n' +
+'Nilai tambah yang siap saya bawa:\n' +
+'• ' + highlight + '\n' +
+'• Pola pikir proaktif dan fokus pada solusi praktis (problem-solving mindset).\n' +
+'• Kemampuan adaptasi cepat di lingkungan kerja dinamis dan kolaboratif.\n\n' +
+'Terlampir resume lengkap saya sebagai bahan pertimbangan. Saya siap berbincang lebih lanjut mengenai rencana kontribusi saya untuk ' + company + '.\n\n' +
+'Salam hangat,\n' + name + '\n' + email;
+      } else {
+        body = 'Yth. ' + hr + ' / Rekruter ' + company + ',\n\n' +
+'Melalui surat ini, saya bermaksud menyampaikan lamaran untuk posisi ' + position + ' di ' + company + '. Sebagai kandidat yang berdedikasi dengan fondasi keahlian relevan, saya siap memberikan kontribusi produktif bagi pencapaian target tim Anda.\n\n' +
+'Kualifikasi & Poin Relevan:\n' +
+'• ' + highlight + '\n' +
+'• Terbiasa bekerja dengan target terukur, disiplin dokumentasi, dan komunikasi efektif lintas fungsi.\n' +
+'• Cepat mempelajari alur kerja dan teknologi baru yang diterapkan di ' + company + '.\n\n' +
+'Terlampir dokumen Curriculum Vitae (CV) ATS standar Harvard saya sebagai bahan tinjauan. Besar harapan saya untuk berdiskusi langsung mengenai peluang kontribusi saya di ' + company + '.\n\n' +
+'Terima kasih atas waktu dan kesempatan yang diberikan.\n\nHormat saya,\n' + name + '\nEmail: ' + email;
+      }
+
+      const complianceFooter = '\n\n---\n[Kepatuhan B2B & Privasi]: Surat ini dikirimkan sebagai korespondensi bisnis sah untuk pengajuan karir profesional. Balas "UNSUBSCRIBE" jika posisi telah terpenuhi atau tidak berkenan menerima kontak di masa mendatang.';
+      return body + complianceFooter;
+    }
+
     function regenerateBlastCoverLetter() {
       const name = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
       const email = document.getElementById('blastSenderEmail')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.email : 'pelamar@gmail.com');
@@ -13739,75 +13785,27 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const roleName = targetRoleElem ? targetRoleElem.options[targetRoleElem.selectedIndex].text : 'Junior Business Analyst';
       const personaStyle = document.getElementById('blastAiPersonaSelect')?.value || 'general';
 
-      const cvInput = document.getElementById('cvExperienceInput')?.value.trim() || '';
-      const previewEl = document.getElementById('previewAfter');
-      const starPreview = (previewEl ? (previewEl.textContent || previewEl.innerText || '') : '').replace(/^"|"$/g, '').trim();
-
       const firstChecked = document.querySelector('input[name="blastTargetCheck"]:checked');
-      let targetCompany = 'Perusahaan Bapak/Ibu';
-      let targetPosition = roleName;
-      let hrTarget = 'Tim Talent Acquisition';
+      let dummyTarget = {
+        company: 'Perusahaan Tujuan',
+        role: roleName,
+        hr: 'Tim Talent Acquisition'
+      };
 
       if (firstChecked) {
         const found = verifiedRecruiterTargets.find(t => t.id === firstChecked.value);
-        if (found) {
-          targetCompany = found.company;
-          targetPosition = found.role;
-          hrTarget = found.hr;
-        }
+        if (found) dummyTarget = found;
       }
 
       const subjectFormatEl = document.getElementById('blastSubjectFormat');
       if (subjectFormatEl) {
-        subjectFormatEl.value = 'Application: ' + targetPosition + ' - ' + name + ' (Fresh Graduate ATS)';
+        subjectFormatEl.value = 'Application: ' + dummyTarget.role + ' - ' + name + ' (Fresh Graduate ATS)';
       }
-
-      let body = '';
-
-      if (personaStyle === 'general') {
-        body = 'Yth. ' + hrTarget + ' / Rekruter ' + targetCompany + ',\n\n' +
-'Melalui surat ini, saya bermaksud menyampaikan lamaran untuk posisi ' + targetPosition + ' di ' + targetCompany + '. Sebagai lulusan yang berdedikasi dan memiliki fondasi analitis kuat, saya siap berkontribusi secara produktif bagi pencapaian target tim Anda.\n\n' +
-'Poin Keunggulan Utama:\n' +
-'• Terbiasa mengelola data dan menyelesaikan tugas berbasis indikator kinerja terukur (KPI).\n' +
-'• Memiliki ketelitian tinggi dalam pemetaan proses kerja serta komunikasi efektif lintas divisi.\n' +
-'• Adaptif dan cepat mempelajari ekosistem teknologi baru di lingkungan industri yang dinamis.\n\n' +
-'Terlampir dokumen Curriculum Vitae (CV) standar Harvard 1-kolom ATS saya sebagai bahan pertimbangan lebih lanjut. Besar harapan saya untuk berdiskusi langsung mengenai peluang kontribusi saya di ' + targetCompany + '.\n\n' +
-'Terima kasih atas waktu dan kesempatan yang diberikan.\n\nHormat saya,\n' + name + '\nEmail: ' + email + '\nLinkedIn: linkedin.com/in/' + name.toLowerCase().replace(/\s+/g, '');
-      } else if (personaStyle === 'corporate') {
-        body = 'Kepada Yth.\n' + hrTarget + '\n' + targetCompany + '\n\nDengan hormat,\n\n' +
-'Sehubungan dengan dibukanya kesempatan karir untuk posisi ' + targetPosition + ' di ' + targetCompany + ', bersama ini saya, ' + name + ', mengajukan diri untuk bergabung ke dalam program rekrutmen perusahaan.\n\n' +
-'Latar belakang akademis dan pengalaman kepemimpinan proyek yang saya miliki telah membentuk integritas, pemikiran analitis terstruktur, serta komitmen tinggi terhadap tata kelola kerja yang profesional. Saya meyakini dapat beradaptasi secara optimal dengan budaya kerja unggul di ' + targetCompany + '.\n\n' +
-'Bersama surat ini, saya lampirkan berkas CV lengkap untuk ditinjau. Saya sangat menantikan kesempatan wawancara guna memaparkan kualifikasi saya secara lebih mendalam.\n\n' +
-'Atas perhatian dan pertimbangan Bapak/Ibu, saya sampaikan terima kasih.\n\nHormat saya,\n' + name + '\nKontak: ' + email;
-      } else if (personaStyle === 'creative') {
-        body = 'Halo ' + hrTarget + ' & Tim ' + targetCompany + '!\n\n' +
-'Saya ' + name + ', dan saya sangat antusias melihat peluang posisi ' + targetPosition + ' di ' + targetCompany + '. Mengikuti perkembangan produk dan inovasi tim Anda, saya melihat ruang kolaborasi nyata di mana keahlian saya dapat memberikan dampak langsung.\n\n' +
-'Yang bisa saya bawa ke meja kerja sejak hari pertama:\n' +
-'• Kemampuan eksekusi cepat dari ideasi hingga implementasi nyata.\n' +
-'• Mindset bertumbuh (growth mindset) yang berorientasi pada pemecahan masalah (problem solving).\n' +
-'• Kolaborasi terbuka dan kemampuan menyederhanakan tantangan operasional yang kompleks.\n\n' +
-'Saya melampirkan CV lengkap saya untuk Anda pelajari. Kapan kita bisa berbincang santai untuk mendiskusikan peluang akselerasi di ' + targetCompany + '?\n\n' +
-'Salam hangat,\n' + name + '\n' + email + ' | Portofolio: linkedin.com/in/' + name.toLowerCase().replace(/\s+/g, '');
-      } else {
-        let experienceHighlight = starPreview && !starPreview.includes('Formula STAR yang siap') 
-          ? starPreview 
-          : 'Memiliki rekam jejak dalam pemetaan alur kerja operasional, analisis data kuantitatif, dan penyusunan deliverable terstruktur dengan capaian metrik terukur.';
-
-        body = 'Yth. ' + hrTarget + ' / Rekruter ' + targetCompany + ',\n\n' +
-'Perkenalkan, saya ' + name + ', lulusan berprestasi dengan fokus spesialisasi pada ' + targetPosition + '. Saya bermaksud melamar pada posisi ' + targetPosition + ' di ' + targetCompany + '.\n\n' +
-'Ringkasan Pencapaian Utama (Sesuai CV):\n' +
-'• ' + experienceHighlight + '\n' +
-'• Terbiasa bekerja dengan pendekatan berbasis metrik angka, dokumentasi teknis terstruktur, dan pemecahan masalah adaptif di bawah tenggat waktu ketat.\n\n' +
-'Terlampir resume standar Harvard 1-Column ATS saya yang memuat rincian keahlian dan rekam jejak proyek terkait. Besar harapan saya untuk diberi kesempatan wawancara guna memaparkan bagaimana kompetensi saya dapat langsung berkontribusi pada pencapaian target ' + targetCompany + '.\n\n' +
-'Terima kasih atas waktu dan perhatian Bapak/Ibu.\n\nHormat saya,\n' + name + '\nEmail: ' + email + '\nLinkedIn: linkedin.com/in/' + name.toLowerCase().replace(/\s+/g, '');
-      }
-
-      // Mandatory Legal Compliance & Opt-Out Footer (UU PDP No. 27/2022 & Anti-Spam Compliance)
-      const complianceFooter = '\n\n---\n[Catatan Kepatuhan Regulasi & Kerahasiaan]: Surat lamaran ini dikirimkan secara langsung sebagai korespondensi bisnis sah (Legitimate Career Inquiries). Jika posisi ini telah terisi atau tim rekrutmen tidak berkenan menerima korespondensi di masa mendatang, silakan balas dengan subjek "UNSUBSCRIBE" untuk otomatis dikeluarkan dari kontak antrean pelamar.';
-      body += complianceFooter;
 
       const textarea = document.getElementById('blastCoverLetterBody');
-      if (textarea) textarea.value = body;
+      if (textarea) {
+        textarea.value = generatePersonalizedCoverLetter(dummyTarget, personaStyle, name, email);
+      }
     }
 
     function startSmartDripBlast() {
@@ -13927,7 +13925,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const sendRealEmailVal = document.getElementById('blastSendRealEmailToggle') ? document.getElementById('blastSendRealEmailToggle').checked : true;
         const senderNameVal = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
         const senderEmailVal = document.getElementById('blastSenderEmail')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.email : 'pelamar@gmail.com');
+        const personaStyleVal = document.getElementById('blastAiPersonaSelect')?.value || 'general';
         const attachedName = currentBlastCvFile ? currentBlastCvFile.name : ('CV_Harvard_ATS_' + senderNameVal.replace(/\s+/g, '_') + '.pdf');
+
+        // Otomatis sesuaikan isi Cover Letter & Subjek khusus untuk perusahaan target ini
+        const personalizedBody = generatePersonalizedCoverLetter(item, personaStyleVal, senderNameVal, senderEmailVal);
+        const personalizedSubject = 'Application: ' + item.role + ' - ' + senderNameVal + ' (Fresh Graduate ATS)';
 
         syncToGoogleSheets('RECORD_BLAST_LOG', {
           applicantName: senderNameVal,
@@ -13935,8 +13938,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           targetCompany: item.company,
           recruiterEmail: item.email,
           position: item.role,
-          subject: 'Application: ' + item.role + ' - ' + senderNameVal,
-          body: document.getElementById('blastCoverLetterBody')?.value || '',
+          subject: personalizedSubject,
+          body: personalizedBody,
           attachmentName: attachedName,
           status: 'TERKIRIM',
           remainingQuota: currentUser.blastQuota,
@@ -13948,8 +13951,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           targetCompany: item.company,
           position: item.role,
           recruiterEmail: item.email,
-          subject: 'Application: ' + item.role + ' - ' + senderNameVal,
-          body: document.getElementById('blastCoverLetterBody')?.value || '',
+          subject: personalizedSubject,
+          body: personalizedBody,
           attachmentName: attachedName,
           status: 'TERKIRIM'
         });
