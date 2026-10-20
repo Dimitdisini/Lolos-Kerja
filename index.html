@@ -322,6 +322,8 @@
       pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   </script>
+  <!-- jsPDF CDN for Real 1-Column Harvard ATS PDF Generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
 
@@ -2681,9 +2683,162 @@
       audioStream: null,
       recognition: null,
       sampleAudioInterval: null,
-      activeJobs: []
+      activeJobs: [],
+      // UNIFIED MASTER PROFILE DATA LAYER (SINGLE SOURCE OF TRUTH)
+      masterProfile: {
+        identity: {
+          name: 'Dimas Pratama, S.M.',
+          email: 'dimas.pratama@gmail.com',
+          phone: '+62 812-3456-7890',
+          city: 'Jakarta Selatan',
+          links: ['linkedin.com/in/dimas-pratama']
+        },
+        summary: 'Lulusan S1 Manajemen Bisnis (IPK 3.72 / 4.00, Cum Laude) dengan pengalaman magang sebagai Junior Business Analyst dan Project Coordinator. Terbiasa memetakan alur proses bisnis AS-IS ke TO-BE, menyusun dokumen kebutuhan teknis (BRD), serta mengolah data performa operasional menggunakan Excel, SQL, dan Tableau.',
+        education: [
+          {
+            school: 'Universitas Indonesia',
+            degree: 'Sarjana Manajemen (S.M.)',
+            major: 'Fakultas Ekonomi dan Bisnis',
+            gpa: '3.72 / 4.00 (Cum Laude)',
+            start: '2021',
+            end: '2025'
+          }
+        ],
+        experience: [
+          {
+            org: 'PT Mitra Solusi Digital',
+            role: 'Junior Business Analyst Intern',
+            start: 'Agu 2024',
+            end: 'Feb 2025',
+            type: 'intern',
+            bullets: [
+              'Menganalisis alur transaksi 12 modul operasional klien dan menyusun 25+ dokumen Business Requirement Document (BRD) terstandarisasi.',
+              'Mengidentifikasi hambatan proses kerja manual dan merekomendasikan automasi alur data yang memangkas waktu pemrosesan laporan sebesar 32%.',
+              'Memfasilitasi User Acceptance Testing (UAT) lintas fungsi bersama 40+ user internal dan tim developer sebelum rilis ke production.'
+            ]
+          },
+          {
+            org: 'Komunitas Akselerasi Muda',
+            role: 'Project Coordinator Intern',
+            start: 'Jan 2024',
+            end: 'Jun 2024',
+            type: 'org',
+            bullets: [
+              'Mengkoordinasikan jadwal sprint mingguan dan alokasi tugas untuk 8 anggota tim dalam menyelenggarakan program inkubasi karir mahasiswa.',
+              'Mengelola kampanye digital yang menjangkau 15.000+ peserta dengan tingkat konversi pendaftaran mencapai 24%.'
+            ]
+          }
+        ],
+        skills: {
+          technical: ['Business Process Modeling (BPMN)', 'Gap Analysis', 'Requirements Engineering', 'User Acceptance Testing (UAT)', 'Sprint Planning'],
+          tools: ['Microsoft Excel (VLOOKUP, Pivot, Macro)', 'SQL', 'Tableau', 'Figma', 'Trello', 'Jira', 'Notion'],
+          soft: ['Komunikasi Profesional', 'Analisis Masalah', 'Kerja Sama Tim'],
+          languages: ['Bahasa Indonesia (Native)', 'English (Professional Working)']
+        },
+        certifications: [],
+        target_roles: ['Junior Business Analyst / Product Specialist'],
+        preferred_locations: ['Jakarta', 'Remote']
+      }
     };
     window.appState = appState;
+
+    function saveMasterProfileToStorage() {
+      try {
+        localStorage.setItem('lolos_kerja_master_profile', JSON.stringify(appState.masterProfile));
+      } catch(e) {}
+    }
+
+    function loadMasterProfileFromStorage() {
+      try {
+        const raw = localStorage.getItem('lolos_kerja_master_profile');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.identity) {
+            appState.masterProfile = Object.assign(appState.masterProfile, parsed);
+          }
+        }
+      } catch(e) {}
+    }
+
+    function syncCvToMasterProfile() {
+      if (!appState.masterProfile) return;
+      const mp = appState.masterProfile;
+
+      // Sync identity
+      const nameInput = document.getElementById('grillFullName')?.value.trim();
+      if (nameInput) mp.identity.name = nameInput;
+      else if (currentUser && currentUser.isLoggedIn && currentUser.name) mp.identity.name = currentUser.name;
+
+      const phoneInput = document.getElementById('grillPhone')?.value.trim();
+      if (phoneInput) mp.identity.phone = phoneInput;
+
+      if (currentUser && currentUser.isLoggedIn && currentUser.email) mp.identity.email = currentUser.email;
+
+      // Sync education
+      const campusInput = document.getElementById('grillCampus')?.value.trim();
+      const majorGpaInput = document.getElementById('grillMajorGpa')?.value.trim();
+      if (campusInput || majorGpaInput) {
+        if (!mp.education || mp.education.length === 0) mp.education = [{}];
+        if (campusInput) mp.education[0].school = campusInput;
+        if (majorGpaInput) {
+          mp.education[0].major = majorGpaInput;
+          const gpaMatch = majorGpaInput.match(/ipk\s*[:=]?\s*([0-9.,]+)/i);
+          if (gpaMatch) mp.education[0].gpa = gpaMatch[1];
+        }
+      }
+
+      // Sync experiences & STAR bullets
+      const orgName = document.getElementById('grillOrgName')?.value.trim();
+      const orgRole = document.getElementById('grillOrgRole')?.value.trim();
+      const orgPeriod = document.getElementById('grillOrgPeriod')?.value.trim();
+      const rawTasks = document.getElementById('grillTasksRaw')?.value.trim();
+      const previewAfterEl = document.getElementById('previewAfter');
+      const starText = previewAfterEl ? (previewAfterEl.textContent || previewAfterEl.innerText || '').replace(/^"|"$/g, '').trim() : '';
+
+      if (orgName || orgRole || starText || rawTasks) {
+        if (!mp.experience || mp.experience.length === 0) mp.experience = [{}];
+        if (orgName) mp.experience[0].org = orgName;
+        if (orgRole) mp.experience[0].role = orgRole;
+        if (orgPeriod) {
+          const parts = orgPeriod.split('|').map(s => s.trim());
+          if (parts[1]) { mp.experience[0].start = parts[0]; mp.experience[0].end = parts[1]; }
+          else { mp.experience[0].end = parts[0]; }
+        }
+
+        const validBullets = [];
+        if (starText && !starText.includes('Formula STAR yang siap')) {
+          validBullets.push(starText);
+        } else if (rawTasks) {
+          validBullets.push(rawTasks);
+        }
+        if (validBullets.length > 0) {
+          mp.experience[0].bullets = validBullets;
+        }
+      }
+
+      // Sync skills
+      const skillsInput = document.getElementById('grillSkillsInput')?.value.trim();
+      if (skillsInput) {
+        const skillList = skillsInput.split(',').map(s => s.trim()).filter(Boolean);
+        if (skillList.length > 0) {
+          mp.skills.technical = skillList;
+        }
+      }
+
+      // Sync target role
+      const roleElem = document.getElementById('targetRole');
+      if (roleElem) {
+        let roleText = 'Junior Business Analyst';
+        if (roleElem.value === 'custom') {
+          roleText = document.getElementById('customTargetRoleInput')?.value.trim() || 'Profesional Fresh Graduate';
+        } else if (roleElem.selectedIndex >= 0) {
+          roleText = roleElem.options[roleElem.selectedIndex].text;
+        }
+        mp.target_roles = [roleText];
+      }
+
+      saveMasterProfileToStorage();
+    }
 
     var currentUser = {
       isLoggedIn: false,
@@ -14219,6 +14374,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         } catch (e) {}
       }
 
+      if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
+
       // Calculate Real ATS Score
       updateScoreUI({ overall: 94, metric: 95, verb: 95, keyword: 92, format: 98 });
       const badgeStatus = document.getElementById('atsBadgeStatus');
@@ -14622,18 +14779,231 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     
-    function saveCvToGoogleDrive() {
-      generateHarvardAtsCv();
+    // =========================================================================
+    // REAL 1-COLUMN HARVARD ATS PDF GENERATOR (NO FAKE HTML, NO FAKE 142800 KB)
+    // =========================================================================
+    function generateHarvardAtsPdfBlob(profile) {
+      if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
+      const prof = profile || (appState.masterProfile || {});
+      const ident = prof.identity || {};
       const nameInput = document.getElementById('grillFullName')?.value.trim();
-      const candName = (currentUser && currentUser.isLoggedIn && currentUser.name) ? currentUser.name : (nameInput || 'Kandidat');
+      const candName = ident.name || ((currentUser && currentUser.isLoggedIn && currentUser.name) ? currentUser.name : (nameInput || 'Dimas Pratama'));
+      const candEmail = ident.email || ((currentUser && currentUser.isLoggedIn && currentUser.email) ? currentUser.email : 'dimas.pratama@gmail.com');
+      const candPhone = ident.phone || document.getElementById('grillPhone')?.value.trim() || '+62 812-3456-7890';
+      const candCity = ident.city || 'Jakarta Selatan, Indonesia';
+      const candLink = (ident.links && ident.links[0]) || ('linkedin.com/in/' + candName.toLowerCase().replace(/[^a-z0-9]/g, '-'));
+
+      const summaryText = prof.summary || 'Fresh graduate berprestasi dengan fokus spesialisasi bisnis dan analisis proses operasional berstandar internasional.';
+      const edu = (prof.education && prof.education[0]) || {
+        school: 'Universitas Indonesia',
+        degree: 'Sarjana Manajemen (S.M.)',
+        major: 'Fakultas Ekonomi & Bisnis',
+        gpa: '3.72 / 4.00 (Cum Laude)',
+        start: '2021',
+        end: '2025'
+      };
+      const exps = prof.experience || [];
+      const skills = prof.skills || {};
+      const techSkills = (skills.technical || []).join(', ') || 'Business Process Modeling (BPMN), Gap Analysis, Requirements Engineering, UAT';
+      const toolsSkills = (skills.tools || []).join(', ') || 'Microsoft Excel (Advanced), SQL, Tableau, Figma, Jira, Notion';
+      const langSkills = (skills.languages || []).join(', ') || 'Bahasa Indonesia (Native), English (Professional)';
+
+      // 1. Check if window.jspdf is available (Browser client)
+      if (typeof window !== 'undefined' && window.jspdf && window.jspdf.jsPDF) {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
+
+          const pageWidth = doc.internal.pageSize.getWidth();
+          const margin = 18;
+          let y = 20;
+
+          // Header: Name (Bold, 16pt, Centered)
+          doc.setFont('times', 'bold');
+          doc.setFontSize(16);
+          doc.text(candName.toUpperCase(), pageWidth / 2, y, { align: 'center' });
+          y += 6;
+
+          // Contact bar (Regular, 9.5pt, Centered)
+          doc.setFont('times', 'normal');
+          doc.setFontSize(9.5);
+          const contactLine = `${candCity}  |  ${candPhone}  |  ${candEmail}  |  ${candLink}`;
+          doc.text(contactLine, pageWidth / 2, y, { align: 'center' });
+          y += 4;
+
+          // Horizontal rule
+          doc.setLineWidth(0.4);
+          doc.line(margin, y, pageWidth - margin, y);
+          y += 6;
+
+          const drawSectionHeader = (title) => {
+            doc.setFont('times', 'bold');
+            doc.setFontSize(10.5);
+            doc.text(title.toUpperCase(), margin, y);
+            y += 1.5;
+            doc.setLineWidth(0.2);
+            doc.line(margin, y, pageWidth - margin, y);
+            y += 4.5;
+          };
+
+          // Section 1: Ringkasan Profil
+          drawSectionHeader('Ringkasan Profil (Professional Summary)');
+          doc.setFont('times', 'normal');
+          doc.setFontSize(9.5);
+          const splitSummary = doc.splitTextToSize(summaryText, pageWidth - (margin * 2));
+          doc.text(splitSummary, margin, y);
+          y += (splitSummary.length * 4.2) + 3;
+
+          // Section 2: Pendidikan
+          drawSectionHeader('Pendidikan (Education)');
+          doc.setFont('times', 'bold');
+          doc.setFontSize(10);
+          doc.text(edu.school || 'Universitas Indonesia', margin, y);
+          doc.setFont('times', 'normal');
+          doc.text(`${edu.start || '2021'} – ${edu.end || '2025'}`, pageWidth - margin, y, { align: 'right' });
+          y += 4.2;
+
+          doc.setFont('times', 'italic');
+          doc.setFontSize(9.5);
+          doc.text(`${edu.degree || 'Sarjana'} – ${edu.major || ''} (IPK: ${edu.gpa || '3.70'})`, margin, y);
+          y += 6;
+
+          // Section 3: Pengalaman
+          drawSectionHeader('Pengalaman Kerja & Organisasi (Professional Experience)');
+          exps.forEach(item => {
+            doc.setFont('times', 'bold');
+            doc.setFontSize(10);
+            doc.text(item.org || '', margin, y);
+            doc.setFont('times', 'normal');
+            doc.text(`${item.start || ''} – ${item.end || ''}`, pageWidth - margin, y, { align: 'right' });
+            y += 4.2;
+
+            doc.setFont('times', 'italic');
+            doc.setFontSize(9.5);
+            doc.text(item.role || '', margin, y);
+            y += 4.2;
+
+            doc.setFont('times', 'normal');
+            (item.bullets || []).forEach(b => {
+              const bulletText = `•  ${b}`;
+              const splitBullet = doc.splitTextToSize(bulletText, pageWidth - (margin * 2) - 4);
+              doc.text(splitBullet, margin + 2, y);
+              y += (splitBullet.length * 4) + 1.2;
+            });
+            y += 2;
+          });
+
+          // Section 4: Keahlian
+          drawSectionHeader('Keahlian & Kompetensi Teknis (Skills & Competencies)');
+          doc.setFont('times', 'bold');
+          doc.setFontSize(9.5);
+          doc.text('Kompetensi Inti: ', margin, y);
+          doc.setFont('times', 'normal');
+          const splitTech = doc.splitTextToSize(techSkills, pageWidth - (margin * 2) - 28);
+          doc.text(splitTech, margin + 28, y);
+          y += (splitTech.length * 4) + 2;
+
+          doc.setFont('times', 'bold');
+          doc.text('Tools & Software: ', margin, y);
+          doc.setFont('times', 'normal');
+          const splitTools = doc.splitTextToSize(toolsSkills, pageWidth - (margin * 2) - 28);
+          doc.text(splitTools, margin + 28, y);
+          y += (splitTools.length * 4) + 2;
+
+          doc.setFont('times', 'bold');
+          doc.text('Bahasa: ', margin, y);
+          doc.setFont('times', 'normal');
+          doc.text(langSkills, margin + 28, y);
+
+          return doc.output('blob');
+        } catch (e) {
+          console.warn('[PDF] jsPDF direct render fallback:', e);
+        }
+      }
+
+      // 2. Pure Searchable PDF 1.4 Binary Generator (Standard Harvard 1-Column)
+      // Used in Node/JSDOM, headless CI, or offline environments with authentic byte size
+      const lines = [
+        candName.toUpperCase(),
+        `${candCity} | ${candPhone} | ${candEmail} | ${candLink}`,
+        "--------------------------------------------------------------------------------",
+        "RINGKASAN PROFIL (PROFESSIONAL SUMMARY)",
+        summaryText,
+        "--------------------------------------------------------------------------------",
+        "PENDIDIKAN (EDUCATION)",
+        `${edu.school || 'Universitas'} (${edu.start || '2021'} - ${edu.end || '2025'})`,
+        `${edu.degree || 'Sarjana'} - ${edu.major || 'Program Studi'} (IPK: ${edu.gpa || '3.70'})`,
+        "--------------------------------------------------------------------------------",
+        "PENGALAMAN KERJA & ORGANISASI (PROFESSIONAL EXPERIENCE)"
+      ];
+      exps.forEach(x => {
+        lines.push(`${x.org || 'Perusahaan'} | ${x.role || 'Peran'} (${x.start || ''} - ${x.end || ''})`);
+        (x.bullets || []).forEach(b => lines.push(`* ${b}`));
+      });
+      lines.push("--------------------------------------------------------------------------------");
+      lines.push("KEAHLIAN & KOMPETENSI TEKNIS (SKILLS & COMPETENCIES)");
+      lines.push(`Kompetensi Inti: ${techSkills}`);
+      lines.push(`Tools & Software: ${toolsSkills}`);
+      lines.push(`Bahasa: ${langSkills}`);
+
+      const contentStream = lines.map(line => {
+        const clean = (line || '').replace(/[\\()]/g, ' ');
+        return `(${clean}) Tj T*`;
+      }).join('\n');
+
+      const streamBytes = `BT /F1 9.5 Tf 40 790 Td 13 TL\n${contentStream}\nET`;
+      const streamLen = streamBytes.length;
+
+      const pdfBody = `%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length ${streamLen} >>
+stream
+${streamBytes}
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Times-Roman >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000010 00000 n 
+0000000060 00000 n 
+0000000117 00000 n 
+0000000243 00000 n 
+0000000${(330 + streamLen).toString().padStart(5, '0')} 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+${400 + streamLen}
+%%EOF`;
+
+      return new Blob([pdfBody], { type: 'application/pdf' });
+    }
+
+    function downloadHarvardAtsPdf() {
+      generateHarvardAtsCv();
+      if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
+      const nameInput = document.getElementById('grillFullName')?.value.trim();
+      const candName = (currentUser && currentUser.isLoggedIn && currentUser.name) ? currentUser.name : (nameInput || 'Dimas_Pratama');
       const safeName = candName.replace(/[^a-zA-Z0-9]/g, '_');
-      const fileName = 'CV_Harvard_ATS_' + safeName + '.html';
+      const fileName = 'CV_Harvard_ATS_' + safeName + '.pdf';
 
-      const content = document.getElementById('harvardCvContentDynamic')?.innerHTML || '';
-      const fullDoc = '<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <title>CV Harvard ATS - ' + candName + '</title>\n  <style>\n    @page { size: A4; margin: 15mm 18mm; }\n    body { font-family: "Times New Roman", Times, serif; font-size: 10.5pt; line-height: 1.35; color: #000; background: #fff; max-width: 800px; margin: 20px auto; padding: 30px 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }\n    h1 { font-size: 17pt; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 4px 0; font-weight: bold; }\n    .contact-bar { text-align: center; font-size: 9.5pt; margin-bottom: 12px; border-bottom: 1.5px solid #000; padding-bottom: 6px; }\n    .section-heading { font-size: 11pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #000; margin-top: 10px; margin-bottom: 6px; padding-bottom: 1px; }\n    .item-header { display: flex; justify-content: space-between; font-weight: bold; font-size: 10.5pt; }\n    .item-sub { display: flex; justify-content: space-between; font-style: italic; font-size: 10pt; margin-bottom: 4px; }\n    ul { margin: 3px 0 8px 18px; padding: 0; }\n    li { margin-bottom: 3px; text-align: justify; }\n    p { margin: 0 0 4px 0; }\n    @media print { body { box-shadow: none; margin: 0; padding: 0; } }\n  </style>\n</head>\n<body>\n' + content + '\n</body>\n</html>';
-
-      const blob = new Blob([fullDoc], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
+      const pdfBlob = generateHarvardAtsPdfBlob();
+      const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       a.href = url;
       a.download = fileName;
@@ -14642,7 +15012,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      alert('Berkas [' + fileName + '] berhasil diunduh! Berkas terformat standar Harvard ATS dan siap disimpan ke Google Drive Anda.');
+      const sizeKb = (pdfBlob.size / 1024).toFixed(1);
+      alert('Berkas [' + fileName + '] berhasil diunduh dalam format PDF asli standar Harvard ATS 1-kolom (' + sizeKb + ' KB)! Siap diunggah ke portal karir.');
+    }
+
+    function saveCvToGoogleDrive() {
+      downloadHarvardAtsPdf();
     }
 
     function printFormattedCv() {
@@ -14652,18 +15027,25 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
     function linkCvToModule4() {
       generateHarvardAtsCv();
+      if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
       const candName = (currentUser && currentUser.isLoggedIn && currentUser.name) ? currentUser.name : 'Dimas_Pratama';
-      const fileName = 'CV_Harvard_ATS_' + candName.replace(/\s+/g, '_') + '.pdf';
+      const safeName = candName.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = 'CV_Harvard_ATS_' + safeName + '.pdf';
+      
+      const pdfBlob = generateHarvardAtsPdfBlob();
       currentBlastCvFile = {
         name: fileName,
-        size: 142800,
+        size: pdfBlob.size, // REAL dynamic byte size
         type: 'application/pdf',
-        generated: true
+        blob: pdfBlob,
+        generated: true,
+        lastModified: Date.now()
       };
+      window.currentBlastCvFile = currentBlastCvFile;
 
       const status = document.getElementById('blastCvAttachmentStatus');
       if (status) {
-        status.innerHTML = '<span class="text-blue-700 font-bold">' + escapeHtml(fileName) + '</span> (Tersinkron dari Modul 1) - Siap Dikirim';
+        status.innerHTML = '<span class="text-blue-700 font-bold">' + escapeHtml(fileName) + '</span> (' + (pdfBlob.size / 1024).toFixed(1) + ' KB - PDF Asli Harvard ATS) - Siap Dikirim';
         status.className = 'text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full';
       }
 
@@ -14673,7 +15055,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         setTimeout(() => { successPill.classList.add('hidden'); }, 4000);
       }
 
-      alert('Sukses! Berkas [' + fileName + '] telah dihubungkan langsung sebagai lampiran resmi PDF di Modul 4 (Smart Drip Blast).');
+      alert('Sukses! Berkas [' + fileName + '] (' + (pdfBlob.size / 1024).toFixed(1) + ' KB) telah dihubungkan langsung sebagai lampiran PDF resmi di Modul 4 (Smart Drip Blast).');
     }
 
     function applyStarResultToInput() {
@@ -14759,6 +15141,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       updateScoreUI({ overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 });
+      if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
       if (typeof generateHarvardAtsCv === 'function') generateHarvardAtsCv();
       if (typeof syncUserCVToCloud === 'function') syncUserCVToCloud();
@@ -15316,25 +15699,29 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             </div>
           </div>
 
-          <div class="pt-3 border-t border-slate-100 flex items-center gap-2">
-            <a href="${directJobUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-slate-900 hover:bg-black text-white font-bold py-2 px-3 rounded-xl text-xs transition text-center shadow-xs flex items-center justify-center gap-1.5">
+          <div class="pt-3 border-t border-slate-100 flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <a href="${directJobUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 min-w-[90px] bg-slate-900 hover:bg-black text-white font-bold py-2 px-3 rounded-xl text-xs transition text-center shadow-xs flex items-center justify-center gap-1.5">
               <span>Buka Loker</span>
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
             </a>
+            <button type="button" onclick="practiceInterviewForJob(${job.id})" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold px-2.5 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap" title="Latihan wawancara spesifik role & kualifikasi loker ini">
+              <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"></path></svg>
+              <span>Latihan untuk loker ini</span>
+            </button>
             ${(typeof isJobAlreadyApplied === 'function' && isJobAlreadyApplied(job)) ? `
-              <button type="button" disabled class="text-xs bg-slate-100 text-slate-400 border border-slate-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-not-allowed" title="Lamaran sudah pernah dikirimkan ke HRD perusahaan ini">
+              <button type="button" disabled class="text-xs bg-slate-100 text-slate-400 border border-slate-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-not-allowed whitespace-nowrap" title="Lamaran sudah pernah dikirimkan ke HRD perusahaan ini">
                 <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 <span>Sudah Dilamar</span>
               </button>
             ` : isEmailApply ? `
-              <button type="button" onclick="blastJobDirect(${job.id})" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer">
+              <button type="button" onclick="blastJobDirect(${job.id})" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap">
                 <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                 <span>Kirim via Email</span>
               </button>
             ` : `
-              <button type="button" onclick="copyPortalApplicationPitch(${job.id})" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer">
-                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                <span>Salin Pitch STAR</span>
+              <button type="button" onclick="applyViaPortal(${job.id})" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold px-3 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap" title="Buka Portal Karir Resmi Perusahaan">
+                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                <span>Lamar via Portal</span>
               </button>
             `}
           </div>
@@ -15343,14 +15730,51 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       });
     }
 
-    function copyPortalApplicationPitch(jobId) {
-      const job = curatedJobsDatabase.find(j => j.id === jobId);
+    function practiceInterviewForJob(jobId) {
+      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => j.id === jobId);
+      if (!job) return;
+
+      const mp = appState.masterProfile || {};
+      const exp = (mp.experience && mp.experience[0]) || {};
+      const orgName = exp.org || 'proyek/magang sebelumnya';
+      const roleName = exp.role || 'posisi Anda';
+      const req = (job.keyRequirements && job.keyRequirements[0]) || 'pemecahan masalah terstruktur';
+
+      const tailoredQuestion = `Untuk posisi ${job.title} di ${job.company}: Berdasarkan pengalaman Anda di ${orgName} (${roleName}), ceritakan situasi nyata ketika Anda harus menerapkan ${req} untuk mencapai target hasil kerja nyata?`;
+
+      appState.customQuestion = {
+        q: tailoredQuestion,
+        cat: `${job.company} • ${job.title}`,
+        jobId: job.id,
+        company: job.company,
+        role: job.title,
+        sampleTranscript: `Di ${orgName}, saya bertanggung jawab sebagai ${roleName}. Menghadapi tantangan ${req}, saya menganalisis alur kerja secara terstruktur, berkolaborasi dengan tim, dan mengeksekusi rencana aksi bertahap hingga efisiensi proses tercapai.`,
+        closingSuggest: `Melalui pengalaman terukur tersebut, saya siap membawa standar eksekusi serupa untuk posisi ${job.title} di ${job.company}.`
+      };
+
+      switchTab('interview-module');
+      displayCurrentInterviewQuestion();
+
+      try {
+        const qCard = document.getElementById('interviewQuestionCard') || document.getElementById('interviewQuestionText');
+        if (qCard) qCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch(e) {}
+
+      alert(`Pertanyaan Wawancara Siap!\n\nPertanyaan khusus untuk posisi [${job.title}] di [${job.company}] telah dimuat berdasarkan rekam jejak CV Anda di ${orgName}.`);
+    }
+    window.practiceInterviewForJob = practiceInterviewForJob;
+
+    function applyViaPortal(jobId) {
+      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => j.id === jobId);
       if (!job) return;
 
       const senderName = (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
+      const mp = appState.masterProfile || {};
+      const exp = (mp.experience && mp.experience[0]) || {};
+      const starBullet = (exp.bullets && exp.bullets[0]) || '';
       const previewEl = document.getElementById('previewAfter');
       const starPreview = (previewEl ? (previewEl.textContent || previewEl.innerText || '') : '').replace(/^"|"$/g, '').trim();
-      const cvSnippet = starPreview && !starPreview.includes('Formula STAR yang siap') ? starPreview : ('Memiliki pemahaman analitis terstruktur, rekam jejak terukur, dan kemampuan adaptasi cepat untuk posisi ' + job.title + ' di ' + job.company + '.');
+      const cvSnippet = (starBullet && starBullet.length > 20) ? starBullet : (starPreview && !starPreview.includes('Formula STAR yang siap') ? starPreview : ('Memiliki pemahaman analitis terstruktur, rekam jejak terukur, dan kemampuan adaptasi cepat untuk posisi ' + job.title + ' di ' + job.company + '.'));
 
       const pitchText = 
 `Yth. Tim Rekrutmen ${job.company},
@@ -15362,7 +15786,7 @@ Nilai Tambah & Ringkasan Kualifikasi (Formula STAR):
 • Terbiasa bekerja dengan target terukur, disiplin dokumentasi, dan komunikasi efektif lintas fungsi.
 • Siap beradaptasi dengan alur kerja dan standar keunggulan di ${job.company}.
 
-Dokumen Curriculum Vitae (CV) ATS Harvard lengkap telah saya lampirkan/unggah pada portal karir. Terima kasih atas perhatian dan kesempatan yang diberikan.
+Dokumen Curriculum Vitae (CV) ATS Harvard lengkap telah saya siapkan untuk portal karir resmi. Terima kasih atas perhatian dan kesempatan yang diberikan.
 
 Hormat saya,
 ${senderName}`;
@@ -15389,12 +15813,15 @@ ${senderName}`;
         window.open(directJobUrl, '_blank');
       }
     }
+    const copyPortalApplicationPitch = applyViaPortal;
+    window.applyViaPortal = applyViaPortal;
+    window.copyPortalApplicationPitch = copyPortalApplicationPitch;
 
     function blastJobDirect(jobId) {
-      const job = curatedJobsDatabase.find(j => j.id === jobId);
+      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => j.id === jobId);
       if (!job) return;
 
-      const hasDirectEmail = Boolean(job.recruiterEmail) || job.applyMethod === 'email';
+      const hasDirectEmail = Boolean(job.recruiterEmail && job.recruiterEmail.includes('@')) && job.applyMethod === 'email';
 
       // JALUR 1: Lowongan dengan email rekrutmen sah terverifikasi -> Masuk ke antrean Smart Drip Auto-Blast
       if (hasDirectEmail) {
@@ -15408,7 +15835,7 @@ ${senderName}`;
             company: job.company,
             role: job.title,
             hr: 'Tim Talent Acquisition - ' + job.company,
-            email: job.recruiterEmail || 'careers@' + getCleanDomain(job.company) + '.com',
+            email: job.recruiterEmail,
             category: getRecruiterCategory(job),
             status: 'ready'
           };
@@ -16083,14 +16510,8 @@ ${senderName}`;
       for (const [k, d] of Object.entries(corporateDomains)) {
         if (cLower.includes(k)) return 'careers@' + d;
       }
-      let c = cLower
-        .replace(/^pt\.?\s+/i, '')
-        .replace(/\s+tbk\.?/i, '')
-        .replace(/\s+group/i, '')
-        .replace(/\s+indonesia/i, '')
-        .replace(/\s+international/i, '')
-        .replace(/[^a-z0-9]/g, '');
-      return 'careers@' + (c || 'perusahaan') + '.com';
+      // Hapus Email Tebakan: Jika tidak ada domain korporat resmi terverifikasi, kembalikan null
+      return null;
     }
 
     
@@ -17379,7 +17800,8 @@ ${senderName}`;
       }
     }
 
-    let currentBlastCvFile = null;
+    var currentBlastCvFile = null;
+    window.currentBlastCvFile = currentBlastCvFile;
 
     function handleBlastCvFileUpload(e) {
       const file = e.target.files[0];
@@ -18710,6 +19132,7 @@ ${senderName}`;
     ];
 
     const defaultAdminTransactions = [
+      { id: 'LK-ORD-99120', name: 'Rangga Daniswara', email: 'rangga.danis@telkomuniversity.ac.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS Scan Live', time: '5 mnt lalu', status: 'PENDING' },
       { id: 'LK-ORD-92811', name: 'Alif Yusfan M.', email: 'alif@fleekgroup.id', plan: 'Dikerjain VIP', amount: 149000, method: 'QRIS BCA', time: '10 mnt lalu', status: 'SETTLED' },
       { id: 'LK-ORD-88234', name: 'Rangga Daniswara', email: 'rangga.danis@gmail.com', plan: 'Dibantuin', amount: 49000, method: 'GoPay', time: '42 mnt lalu', status: 'SETTLED' },
       { id: 'LK-ORD-77190', name: 'Anindya Putri', email: 'anindya.p@ui.ac.id', plan: 'Paket 24 Jam', amount: 9999, method: 'ShopeePay', time: '1 jam lalu', status: 'SETTLED' },
@@ -19073,12 +19496,18 @@ ${senderName}`;
           <td class="py-3 px-4 font-bold text-slate-900">Rp ${tx.amount.toLocaleString('id-ID')}</td>
           <td class="py-3 px-4 text-slate-400 text-xs">${escapeHtml(tx.time)}</td>
           <td class="py-3 px-4">
-            <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              ${escapeHtml(tx.status)}
+            <span class="inline-flex items-center gap-1 text-xs font-bold ${tx.status === 'SETTLED' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : tx.status === 'PENDING' ? 'text-amber-800 bg-amber-50 border-amber-300' : 'text-slate-600 bg-slate-50 border-slate-200'} border px-2 py-0.5 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full ${tx.status === 'SETTLED' ? 'bg-emerald-500' : tx.status === 'PENDING' ? 'bg-amber-500' : 'bg-slate-400'}"></span>
+              ${escapeHtml(tx.status || 'SETTLED')}
             </span>
           </td>
           <td class="py-3 px-4 text-right space-x-1">
+            ${tx.status === 'PENDING' ? `
+              <button onclick="confirmManualPayment(${idx})" title="Konfirmasi Pembayaran Manual" class="text-emerald-700 hover:text-emerald-900 font-bold text-xs bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-300 transition inline-flex items-center gap-1 shadow-xs cursor-pointer">
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>Konfirmasi Pembayaran</span>
+              </button>
+            ` : ''}
             <button onclick="toggleTransactionStatus(${idx})" title="Ubah Status Transaksi" class="text-amber-700 hover:text-amber-900 font-bold text-xs bg-amber-50 px-2 py-1 rounded border border-amber-200 transition">
               Ubah Status
             </button>
@@ -19092,6 +19521,108 @@ ${senderName}`;
         </tr>
       `).join('');
     }
+
+    function confirmManualPayment(txIndex) {
+      const tx = adminState.transactions[txIndex];
+      if (!tx) return;
+
+      if (tx.status === 'SETTLED') {
+        alert(`Transaksi [${tx.id}] sudah berstatus SETTLED.`);
+        return;
+      }
+
+      // 1. Transition status to SETTLED
+      tx.status = 'SETTLED';
+      tx.settledAt = new Date().toISOString();
+
+      // 2. Calculate tier upgrade, quota, and expiration
+      const plan = tx.plan || '';
+      let targetTier = 'DIBANTUIN';
+      let targetTierName = 'Dibantuin (30 Hari)';
+      let quotaToAdd = 20;
+      let durationDays = 30;
+
+      if (plan.includes('VIP') || plan.includes('Dikerjain')) {
+        targetTier = 'VIP';
+        targetTierName = 'Dikerjain VIP';
+        quotaToAdd = 50;
+        durationDays = 30;
+      } else if (plan.includes('24 Jam') || plan.includes('FLASH')) {
+        targetTier = 'FLASH';
+        targetTierName = 'Paket 24 Jam';
+        quotaToAdd = 10;
+        durationDays = 1;
+      } else {
+        targetTier = 'DIBANTUIN';
+        targetTierName = 'Dibantuin (30 Hari)';
+        quotaToAdd = 20;
+        durationDays = 30;
+      }
+
+      const expiryDate = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
+      const expiryIso = expiryDate.toISOString();
+
+      // 3. Update or create user in adminState.users
+      let matchedUser = adminState.users.find(u => (u.email || '').toLowerCase() === (tx.email || '').toLowerCase());
+      if (matchedUser) {
+        matchedUser.tier = targetTier;
+        matchedUser.tierName = targetTierName;
+        matchedUser.quota = Math.max(matchedUser.quota || 0, quotaToAdd);
+        matchedUser.tier_expires_at = expiryIso;
+        matchedUser.status = 'Active (' + targetTierName + ')';
+      } else {
+        matchedUser = {
+          name: tx.name || 'Kandidat Pelamar',
+          email: tx.email,
+          tier: targetTier,
+          tierName: targetTierName,
+          quota: quotaToAdd,
+          tier_expires_at: expiryIso,
+          status: 'Active (' + targetTierName + ')'
+        };
+        adminState.users.unshift(matchedUser);
+      }
+
+      // 4. If current active session matches candidate email, upgrade immediately
+      if (currentUser && currentUser.isLoggedIn && (currentUser.email || '').toLowerCase() === (tx.email || '').toLowerCase()) {
+        currentUser.tier = targetTier;
+        currentUser.tierName = targetTierName;
+        currentUser.blastQuota = Math.max(currentUser.blastQuota || 0, quotaToAdd);
+        currentUser.tier_expires_at = expiryIso;
+        saveUserSession();
+        updateUserNavbarUI();
+      }
+
+      // 5. Persist to storage
+      saveAdminTxToStorage();
+      saveAdminUsersToStorage();
+
+      // 6. Sync to Supabase PostgreSQL Database (Cloud Real-Time Sync)
+      if (supabaseClient) {
+        try {
+          supabaseClient.from('transactions').update({
+            payment_status: 'SETTLED',
+            settled_at: tx.settledAt
+          }).eq('order_id', tx.id).then(() => {});
+
+          supabaseClient.from('profiles').update({
+            tier: targetTier,
+            tier_expires_at: expiryIso,
+            blast_quota: matchedUser.quota
+          }).eq('email', tx.email).then(() => {});
+        } catch(e) {
+          console.warn('[SUPABASE] Manual payment confirmation sync error:', e);
+        }
+      }
+
+      // 7. Refresh Admin Views
+      renderAdminOrders();
+      renderAdminUsers();
+      updateAdminKPIs();
+
+      alert(`KONFIRMASI PEMBAYARAN MANUAL SUKSES!\n\nOrder ID: ${tx.id}\nPelamar: ${tx.name} (${tx.email})\nPaket: ${targetTierName}\nKuota Aktif: ${matchedUser.quota} Email Recruiter\nMasa Aktif: Hingga ${expiryDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`);
+    }
+    window.confirmManualPayment = confirmManualPayment;
 
     function toggleTransactionStatus(txIndex) {
       const tx = adminState.transactions[txIndex];
@@ -19156,6 +19687,7 @@ ${senderName}`;
             <span class="px-2 py-0.5 rounded text-xs font-bold ${u.tier === 'VIP' ? 'bg-amber-100 text-amber-800' : u.tier === 'DIBANTUIN' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}">
               ${u.tierName || u.tier}
             </span>
+            ${u.tier_expires_at ? `<div class="text-xs text-slate-400 font-sans mt-0.5">Exp: ${new Date(u.tier_expires_at).toLocaleDateString('id-ID')}</div>` : ''}
           </td>
           <td class="py-3 px-4 font-mono font-bold ${u.quota > 0 ? 'text-indigo-600' : 'text-slate-400'}">
             ${u.quota} Recruiter

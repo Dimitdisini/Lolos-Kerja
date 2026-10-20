@@ -279,6 +279,46 @@ async function runAudit() {
   const mobileNavDrawerHtml = document.getElementById('mobileNavDrawer').innerHTML;
   assertTest('T48', 'Mobile Nav Drawer uses valid auth modal functions', !mobileNavDrawerHtml.includes('openLoginModal') && mobileNavDrawerHtml.includes('openAuthModal'), 'Mobile Drawer verified');
 
+  console.log('\n--- FASE 7: SPRINT 2 / FASE 1 INTEGRATED ARCHITECTURE AUDIT ---');
+  // 1. Unified Master Profile Data Layer
+  assertTest('T49', 'Master Profile layer initialized in appState', Boolean(window.appState && window.appState.masterProfile && window.appState.masterProfile.identity && window.appState.masterProfile.experience.length > 0), `Candidate: ${window.appState.masterProfile.identity.name}`);
+  
+  // Update CV text and sync to Master Profile
+  document.getElementById('grillFullName').value = 'Dimas Pratama, S.M.';
+  document.getElementById('grillOrgName').value = 'PT Solusi Teknologi Nusantara';
+  document.getElementById('grillOrgRole').value = 'Junior Analyst';
+  window.syncCvToMasterProfile();
+  assertTest('T50', 'CV updates synchronize seamlessly to masterProfile', window.appState.masterProfile.identity.name === 'Dimas Pratama, S.M.' && window.appState.masterProfile.experience[0].org === 'PT Solusi Teknologi Nusantara', 'Master Profile sync verified');
+
+  // 2. Real ATS PDF Exporter (Bukan Fake HTML / Fake 142800)
+  assertTest('T51', 'Real Harvard ATS PDF Blob generator exists', typeof window.generateHarvardAtsPdfBlob === 'function', 'generateHarvardAtsPdfBlob available');
+  const pdfBlob = window.generateHarvardAtsPdfBlob();
+  assertTest('T52', 'PDF generator produces real application/pdf blob', pdfBlob && pdfBlob.type === 'application/pdf' && pdfBlob.size > 1500, `Real PDF Size: ${pdfBlob.size} bytes`);
+  
+  window.linkCvToModule4();
+  assertTest('T53', 'linkCvToModule4 sets real dynamic PDF file (replaces fake 142800)', window.currentBlastCvFile && window.currentBlastCvFile.size !== 142800 && window.currentBlastCvFile.size > 1500, `Attached PDF: ${window.currentBlastCvFile.name} (${window.currentBlastCvFile.size} bytes)`);
+
+  // 3. Hapus Email Tebakan (No More Fake careers@<nama>.com)
+  const unknownCompEmail = window.resolveScrapedCompanyEmail('Perusahaan Antah Berantah');
+  assertTest('T54', 'resolveScrapedCompanyEmail returns null instead of guessing careers@<nama>.com', unknownCompEmail === null, 'Email guessing eliminated');
+
+  // 4. Keterhubungan Modul Wawancara dengan Loker & CV
+  window.practiceInterviewForJob(1);
+  assertTest('T55', 'practiceInterviewForJob loads tailored question connecting CV to Job', window.appState.customQuestion && window.appState.customQuestion.q.includes('Hyatt Regency') && window.appState.currentTab === 'interview-module', window.appState.customQuestion.q);
+
+  // 5. Admin Manual Payment Confirmation
+  const pendingTxIndex = window.adminState.transactions.findIndex(t => t.status === 'PENDING');
+  assertTest('T56_find', 'Admin portal identifies PENDING transaction for manual settlement', pendingTxIndex !== -1, `Found pending tx at index ${pendingTxIndex}`);
+  
+  if (pendingTxIndex !== -1) {
+    const targetEmail = window.adminState.transactions[pendingTxIndex].email;
+    window.confirmManualPayment(pendingTxIndex);
+    const settledTx = window.adminState.transactions[pendingTxIndex];
+    const matchedUser = window.adminState.users.find(u => u.email.toLowerCase() === targetEmail.toLowerCase());
+    
+    assertTest('T56_settle', 'confirmManualPayment settles transaction and applies tier with tier_expires_at', settledTx.status === 'SETTLED' && Boolean(settledTx.settledAt) && matchedUser && matchedUser.tier === 'VIP' && Boolean(matchedUser.tier_expires_at), `Status: ${settledTx.status}, Tier: ${matchedUser.tier}, Expires: ${matchedUser.tier_expires_at}`);
+  }
+
   console.log('\n=================================================================');
   console.log('                    EXECUTIVE QA SUMMARY REPORT                  ');
   console.log('=================================================================');
