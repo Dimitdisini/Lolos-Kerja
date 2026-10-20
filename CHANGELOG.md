@@ -4,6 +4,36 @@ Format mengikuti standar [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 
 ---
 
+## [2.3.0] - 2026-10-20 (Sprint 4: Rapi, Pengujian Otomatis, Observabilitas & Kepatuhan UU PDP)
+
+### Added
+- **Suite Pengujian Vitest Unit Terotomasi (`/tests/unit/`)**:
+  - `limits-and-quota.test.js`: Pengujian kebenaran tabel batas paket Lampiran A (`TIER_LIMITS`), pemetaan label, `getEffectiveTier`, dan pembatasan fitur atomik.
+  - `master-profile-schema.test.js`: Validasi skema Master Profile (identitas, pendidikan, pengalaman berbobot STAR, skill matrix).
+  - `scraping-filter.test.js`: Pengujian algoritma deduplikasi SHA-1 (`generateJobHash`) dan penolakan posisi senior/eksekutif (`isFreshGradEligible`).
+  - `anti-fabrication-llm.test.js`: Pengujian sanitasi prompt injection `<user_data>`, ekstraktor JSON toleran blok kode, dan aturan anti-fabrikasi (permintaan klarifikasi metrik).
+  - `privacy-and-compliance.test.js`: Pengujian skema ekspor data portabilitas dan verifikasi pembersihan data sesuai UU PDP No. 27/2022.
+- **RFC 8058 & Anti-Spam Unsubscribe Endpoint (`/api/blast/unsubscribe.js`)**: Handler serverless untuk pendaftaran otomatis email rekruter ke tabel `email_blocklist` saat menerima request berhenti berlangganan.
+- **Fitur Portabilitas Data ("Unduh Data Saya")**: Tombol ekspor data JSON lengkap di `#account-module` untuk memenuhi hak portabilitas data pengguna.
+- **Fitur Hak Dihapus / Dilupakan ("Hapus Akun dan Data Saya")**: Aksi pembersihan total draf CV, riwayat lamaran, dan data sesi dari penyimpanan browser dengan konfirmasi modal berlapis.
+- **Modal Interaktif Legal & Privasi (`#legalModal`)**: Akses langsung dokumen hukum tanpa reload:
+  - Kebijakan Privasi (UU PDP No. 27/2022).
+  - Syarat & Ketentuan Layanan.
+  - Kebijakan Korespondensi Email & Anti-Spam (RFC 8058).
+  - Standar Kepatuhan Teknis Dimitri HQ.
+- **Kolom Legal & Kepatuhan di Footer**: Menambahkan navigasi terstruktur dokumen legal di footer website.
+- **Naskah Dokumentasi Produksi Lengkap (`README.md` & `RUNBOOK.md`)**:
+  - `README.md` ditulis ulang secara profesional tanpa sisa terminologi usang.
+  - `RUNBOOK.md` dilengkapi instruksi Instant Rollback Vercel, rotasi kunci rahasia, dan emergency pause blast.
+
+### Changed
+- **Pembersihan Berkas & Direktori**:
+  - Mengarsipkan berkas skrip legacy (`flutter_lolos_kerja_app.dart`, `google-apps-script-webhook.js`, `scrape-apify.js`, `simulate-5-accounts.js`, `fix_inline_custom_role.js`) ke folder `_archive/`.
+  - Menambahkan `_archive/` ke `.gitignore` untuk menjaga kebersihan repositori publik.
+- **Konsolidasi Perintah Pengujian (`npm test`)**: Menyatukan eksekusi `test:unit` (Vitest), `test:qa` (E2E Smoke & Logic), dan `test:uiux` (Mobile & Accessibility) dalam satu perintah dengan total 110 pengujian 100% PASS.
+
+---
+
 ## [2.2.0] - 2026-10-20 (Sprint 3: UI/UX Modernization & Mobile Optimization)
 
 ### Added

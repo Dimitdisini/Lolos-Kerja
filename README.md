@@ -1,89 +1,168 @@
-# Kandidat AI (Dims Career Copilot)
+# Lolos Kerja (ai.fleekgroup.id / LOLOSKERJA.ID)
 
-> **AI-Powered Career Accelerator untuk Mahasiswa & Fresh Graduate**  
-> Bimbingan bedah CV berbasis Socratic STAR, simulasi wawancara suara real-time dengan Dual-Score Evaluation, dan kurasi lowongan kerja tanpa friksi copy-paste.
+Platform akselerasi karir berbasis AI untuk mahasiswa dan fresh graduate Indonesia. Dilengkapi engine bimbingan bedah CV Socratic (Google X-Y-Z formula), simulasi wawancara suara real-time dengan Dual-Score Evaluation, kurasi lowongan kerja terverifikasi tanpa email tebakan, dan Smart Drip auto-blast email terjadwal.
 
 ---
 
-## Gambaran Umum
-
-Banyak mahasiswa tingkat akhir dan fresh graduate mengalami kecemasan ganda saat mencari kerja:
-1. **CV Anxiety**: Merasa pengalaman organisasi/kuliah minim dan bingung menyusunnya agar lolos sistem ATS.
-2. **Interview Anxiety**: Takut berbicara di depan HR, gugup dengan banyak kata gumam (*"aaa", "eee", "kayak"*), dan ragu menghadapi wawancara bahasa Inggris.
-3. **Portal Fatigue**: Lelah harus membuka belasan tab dan menyalin tautan lowongan kerja bolak-balik.
-
-**Kandidat AI** hadir sebagai pendamping satu pintu (*career copilot*) yang menyelesaikan ketiga masalah tersebut secara instan.
+## Daftar Isi
+1. [Fitur Utama](#fitur-utama)
+2. [Arsitektur Sistem](#arsitektur-sistem)
+3. [Struktur Repositori](#struktur-repositori)
+4. [Persyaratan & Instalasi Lokal](#persyaratan--instalasi-lokal)
+5. [Variabel Lingkungan (Environment Variables)](#variabel-lingkungan-environment-variables)
+6. [Pengujian Otomatis (QA & Unit Tests)](#pengujian-otomatis-qa--unit-tests)
+7. [Kebijakan Kepatuhan & Privasi](#kebijakan-kepatuhan--privasi)
+8. [Panduan Deployment (Vercel & Supabase)](#panduan-deployment-vercel--supabase)
 
 ---
 
 ## Fitur Utama
 
-### 1. Bedah CV Socratic & Optimasi STAR
-* **ATS Health Score (0–100)**: Evaluasi kepatuhan format, kepadatan kata kerja aksi (*action verbs*), dan kelengkapan metrik.
-* **Socratic Probing**: AI membimbing pengguna mengekstrak angka riil dan hasil nyata dari pengalaman yang awalnya terasa "biasa saja".
-* **Visual Diff Before vs After**: Menampilkan perbandingan kalimat sebelum dan sesudah dipoles, dengan tombol 1-klik untuk menerapkan perubahan.
-* **1-Click Plain Text ATS Export**: Salin teks bersih yang siap ditempel ke portal karir perusahaan.
+### 1. Bedah CV Socratic & Real ATS PDF Exporter
+* **Socratic Probing**: Menganalisis draf CV pengguna dan membimbing penambahan metrik riil menggunakan Google X-Y-Z / STAR formula.
+* **Aturan Keras Anti-Fabrikasi**: LLM dilarang mengarang angka atau fakta yang tidak ada di draf. Jika draf tanpa angka, sistem mengajukan pertanyaan klarifikasi (`needs_input`).
+* **Visual Stepper 3 Langkah**: 1. Unggah/Isi Draf -> 2. Skor ATS & Rekomendasi STAR -> 3. Pratinjau & Ekspor Harvard PDF.
+* **Harvard ATS 1-Column Engine**: Mengunduh berkas PDF biner nyata (Times-Roman, layout 1-kolom, margin simetris, teks dapat diseleksi mesin ATS).
 
 ### 2. Simulasi Wawancara Suara (Voice Mock Interview)
-* **Perekaman Suara Real-Time**: Terintegrasi dengan Web Audio API dan Web Speech recognition.
+* **Perekaman Suara Real-Time**: Terintegrasi dengan Web Speech & Web Audio API.
 * **Dual-Score Evaluation Matrix**:
-  * **Skor Relevansi (0–100)**: Mengevaluasi apakah substansi jawaban selaras dengan metode STAR dan kebutuhan posisi kerja.
-  * **Skor Delivery & Ketenangan (0–100)**: Mengukur artikulasi, kestabilan tempo bicara (WPM), dan deteksi otomatis kata gumam/filler (*"aaa", "eee", "kayak", "anu", "gitu"*).
-* **Dual-Language Switcher**: Pilihan mode Bahasa Indonesia (HR screening lokal) dan Bahasa Inggris (multinational company / MT program).
-* **Model Answer Percontohan**: Rekomendasi struktur jawaban ideal untuk dipelajari.
+  * **Skor Relevansi (0-100)**: Mengevaluasi apakah substansi jawaban selaras dengan metode STAR dan relevan terhadap kualifikasi loker.
+  * **Skor Delivery & Ketenangan (0-100)**: Mengukur kestabilan tempo bicara (WPM) dan mendeteksi kata jeda/filler vokal (*"aaa", "eee", "kayak", "anu", "gitu"*).
+* **Koneksi Loker ke Wawancara**: Fitur "Latihan untuk loker ini" otomatis memuat simulasi pertanyaan khusus untuk posisi target.
 
-### 3. Smart Job Matcher (Zero Copy-Paste)
-* **Katalog Loker Terkurasi**: 50+ lowongan aktif dari Glints, LinkedIn, dan JobStreet yang diselaraskan dengan keahlian dan jurusan pengguna.
-* **Analisis Kesenjangan Keahlian (Skill Gap)**: Menampilkan keahlian yang sudah cocok serta keahlian yang disarankan untuk dipelajari.
-* **Direct Deep-Link Glints**: Tombol 1-klik yang langsung membuka pencarian resmi di Glints dengan parameter posisi terisi otomatis.
+### 3. Smart Job Matcher Terverifikasi
+* **Katalog Loker Terkurasi**: Lowongan aktif dari LinkedIn, JobStreet, dan Glints yang telah melalui pipeline normalisasi dan deduplikasi hash SHA-1.
+* **Filter Senioritas Ketat**: Otomatis membuang lowongan berlevel Head, Director, VP, Manager, dan Senior dari katalog fresh graduate.
+* **Pemisahan Jalur Loker**:
+  * **Email Resmi Terverifikasi**: Lowongan dengan kontak HR terverifikasi dapat dimasukkan ke antrean Auto-Blast Email.
+  * **Portal Resmi ATS**: Lowongan via Workday/Taleo/Glints diarahkan ke tombol "Lamar via Portal" transparan. Email tebakan spekulatif (`careers@<nama>.com`) telah dieliminasi 100%.
 
-### 4. Konsol Simulasi Orkestrasi Agen (Multi-Agent Swarm)
-Visualisasi arsitektur 5 agen otonom di latar belakang:
-* `@kai` (Chief of Staff & Orchestrator)
-* `@tari-agent` (Socratic CV & Metric Modeler)
-* `@vocalis-agent` (Acoustic Pacing & Vocal Delivery)
-* `@scout-agent` (Loker Crawler & Deep-Link Query)
-* `@dewi-gatekeeper` (Strict Anti-Slop & Quality Audit)
+### 4. Smart Drip Auto-Blast Terjadwal
+* **Distribusi Pengiriman Alami**: Pengiriman disebar acak pada jam kerja (08:00 - 17:00 WIB) dengan jeda minimum 3 menit untuk melindungi reputasi domain.
+* **Dukungan Kepatuhan UU PDP & Anti-Spam**: Header `List-Unsubscribe` resmi, footer kepatuhan B2B, dan pencatatan blocklist otomatis saat terjadi keluhan atau bounce.
 
----
-
-## Arsitektur Teknis
-
-* **Frontend**: Vanilla HTML5, CSS3 kustom (Dark Forest Matte `#04110a`, Deep Moss `#0c2619`, Mint Sage `#7fd0a5`, Warm Amber `#f59e0b`), dan Vanilla JavaScript modern.
-* **Audio Processing**: Web Audio API (`AudioContext`, `AnalyserNode`) untuk visualisasi gelombang suara (*live waveform canvas*) dan kalkulasi durasi riil.
-* **Zero Dependencies**: Berdiri sendiri (*single-file*), tanpa build tool, tanpa `npm install`, 100% cepat dan hemat memori.
+### 5. Unified Master Profile & Dashboard Akun
+* Modul Akun (`#account-module`) menyajikan profil, sisa kuota, tanggal kedaluwarsa paket (`tier_expires_at`), riwayat CV aktif, dan riwayat lamaran terkirim.
+* Dilengkapi fitur portabilitas data ("Unduh Data Saya") dan penghapusan data ("Hapus Akun dan Data Saya").
 
 ---
 
-## Panduan Menjalankan Secara Lokal
+## Arsitektur Sistem
 
-1. Klon repositori ini:
-   ```bash
-   git clone https://github.com/username/kandidat-ai.git
-   cd kandidat-ai
-   ```
-2. Buka berkas `index.html` langsung di Google Chrome atau peramban modern lainnya. Tidak memerlukan server lokal.
+Platform mengadopsi arsitektur modular:
+* **Frontend**: Vanilla JS modern + Tailwind CSS + Responsive Floating Navigation.
+* **Backend API**: Vercel Serverless Functions (`/api/`) dengan format Node.js ESM.
+* **Database & Auth**: Supabase PostgreSQL dengan Row-Level Security (RLS) ketat dan atomik stored procedure.
+* **AI Engine**: Anthropic Claude 3.5 Sonnet / Haiku melalui wrapper terpusat (`/api/_lib/llm.js`).
+* **PDF Engine**: Client-side `jsPDF` & Server-side `pdf-lib`.
 
 ---
 
-## Panduan Deployment ke Vercel
+## Struktur Repositori
 
-Repositori ini telah dilengkapi dengan `vercel.json` dan siap di-deploy dalam hitungan detik:
-
-### Opsi A: Lewat Vercel CLI
-```bash
-npm i -g vercel
-vercel
+```text
+├── api/                     # Serverless Endpoints (Vercel)
+│   ├── _lib/                # Shared helpers (auth, limits, llm, quota, rateLimit)
+│   ├── cv/                  # analyze, rewrite, export-pdf
+│   ├── interview/           # questions, score
+│   ├── jobs/                # list, match
+│   ├── blast/               # plan, approve, tick, unsubscribe
+│   └── billing/             # create-order, admin-confirm, webhook
+├── scripts/
+│   └── scrape/              # run.js (pipeline normalisasi), stats.js
+├── supabase/
+│   └── migrations/          # 0001_core.sql, 0002_modules.sql, 0003_seed_promote_owner.sql
+├── tests/
+│   └── unit/                # Vitest unit test suite
+├── deploy/
+│   └── workflows/           # CI, scraper, dan blast-tick cron GitHub Actions
+├── index.html               # Main Single-Page Application (SPA)
+├── run-full-qa-audit.js     # End-to-end QA audit runner (64 tests)
+├── run-ui-ux-audit.js       # Mobile & accessibility audit runner (20 tests)
+├── package.json
+├── vercel.json
+└── README.md
 ```
 
-### Opsi B: Lewat Dashboard Vercel (1-Click)
-1. Push folder ini ke akun GitHub kamu sebagai repositori baru (misal: `kandidat-ai`).
-2. Masuk ke [vercel.com](https://vercel.com) $\rightarrow$ klik **Add New Project**.
-3. Pilih repositori `kandidat-ai` dari daftar GitHub.
-4. Klik **Deploy** (Framework Preset: *Other*, Root Directory: `./`).
-5. Selesai! Web langsung online dengan HTTPS aktif.
+---
+
+## Persyaratan & Instalasi Lokal
+
+### Prasyarat
+* Node.js v18.0.0 atau lebih baru
+* npm v9.0.0 atau lebih baru
+
+### Langkah Instalasi
+1. Klon repositori ini:
+   ```bash
+   git clone https://github.com/Dimitdisini/Lolos-Kerja.git
+   cd Lolos-Kerja
+   ```
+2. Pasang dependensi:
+   ```bash
+   npm install
+   ```
+3. Salin konfigurasi environment:
+   ```bash
+   cp .env.example .env
+   ```
+4. Jalankan development server:
+   ```bash
+   npm run dev
+   ```
+5. Buka `http://localhost:5173` di peramban Anda.
 
 ---
 
-## Lisensi & Hak Cipta
-Dibuat oleh **Dimitri Ahmad** (Dimitri HQ / Dims Lab) & **Sasa**.
+## Variabel Lingkungan (Environment Variables)
+
+Isi berkas `.env` dengan kredensial berikut:
+
+| Variabel | Keterangan |
+|---|---|
+| `SUPABASE_URL` | URL Proyek Supabase |
+| `SUPABASE_ANON_KEY` | Kunci anonim publik Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Kunci admin backend Supabase (rahasia) |
+| `ANTHROPIC_API_KEY` | Kunci API Anthropic untuk LLM Bedah CV & Wawancara |
+| `RESEND_API_KEY` | Kunci API Resend untuk pengiriman email Auto-Blast |
+| `MAIL_FROM_DOMAIN` | Domain email pengirim (misal: `lamaran.loloskerja.id`) |
+| `CRON_SECRET` | Token autentikasi untuk memicu `/api/blast/tick` via cron |
+| `DRY_RUN` | Set `true` untuk mode simulasi pengiriman tanpa biaya Resend |
+
+---
+
+## Pengujian Otomatis (QA & Unit Tests)
+
+Jalankan seluruh suite verifikasi kualitas:
+
+```bash
+# 1. Jalankan unit test Vitest
+npx vitest run
+
+# 2. Jalankan end-to-end QA audit (64 tes)
+npm run test:qa
+
+# 3. Jalankan mobile & accessibility audit (20 tes)
+npm run test:uiux
+
+# 4. Jalankan seluruh suite sekaligus
+npm test
+```
+
+Status Kepatuhan: **100% PASS** (24 Vitest + 64 E2E QA + 20 UI/UX).
+
+---
+
+## Kebijakan Kepatuhan & Privasi
+
+* [Kebijakan Privasi (PRIVACY.md)](./PRIVACY.md): Kepatuhan terhadap UU Perlindungan Data Pribadi (UU PDP No. 27 Tahun 2022).
+* [Syarat & Ketentuan Layanan (TERMS.md)](./TERMS.md): Ketentuan penggunaan platform, kepemilikan data, dan batasan tanggung jawab.
+* [Kebijakan Pengiriman Email (EMAIL-POLICY.md)](./EMAIL-POLICY.md): Standar Anti-Spam (UU ITE No. 1/2024 & RFC 8058 List-Unsubscribe).
+* [Petunjuk Operasional Sistem (RUNBOOK.md)](./RUNBOOK.md): SOP penanganan darurat bounce rate, rollback Vercel, dan rotasi secret key.
+
+---
+
+## Lisensi & Tim
+Hak Cipta © 2026 **PT Fleek Group Indonesia & PT Xavortree Digital Solution (Dimitri HQ)**.  
+Lead Architect & Builder: **Dimitri Ahmad** (Group CEO & Technology Architect).

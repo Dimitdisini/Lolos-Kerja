@@ -2106,6 +2106,33 @@
         </div>
       </div>
 
+      <!-- ROW 4: KONTROL DATA PENGGUNA & PRIVASI (UU PDP NO. 27/2022) -->
+      <div class="dospem-card p-5 space-y-4 border border-slate-200">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Kontrol Data & Privasi (UU PDP No. 27/2022)</span>
+          </div>
+          <span class="text-xs text-slate-400 font-medium">Hak Portabilitas & Penghapusan Data</span>
+        </div>
+
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Sesuai dengan Undang-Undang Perlindungan Data Pribadi No. 27 Tahun 2022, Anda memiliki kendali penuh atas data Anda. Anda dapat mengunduh salinan profil dan riwayat Anda kapan saja, atau menghapus seluruh catatan data Anda secara permanen dari perangkat ini.
+        </p>
+
+        <div class="flex items-center gap-3 pt-2 flex-wrap">
+          <button type="button" onclick="downloadMyData()" id="btnDownloadMyData" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-200 transition flex items-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Unduh Data Saya (JSON)</span>
+          </button>
+
+          <button type="button" onclick="deleteMyAccountAndData()" id="btnDeleteMyData" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs px-4 py-2.5 rounded-xl border border-rose-200 transition flex items-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            <span>Hapus Akun dan Data Saya</span>
+          </button>
+        </div>
+      </div>
+
     </section>
 
     <!-- ========================================================================= -->
@@ -2883,8 +2910,8 @@
 
   <!-- FOOTER (Clean Dospem Style) -->
   <footer class="border-t border-slate-200 bg-slate-50 py-12 text-xs text-slate-500 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-4 gap-8">
-      <div class="col-span-2 sm:col-span-1 space-y-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-5 gap-8">
+      <div class="col-span-2 md:col-span-1 space-y-3">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-lg bg-blue-600 text-white font-bold flex items-center justify-center text-xs">LK</div>
           <span class="font-extrabold text-slate-900 text-sm">Lolos Kerja</span>
@@ -2922,6 +2949,16 @@
           <li><span class="text-slate-400">Harvard 1-Column ATS</span></li>
           <li><span class="text-slate-400">Dual-Score Evaluation</span></li>
           <li><span class="text-slate-400">Safety Drip Protocol</span></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-900 mb-3 text-xs uppercase tracking-wider">Legal & Kepatuhan</h4>
+        <ul class="space-y-2 text-xs">
+          <li><button type="button" onclick="openLegalModal('privacy')" class="hover:text-blue-600 cursor-pointer">Kebijakan Privasi (UU PDP)</button></li>
+          <li><button type="button" onclick="openLegalModal('terms')" class="hover:text-blue-600 cursor-pointer">Syarat & Ketentuan</button></li>
+          <li><button type="button" onclick="openLegalModal('email-policy')" class="hover:text-blue-600 cursor-pointer">Kebijakan Anti-Spam</button></li>
+          <li><button type="button" onclick="openLegalModal('compliance')" class="hover:text-blue-600 cursor-pointer">Kepatuhan RFC 8058</button></li>
         </ul>
       </div>
     </div>
@@ -3208,6 +3245,148 @@
         `;
         container.appendChild(row);
       });
+    };
+
+    /* -------------------------------------------------------------------------
+       DATA PORTABILITY & USER PRIVACY (UU PDP NO. 27/2022)
+       ------------------------------------------------------------------------- */
+    window.downloadMyData = function() {
+      const data = {
+        app: "Lolos Kerja",
+        version: "2.2.0",
+        exportedAt: new Date().toISOString(),
+        user: (window.appState && window.appState.user) || null,
+        masterProfile: (window.appState && window.appState.masterProfile) || null,
+        appliedJobsHistory: (window.appliedJobsHistory) || [],
+        lastInterviewSession: (window.appState && window.appState.lastInterviewSession) || null
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "data-kandidat-lolos-kerja.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      if (typeof window.showToast === "function") {
+        window.showToast("Data akun dan profil Anda berhasil diekspor (JSON).", "success");
+      }
+    };
+
+    window.deleteMyAccountAndData = function() {
+      if (typeof window.showConfirmModal === "function") {
+        window.showConfirmModal(
+          "Hapus Akun dan Seluruh Data?",
+          "Sesuai UU Perlindungan Data Pribadi No. 27/2022, tindakan ini akan menghapus permanen draf CV, profil, dan riwayat lamaran Anda dari penyimpanan browser ini.",
+          function() {
+            try {
+              localStorage.removeItem("dims_career_user");
+              localStorage.removeItem("dims_master_profile");
+              localStorage.removeItem("lk_saved_cv_state");
+              localStorage.removeItem("appliedJobsHistory");
+              sessionStorage.clear();
+            } catch (e) {}
+            if (window.appState) {
+              window.appState.user = { isLoggedIn: false, name: "Kandidat Pelamar", email: "kandidat@gmail.com", tier: "FREE", blastQuota: 10 };
+              window.appliedJobsHistory = [];
+            }
+            if (typeof window.logoutUser === "function") {
+              window.logoutUser();
+            }
+            if (typeof window.showToast === "function") {
+              window.showToast("Seluruh data akun dan profil Anda telah dihapus bersih.", "info");
+            }
+            if (typeof window.switchTab === "function") {
+              window.switchTab("home-module");
+            }
+          }
+        );
+      }
+    };
+
+    /* -------------------------------------------------------------------------
+       LEGAL DOCUMENTS MODAL CONTROLLER
+       ------------------------------------------------------------------------- */
+    window.openLegalModal = function(type) {
+      const modal = document.getElementById("legalModal");
+      const titleEl = document.getElementById("legalModalTitle");
+      const badgeEl = document.getElementById("legalModalBadge");
+      const bodyEl = document.getElementById("legalModalBody");
+      if (!modal || !titleEl || !bodyEl) return;
+
+      if (type === "privacy") {
+        if (badgeEl) badgeEl.textContent = "KEBIJAKAN PRIVASI";
+        titleEl.textContent = "Kebijakan Privasi & Perlindungan Data Pribadi";
+        bodyEl.innerHTML = `
+          <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+            <p class="font-bold text-slate-800">Kepatuhan UU No. 27 Tahun 2022 tentang Perlindungan Data Pribadi (UU PDP)</p>
+            <p>Platform <strong>Lolos Kerja</strong> berkomitmen melindungi hak privasi setiap pengguna. Data yang diproses mencakup data identitas profesional (nama, kontak, riwayat pendidikan, pengalaman kerja) yang diunggah secara sukarela.</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">1. Tujuan Pemrosesan Data</h4>
+            <ul class="list-disc pl-4 space-y-1">
+              <li>Menganalisis kesesuaian format CV terhadap standar mesin Applicant Tracking System (ATS).</li>
+              <li>Menghasilkan rekomendasi formula STAR (Situation, Task, Action, Result) berbasis pengalaman riil kandidat.</li>
+              <li>Memfasilitasi simulasi wawancara suara dan pencocokan lowongan kerja yang relevan.</li>
+              <li>Mengirimkan surat lamaran profesional ke kontak rekruter resmi atas persetujuan eksplisit pengguna.</li>
+            </ul>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">2. Hak Pengguna (Subjek Data)</h4>
+            <p>Anda memiliki hak hukum untuk mengakses data Anda ("Unduh Data Saya"), memperbarui draf CV, dan meminta penghapusan permanen ("Hapus Akun dan Data Saya") kapan saja melalui menu Dasbor Akun.</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">3. Keamanan Data</h4>
+            <p>Kami tidak menjual, menyewakan, atau membagikan data profil kandidat kepada pihak ketiga untuk kepentingan periklanan atau monetisasi non-karir.</p>
+          </div>
+        `;
+      } else if (type === "terms") {
+        if (badgeEl) badgeEl.textContent = "SYARAT & KETENTUAN";
+        titleEl.textContent = "Syarat & Ketentuan Layanan";
+        bodyEl.innerHTML = `
+          <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+            <p class="font-bold text-slate-800">Ketentuan Penggunaan Platform Lolos Kerja</p>
+            <p>Dengan mengakses atau menggunakan platform Lolos Kerja, pengguna menyetujui ketentuan berikut:</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">1. Batasan Layanan & Anti-Klaim Spekulatif</h4>
+            <p>Lolos Kerja adalah platform alat bantu (copilot) persiapan karir. Platform tidak menjamin kelulusan seleksi kerja 100%, karena keputusan penerimaan karyawan sepenuhnya berada di tangan masing-masing perusahaan perekrut.</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">2. Kejujuran Data Pelamar</h4>
+            <p>Pengguna bertanggung jawab penuh atas kebenaran fakta, ijazah, pengalaman, dan klaim kompetensi yang dicantumkan dalam CV. AI dilarang digunakan untuk mengarang pencapaian fiktif yang melanggar hukum.</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">3. Kuota & Pembayaran</h4>
+            <p>Pembayaran paket bersifat final dan memberikan hak akses serta kuota blast sesuai tingkatan paket yang dipilih selama masa aktif yang berlaku.</p>
+          </div>
+        `;
+      } else if (type === "email-policy") {
+        if (badgeEl) badgeEl.textContent = "KEBIJAKAN EMAIL";
+        titleEl.textContent = "Kebijakan Korespondensi Email & Anti-Spam";
+        bodyEl.innerHTML = `
+          <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+            <p class="font-bold text-slate-800">Standar Pengiriman Lamaran Kerja Profesional</p>
+            <p>Untuk memastikan email lamaran sampai ke inbox rekruter tanpa ditandai spam, sistem Lolos Kerja menerapkan batas teknis ketat:</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">1. Protokol Smart Drip (Jeda Alami)</h4>
+            <p>Email dikirim satu per satu dengan jeda minimum 3 menit dan hanya disebar pada jam kerja normal (08:00 - 17:00 WIB) untuk mencegah lonjakan koneksi server.</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">2. Mekanisme Berhenti Berlangganan (RFC 8058)</h4>
+            <p>Setiap email memuat tautan resmi "Berhenti Berlangganan" di footer dan header teknis. Jika HRD menekan tautan tersebut, alamat mereka otomatis masuk ke daftar blokir permanen (blacklist).</p>
+            <h4 class="font-bold text-slate-800 text-xs uppercase">3. Eliminasi Alamat Tebakan</h4>
+            <p>Sistem tidak pernah menebak alamat email rekruter. Hanya alamat kontak resmi terverifikasi yang diproses; lowongan lain wajib diarahkan via portal karir resmi.</p>
+          </div>
+        `;
+      } else {
+        if (badgeEl) badgeEl.textContent = "KEPATUHAN TEKNIS";
+        titleEl.textContent = "Standar Kepatuhan & Keamanan Sistem";
+        bodyEl.innerHTML = `
+          <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+            <p class="font-bold text-slate-800">Spesifikasi Arsitektur & Keamanan Dimitri HQ</p>
+            <ul class="list-disc pl-4 space-y-1.5">
+              <li><strong>Autentikasi:</strong> Enkripsi token berbasis Supabase Auth dengan Row-Level Security (RLS) PostgreSQL.</li>
+              <li><strong>Otorisasi:</strong> Validasi hak akses dan kuota sisi server (server-side authority).</li>
+              <li><strong>Keamanan Input:</strong> Sanitasi HTML dan proteksi XSS pada seluruh form dan upload nama berkas.</li>
+              <li><strong>Anti-AI Slop:</strong> Desain antarmuka bersih, bernapas, dan proporsional untuk perangkat seluler.</li>
+            </ul>
+          </div>
+        `;
+      }
+
+      modal.classList.remove("hidden");
+    };
+
+    window.closeLegalModal = function() {
+      const modal = document.getElementById("legalModal");
+      if (modal) modal.classList.add("hidden");
     };
 
     /* -------------------------------------------------------------------------
@@ -21384,7 +21563,33 @@ ${senderName}`;
 
     </div>
   </div>
-<!-- AI INLINE SUGGESTION ENGINE (Contextual, Zero Template) -->
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 5: LEGAL & PRIVASI (UU PDP & ANTI-SPAM COMPLIANCE)                  -->
+  <!-- ========================================================================= -->
+  <div id="legalModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4 overflow-y-auto">
+    <div class="dospem-card max-w-lg w-full p-6 sm:p-7 space-y-4 bg-white relative animate-in fade-in zoom-in-95 duration-200 shadow-2xl my-auto max-h-[85vh] flex flex-col">
+      <button onclick="closeLegalModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer" title="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+
+      <div>
+        <span id="legalModalBadge" class="text-xs font-bold uppercase tracking-wider text-blue-600 font-mono">KEBIJAKAN RESMI</span>
+        <h3 id="legalModalTitle" class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">Dokumen Hukum & Privasi</h3>
+      </div>
+
+      <div id="legalModalBody" class="overflow-y-auto pr-1 flex-1 border-t border-slate-100 pt-3">
+        <!-- Dynamic content injected by openLegalModal() -->
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end">
+        <button type="button" onclick="closeLegalModal()" class="px-5 py-2.5 bg-slate-900 hover:bg-black text-white text-xs font-bold rounded-xl transition cursor-pointer">
+          Saya Mengerti
+        </button>
+      </div>
+    </div>
+  </div>
+
 <script>
 window._grillHintTimers = {};
 window.aiGrillHint = function(el) {
