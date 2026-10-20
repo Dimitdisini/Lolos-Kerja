@@ -4,6 +4,30 @@ Format mengikuti standar [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 
 ---
 
+## [2.2.0] - 2026-10-20 (Sprint 3: UI/UX Modernization & Mobile Optimization)
+
+### Added
+- **Unified Toast Notification & Confirmation Modal**: Menggantikan blocking native `window.alert` dan `window.prompt` dengan sistem toast non-blocking modern bergaya clean matte (`showToast(msg, type)`) dengan warna emerald (sukses), rose (error), dan slate (info), serta dialog modal konfirmasi (`showConfirmModal(title, msg, onConfirm)`).
+- **Safe Alert Bridge**: Bridge aman `window.alert` yang memanggil `showToast` tanpa memutus runner test headless (JSDOM).
+- **Dasbor Akun & Profil Pengguna (`account-module`)**: Modul mandiri terpadu berisi:
+  - Kartu profil kandidat (nama, email, avatar, role badge).
+  - Status kuota Auto-Blast & masa aktif langganan dinamis (`tier_expires_at`).
+  - Riwayat CV aktif dengan skor ATS, target role, dan aksi langsung unduh PDF Harvard 1-kolom.
+  - Riwayat lamaran terkirim real-time yang tersinkronisasi dari `appliedJobsHistory`.
+  - Riwayat sesi latihan wawancara suara terakhir (skor relevansi, delivery, WPM, dan deteksi kata jeda).
+  - Tombol upgrade paket dan logout.
+- **Navigasi Terpadu Akun**: Tombol tab "Akun" ditambahkan pada desktop navbar, mobile nav drawer, dan mobile floating bottom nav (6 tabs).
+- **Visual Progress Stepper (Modul CV)**: Indikator tahapan visual interaktif 3-langkah (**1. Unggah/Isi Draft** -> **2. Skor ATS & STAR** -> **3. Pratinjau & Ekspor**) yang tersinkronisasi otomatis dengan status formulir dan subtab.
+- **Mobile Job Filter Toggle**: Tombol toggle kolaps filter jurusan & kategori (`#mobileFilterToggleBtn`) untuk menghemat ruang vertikal layar HP.
+- **Suite Audit UI/UX Otomatis (UX-15 s/d UX-20)**: Memperluas `run-ui-ux-audit.js` hingga 20 pengujian terotomasi untuk memvalidasi kepatuhan komponen baru.
+
+### Changed
+- **Pembersihan Klaim Spekulatif**: Menghapus klaim berlebih ("94% lolos ATS", "100% bebas bouncing", "ChatGPT sering halusinasi") dan menggantinya dengan penjelasan proposisi nilai nyata ("Format Standar Harvard ATS 1-Kolom", "Algoritma Smart Drip Terjadwal", "Formula STAR Berbasis Pengalaman Asli").
+- **Standarisasi Pemetaan Tier (`TIER_LABELS`)**: Menyatukan seluruh label tier aplikasi: `FREE: 'Gratis'`, `FLASH: 'Paket 24 Jam'`, `DIBANTUIN: 'Dibantuin'`, `VIP: 'Dikerjain VIP'`.
+- **Badge Status Lowongan Kerja**: Mempertegas visual badge antara lowongan `Kirim via Email Resmi` (emerald) vs `Lamar via Portal` (slate/blue).
+
+---
+
 ## [2.1.0] - 2026-10-20 (Sprint 2: MVP Vertikal & Integrasi Terpadu)
 
 ### Added

@@ -78,7 +78,7 @@ const isHeroStackedOnMobile = heroInputContainer && heroInputContainer.className
 assertUIUX('UX-08', 'Mobile', 'Hero Input Stacked Layout on Mobile (No Horizontal Cutoff)', isHeroStackedOnMobile, 'flex-col sm:flex-row active');
 
 const bottomNavButtons = document.querySelectorAll('.mobile-bottom-tab');
-assertUIUX('UX-09', 'Mobile', 'Mobile Bottom Tabs Touch Target (5 Tabs with min-h 44px)', bottomNavButtons.length === 5, `Found ${bottomNavButtons.length} mobile tabs`);
+assertUIUX('UX-09', 'Mobile', 'Mobile Bottom Tabs Touch Target (6 Tabs with min-h 44px)', bottomNavButtons.length === 6, `Found ${bottomNavButtons.length} mobile tabs`);
 
 // -----------------------------------------------------------------------------
 // 3. COLOR CONTRAST & ACCESSIBILITY (WCAG AA COMPLIANCE)
@@ -98,19 +98,49 @@ assertUIUX('UX-11', 'A11y', 'All Form Controls Have Accessible Label / Placehold
 // -----------------------------------------------------------------------------
 console.log('\n--- 4. INFORMATION ARCHITECTURE & CLUTTER CONTROL ---');
 
-const coreModules = ['home-module', 'cv-module', 'interview-module', 'jobs-module', 'blast-module', 'pricing-module'];
+const coreModules = ['home-module', 'cv-module', 'interview-module', 'jobs-module', 'blast-module', 'pricing-module', 'account-module'];
 const allCoreModulesPresent = coreModules.every(id => document.getElementById(id) !== null);
-assertUIUX('UX-12', 'Architecture', 'All 6 Core Modules Structured with Clean IDs', allCoreModulesPresent, 'Core module architecture intact');
+assertUIUX('UX-12', 'Architecture', 'All Core Modules Structured with Clean IDs', allCoreModulesPresent, 'Core module architecture intact');
 
 const mobileComparisonCards = document.querySelector('.sm\\:hidden.space-y-2\\.5');
 assertUIUX('UX-13', 'Architecture', 'Mobile Clean Comparison Cards (sm:hidden replaces wide table)', mobileComparisonCards !== null, 'Mobile comparative card layout active');
 
-const modals = ['authModal', 'qrisModal', 'blastJobDetailModal'];
+const modals = ['authModal', 'qrisModal', 'blastJobDetailModal', 'confirmModal'];
 const allModalsResponsive = modals.every(id => {
   const m = document.getElementById(id);
   return m && m.className.includes('fixed inset-0') && m.className.includes('backdrop-blur');
 });
-assertUIUX('UX-14', 'Architecture', 'Responsive Modal Dialogs with Backdrop Blur', allModalsResponsive, 'Auth, QRIS & Blast detail modals verified');
+assertUIUX('UX-14', 'Architecture', 'Responsive Modal Dialogs with Backdrop Blur', allModalsResponsive, 'Auth, QRIS, Blast detail & Confirm modals verified');
+
+// -----------------------------------------------------------------------------
+// 5. SPRINT 3 UI/UX & CLAIM PURIFICATION AUDIT
+// -----------------------------------------------------------------------------
+console.log('\n--- 5. SPRINT 3 UI/UX & CLAIM PURIFICATION AUDIT ---');
+
+const toastContainerExists = document.getElementById('toastContainer') !== null;
+const confirmModalExists = document.getElementById('confirmModal') !== null;
+assertUIUX('UX-15', 'Sprint 3', 'Unified Toast & Confirm Modal Components Exist', toastContainerExists && confirmModalExists, 'Toast container and confirm dialog active');
+
+const accountModule = document.getElementById('account-module');
+const accountComponents = ['accountUserName', 'accountUserQuotaDisplay', 'accountUserExpiryDisplay', 'accountCvTargetRole', 'accountAppliedContainer'];
+const accountValid = accountModule && accountComponents.every(id => document.getElementById(id) !== null);
+assertUIUX('UX-16', 'Sprint 3', 'Account Module Dashboard Structure Verified', accountValid, 'All account cards & history containers present');
+
+const cvStepperExists = document.getElementById('cvStepperLineProgress') !== null && document.getElementById('cvStepNode-1') !== null && document.getElementById('cvStepNode-3') !== null;
+assertUIUX('UX-17', 'Sprint 3', 'CV 3-Step Visual Progress Stepper Present', cvStepperExists, '3-step progress stepper verified');
+
+const filterToggleBtn = document.getElementById('mobileFilterToggleBtn');
+const filterCollapsible = document.getElementById('jobFiltersCollapsibleContainer');
+assertUIUX('UX-18', 'Sprint 3', 'Mobile Job Filter Toggle & Collapsible Container Present', filterToggleBtn !== null && filterCollapsible !== null, 'Mobile space-saving filter toggle verified');
+
+const halusinasiMatches = (htmlContent.match(/ChatGPT Sering Halusinasi/gi) || []).length;
+const bounceMatches = (htmlContent.match(/100% Bebas Bouncing/gi) || []).length;
+const p94Matches = (htmlContent.match(/94% CV fresh graduate/gi) || []).length;
+const totalSpeculativeClaims = halusinasiMatches + bounceMatches + p94Matches;
+assertUIUX('UX-19', 'Sprint 3', 'Zero Speculative Claims in Production UI', totalSpeculativeClaims === 0, `Speculative claims remaining: ${totalSpeculativeClaims}`);
+
+const tierLabelsInScript = htmlContent.includes("FREE: 'Gratis'") && htmlContent.includes("VIP: 'Dikerjain VIP'") && htmlContent.includes("FLASH: 'Paket 24 Jam'") && htmlContent.includes("DIBANTUIN: 'Dibantuin'");
+assertUIUX('UX-20', 'Sprint 3', 'Unified Tier Labels Mapping Defined', tierLabelsInScript, 'TIER_LABELS standardized');
 
 console.log('\n=================================================================');
 console.log('                 EXECUTIVE UI/UX AUDIT REPORT                    ');
@@ -120,7 +150,7 @@ const complianceRate = ((passedAuditTests / totalAuditTests) * 100).toFixed(1);
 console.log(`UI/UX COMPLIANCE RATE: ${complianceRate}%`);
 
 if (failedAuditTests === 0) {
-  console.log('\nALL 14 UI/UX & MOBILE ACCESSIBILITY STANDARDS COMPLIANT (100%)!');
+  console.log(`\nALL ${totalAuditTests} UI/UX & MOBILE ACCESSIBILITY STANDARDS COMPLIANT (100%)!`);
   process.exit(0);
 } else {
   console.error(`\nFAILED ${failedAuditTests} UI/UX AUDITS!`);
