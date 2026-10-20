@@ -1494,7 +1494,9 @@
               <div class="flex items-center justify-between gap-2 flex-wrap">
                 <!-- Filter Chips -->
                 <div class="flex items-center gap-1.5 flex-wrap" id="blastCategoryChips">
-                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Mitra (22)</button>
+                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Target</button>
+                  <button type="button" onclick="setBlastCategoryFilter('scraped_live')" id="btn-blast-cat-scraped_live" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>Loker Scraping Live (<span id="blastCountScrapedPill">380+</span>)</button>
+                  <button type="button" onclick="setBlastCategoryFilter('tier1')" id="btn-blast-cat-tier1" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100">Mitra Tier-1 (22)</button>
                   <button type="button" onclick="setBlastCategoryFilter('tech')" id="btn-blast-cat-tech" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Tech & Startup</button>
                   <button type="button" onclick="setBlastCategoryFilter('bumn_bank')" id="btn-blast-cat-bumn_bank" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">BUMN & Perbankan</button>
                   <button type="button" onclick="setBlastCategoryFilter('fmcg_corp')" id="btn-blast-cat-fmcg_corp" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">FMCG & Korporat</button>
@@ -11436,6 +11438,69 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     "salary": "Kompetitif (Standar Industri / UMR)",
     "link": "https://id.linkedin.com/jobs/view/hardware-product-owner-at-mceasy-4475725679?position=3&pageNum=42&refId=ddckbcyXFqPhC6kyR60ZUQ%3D%3D&trackingId=LmpZ5yjivHUA6gy3hX1aag%3D%3D",
     "query": "Hardware Product Owner McEasy"
+  },
+  {
+    "id": 419,
+    "title": "Data Science Manager",
+    "company": "Noraa & Co.",
+    "category": "it-software",
+    "location": "jakarta",
+    "level": "fresh-grad",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Komunikasi Profesional",
+      "Analisis Masalah",
+      "Kerja Sama Tim"
+    ],
+    "valueAddSkills": [
+      "SOP Industri",
+      "Adaptif & Cepat Belajar"
+    ],
+    "salary": "Kompetitif (Standar Industri / UMR)",
+    "link": "https://id.linkedin.com/jobs/view/data-science-manager-at-noraa-co-4465911639?position=42&pageNum=0&refId=4t6tOU4zaVsZANKxQx6h7w%3D%3D&trackingId=olhUj%2F3VfifWhRWnDpQW1w%3D%3D",
+    "query": "Data Science Manager Noraa & Co."
+  },
+  {
+    "id": 420,
+    "title": "Account Executive",
+    "company": "GLOBE RENT A CAR",
+    "category": "it-software",
+    "location": "surabaya",
+    "level": "fresh-grad",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Komunikasi Profesional",
+      "Analisis Masalah",
+      "Kerja Sama Tim"
+    ],
+    "valueAddSkills": [
+      "SOP Industri",
+      "Adaptif & Cepat Belajar"
+    ],
+    "salary": "Kompetitif (Standar Industri / UMR)",
+    "link": "https://id.linkedin.com/jobs/view/account-executive-at-globe-rent-a-car-4479688423?position=31&pageNum=0&refId=4t6tOU4zaVsZANKxQx6h7w%3D%3D&trackingId=gpD%2B14EzlzjuTwxsu2Xy3g%3D%3D",
+    "query": "Account Executive GLOBE RENT A CAR"
+  },
+  {
+    "id": 421,
+    "title": "Sales Executive - Makassar",
+    "company": "McEasy",
+    "category": "it-software",
+    "location": "makassar",
+    "level": "fresh-grad",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Komunikasi Profesional",
+      "Analisis Masalah",
+      "Kerja Sama Tim"
+    ],
+    "valueAddSkills": [
+      "SOP Industri",
+      "Adaptif & Cepat Belajar"
+    ],
+    "salary": "Kompetitif (Standar Industri / UMR)",
+    "link": "https://id.linkedin.com/jobs/view/sales-executive-makassar-at-mceasy-4479967938?position=15&pageNum=0&refId=4t6tOU4zaVsZANKxQx6h7w%3D%3D&trackingId=yPf6qzTJQLmzkkIUMMF9PQ%3D%3D",
+    "query": "Sales Executive - Makassar McEasy"
   }
 ];
 
@@ -13259,9 +13324,63 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       return 'business-analyst';
     }
 
+    const corporateDomains = {
+      "hyatt": "hyatt.com",
+      "seven retail": "sevenretail.com",
+      "bp consulting": "bpconsulting.co.id",
+      "trinova": "trinovatech.com",
+      "fore coffee": "fore.coffee",
+      "viridien": "viridiengroup.com",
+      "noraa": "noraa.co",
+      "ritz-carlton": "ritzcarlton.com",
+      "bureau veritas": "bureauveritas.com",
+      "meratus": "meratusline.com",
+      "marriott": "marriott.com",
+      "grab": "grab.com",
+      "traveloka": "traveloka.com",
+      "kredivo": "kredivo.com",
+      "mekari": "mekari.com",
+      "siloam": "siloamhospitals.com",
+      "techconnect": "techconnect.co.id",
+      "hilton": "hilton.com",
+      "pakuwon": "pakuwonjati.com",
+      "mceasy": "mceasy.com",
+      "savaya": "savaya.com",
+      "kulu": "kulu.id",
+      "larsen": "larsentoubro.com",
+      "pop mart": "popmart.com",
+      "danone": "danone.com",
+      "unilever": "unilever.com",
+      "nestle": "nestle.com",
+      "shopee": "shopee.com",
+      "tokopedia": "tokopedia.com",
+      "goto": "gotocompany.com",
+      "bca": "bca.co.id",
+      "mandiri": "bankmandiri.co.id",
+      "telkom": "telkom.co.id",
+      "astra": "astra.co.id"
+    };
+
+    function resolveScrapedCompanyEmail(comp) {
+      const cLower = (comp || '').toLowerCase();
+      for (const [k, d] of Object.entries(corporateDomains)) {
+        if (cLower.includes(k)) return 'careers@' + d;
+      }
+      let c = cLower
+        .replace(/^pt\.?\s+/i, '')
+        .replace(/\s+tbk\.?/i, '')
+        .replace(/\s+group/i, '')
+        .replace(/\s+indonesia/i, '')
+        .replace(/\s+international/i, '')
+        .replace(/[^a-z0-9]/g, '');
+      return 'careers@' + (c || 'perusahaan') + '.com';
+    }
+
     function buildUnifiedRecruiterTargets(targetRoleKey) {
       const roleKey = targetRoleKey || getActiveCandidateRoleKey();
-      return verifiedTier1Recruiters.map(t => {
+      
+      // 1. Mitra Tier-1 Terverifikasi (22 Korporat & BUMN)
+      const tier1List = verifiedTier1Recruiters.map(t => {
         const resolvedRole = (t.roleMap && t.roleMap[roleKey]) ? t.roleMap[roleKey] : 'Business Analyst & Project Trainee';
         return {
           id: t.id,
@@ -13269,10 +13388,42 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           hr: t.hr,
           email: t.email,
           category: t.category,
+          subCategory: 'tier1',
           status: t.status,
           role: resolvedRole
         };
       });
+
+      // 2. Loker Scraping Nyata (400+ Lowongan Live LinkedIn)
+      const seenScraped = new Set();
+      const scrapedList = [];
+      if (typeof curatedJobsDatabase !== 'undefined' && Array.isArray(curatedJobsDatabase)) {
+        curatedJobsDatabase.forEach(job => {
+          const pairKey = (job.company + ' - ' + job.title).toLowerCase().trim();
+          if (seenScraped.has(pairKey)) return;
+          seenScraped.add(pairKey);
+
+          // Hindari duplikasi jika perusahaan sudah ada di Tier-1
+          const isAlreadyTier1 = verifiedTier1Recruiters.some(t => t.company.toLowerCase().includes(job.company.toLowerCase()));
+          if (isAlreadyTier1) return;
+
+          const email = job.recruiterEmail || resolveScrapedCompanyEmail(job.company);
+          scrapedList.push({
+            id: 'scraped-rec-' + job.id,
+            jobId: job.id,
+            company: job.company,
+            hr: 'Talent Acquisition Team',
+            email: email,
+            category: getRecruiterCategory(job),
+            subCategory: 'scraped_live',
+            status: 'ready',
+            role: job.title,
+            location: job.location
+          });
+        });
+      }
+
+      return [...tier1List, ...scrapedList];
     }
 
     let verifiedRecruiterTargets = buildUnifiedRecruiterTargets('business-analyst');
@@ -13421,7 +13572,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
     function setBlastCategoryFilter(cat) {
       blastActiveCategory = cat;
-      const categories = ['all', 'tech', 'bumn_bank', 'fmcg_corp', 'custom'];
+      const categories = ['all', 'scraped_live', 'tier1', 'tech', 'bumn_bank', 'fmcg_corp', 'custom'];
       categories.forEach(c => {
         const btn = document.getElementById('btn-blast-cat-' + c);
         if (btn) {
@@ -13442,8 +13593,19 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       items.forEach(label => {
         const text = (label.textContent || label.innerText || '').toLowerCase();
         const cat = label.getAttribute('data-category') || 'all';
+        const subCat = label.getAttribute('data-subcategory') || '';
         const matchesSearch = !search || text.includes(search);
-        const matchesCat = blastActiveCategory === 'all' || cat === blastActiveCategory;
+        
+        let matchesCat = false;
+        if (blastActiveCategory === 'all') {
+          matchesCat = true;
+        } else if (blastActiveCategory === 'scraped_live') {
+          matchesCat = (subCat === 'scraped_live');
+        } else if (blastActiveCategory === 'tier1') {
+          matchesCat = (subCat === 'tier1');
+        } else {
+          matchesCat = (cat === blastActiveCategory);
+        }
 
         if (matchesSearch && matchesCat) {
           label.style.display = 'flex';
@@ -13476,11 +13638,17 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       if (!container) return;
       container.innerHTML = '';
 
+      const scrapedCount = verifiedRecruiterTargets.filter(t => t.subCategory === 'scraped_live').length;
+      const tier1Count = verifiedRecruiterTargets.filter(t => t.subCategory === 'tier1').length;
+
       const badgeCount = document.getElementById('blastTargetsCountBadge');
       if (badgeCount) {
-        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)';
-        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Tier-1 Terverifikasi (Kepatuhan B2B Sah)';
+        badgeCount.innerText = verifiedRecruiterTargets.length + ' Target Siap Blast (' + tier1Count + ' Tier-1 & ' + scrapedCount + ' Loker Live)';
+        badgeCount.textContent = verifiedRecruiterTargets.length + ' Target Siap Blast (' + tier1Count + ' Tier-1 & ' + scrapedCount + ' Loker Live)';
       }
+
+      const scrapedPill = document.getElementById('blastCountScrapedPill');
+      if (scrapedPill) scrapedPill.innerText = scrapedCount;
 
       const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
       if (quotaDisplay) quotaDisplay.innerText = (currentUser.blastQuota !== undefined ? currentUser.blastQuota : 10) + ' Email';
@@ -13489,17 +13657,33 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const isChecked = autoCheckedIds.includes(t.id) || (autoCheckedIds.length === 0 && i < 3);
         const card = document.createElement('label');
         card.setAttribute('data-category', t.category || (t.custom ? 'custom' : 'all'));
+        card.setAttribute('data-subcategory', t.subCategory || (t.custom ? 'custom' : 'tier1'));
         card.className = 'rounded-2xl border border-slate-200/80 bg-white/95 p-3.5 hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between cursor-pointer';
 
         const companyInitial = t.company ? t.company.charAt(0).toUpperCase() : 'H';
-        const customBadge = t.custom ? `
-          <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 font-bold px-2 py-0.5 rounded-full">Kustom</span>
-            <button type="button" onclick="deleteCustomRecruiterTarget('${t.id}', event)" title="Hapus target ini" class="text-slate-400 hover:text-red-600 p-1 rounded transition text-xs font-bold">&times;</button>
-          </div>
-        ` : `
-          <span class="text-[10px] bg-blue-50 text-blue-700 border border-blue-200 font-bold px-2.5 py-0.5 rounded-full shrink-0">${t.role}</span>
-        `;
+        let badgeHtml = '';
+        if (t.custom) {
+          badgeHtml = `
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 font-bold px-2 py-0.5 rounded-full">Kustom</span>
+              <button type="button" onclick="deleteCustomRecruiterTarget('${t.id}', event)" title="Hapus target ini" class="text-slate-400 hover:text-red-600 p-1 rounded transition text-xs font-bold">&times;</button>
+            </div>
+          `;
+        } else if (t.subCategory === 'scraped_live') {
+          badgeHtml = `
+            <div class="text-right shrink-0">
+              <span class="text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-2 py-0.5 rounded-full inline-block">Scraping Live</span>
+              <span class="block text-[9px] text-slate-400 font-medium mt-0.5 max-w-[140px] truncate">${t.role}</span>
+            </div>
+          `;
+        } else {
+          badgeHtml = `
+            <div class="text-right shrink-0">
+              <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full inline-block">Mitra Tier-1</span>
+              <span class="block text-[9px] text-slate-500 font-medium mt-0.5 max-w-[140px] truncate">${t.role}</span>
+            </div>
+          `;
+        }
 
         card.innerHTML = `
           <div class="flex items-center gap-3">
@@ -13514,7 +13698,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
               <div class="text-[11px] text-slate-500 font-medium">${t.hr} &bull; <span class="text-blue-600 font-mono font-semibold">${t.email}</span></div>
             </div>
           </div>
-          ${customBadge}
+          ${badgeHtml}
         `;
         container.appendChild(card);
       });
