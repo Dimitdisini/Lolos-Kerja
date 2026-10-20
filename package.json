@@ -3,6 +3,7 @@
   "version": "2.1.0",
   "description": "Lolos Kerja - AI Career Copilot for Indonesian Fresh Graduates",
   "main": "index.html",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -22,7 +23,9 @@
   "author": "Dimitri Ahmad (Dimitri HQ)",
   "license": "UNLICENSED",
   "dependencies": {
-    "jspdf": "^2.5.1"
+    "@anthropic-ai/sdk": "^0.135.0",
+    "jspdf": "^2.5.1",
+    "pdf-lib": "^1.17.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",

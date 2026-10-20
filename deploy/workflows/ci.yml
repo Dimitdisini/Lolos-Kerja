@@ -1,0 +1,30 @@
+name: Continuous Integration & QA Audit
+
+on:
+  push:
+    branches: [ main, sprint-* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  audit-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci || npm install
+
+      - name: Run Full End-to-End QA Regression Suite
+        run: npm run test:qa
+
+      - name: Run UI/UX and Mobile Accessibility Audit
+        run: npm run test:uiux
