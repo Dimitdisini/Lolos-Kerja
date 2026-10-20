@@ -854,19 +854,19 @@
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap & Gelar *</label>
-                      <input type="text" id="grillFullName" placeholder="misal: Dimas Pratama, S.M." onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillFullName" placeholder="misal: Dimas Pratama, S.M." onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">No. WhatsApp Aktif *</label>
-                      <input type="text" id="grillPhone" placeholder="misal: +62 812-3456-7890" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillPhone" placeholder="misal: +62 812-3456-7890" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">Asal Kampus / Universitas *</label>
-                      <input type="text" id="grillCampus" placeholder="misal: Universitas Indonesia" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillCampus" placeholder="misal: Universitas Indonesia" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">Fakultas / Jurusan & IPK *</label>
-                      <input type="text" id="grillMajorGpa" placeholder="misal: S1 Manajemen (IPK 3.72)" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillMajorGpa" placeholder="misal: S1 Manajemen (IPK 3.72)" onkeydown="handleGrillEnter(event, 2)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                   </div>
                   <div class="flex items-center justify-between pt-2 border-t border-slate-100">
@@ -882,15 +882,15 @@
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">Nama Perusahaan / Organisasi *</label>
-                      <input type="text" id="grillOrgName" placeholder="misal: PT Telkom Indonesia / BEM Fakultas" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillOrgName" placeholder="misal: PT Telkom Indonesia / BEM Fakultas" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                     <div>
                       <label class="block font-semibold text-slate-700 mb-1">Jabatan / Posisi Kamu *</label>
-                      <input type="text" id="grillOrgRole" placeholder="misal: Project Management Intern / Staf Divisi" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillOrgRole" placeholder="misal: Project Management Intern / Staf Divisi" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                     <div class="sm:col-span-2">
                       <label class="block font-semibold text-slate-700 mb-1">Kota & Periode Kegiatan</label>
-                      <input type="text" id="grillOrgPeriod" placeholder="misal: Jakarta | Jan 2024 – Jun 2024" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500">
+                      <input type="text" id="grillOrgPeriod" placeholder="misal: Jakarta | Jan 2024 – Jun 2024" onkeydown="handleGrillEnter(event, 3)" class="dospem-input w-full p-2.5 rounded-xl font-medium focus:ring-2 focus:ring-blue-500" oninput="aiGrillHint(this)">
                     </div>
                   </div>
                   <div class="flex items-center justify-between pt-2 border-t border-slate-100">
@@ -910,7 +910,7 @@
                       <span>Ceritakan dengan bahasamu sendiri (santai saja):</span>
                       <span class="text-blue-600 font-semibold">AI otomatis poles ke Google STAR</span>
                     </div>
-                    <textarea id="grillTasksRaw" rows="4" class="dospem-input w-full p-3.5 rounded-xl text-xs leading-relaxed font-sans shadow-inner focus:ring-2 focus:ring-blue-500" placeholder="misal: Saya bantu tim koordinasi 8 orang bikin laporan mingguan, uji coba aplikasi ke 40 user, sama bantu efisiensi approval dokumen jadi lebih cepat..."></textarea>
+                    <textarea id="grillTasksRaw" rows="4" oninput="aiGrillHint(this)" class="dospem-input w-full p-3.5 rounded-xl text-xs leading-relaxed font-sans shadow-inner focus:ring-2 focus:ring-blue-500" placeholder="misal: Saya bantu tim koordinasi 8 orang bikin laporan mingguan, uji coba aplikasi ke 40 user, sama bantu efisiensi approval dokumen jadi lebih cepat..." oninput="aiGrillHint(this)"></textarea>
                   </div>
 
                   <!-- Quick Inspiration Chips -->
@@ -1133,7 +1133,7 @@
               <div id="cvTabComparisonContent" class="space-y-3">
                 <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs space-y-1">
                   <span class="font-bold text-red-700 block">SEBELUM (Pasif & Tanpa Angka):</span>
-                  <p id="previewBefore" class="text-slate-600 italic">Menunggu input pengalaman...</p>
+                  <p id="previewBefore" class="text-slate-600 italic text-xs"></p>
                 </div>
 
                 <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-2">
@@ -1141,7 +1141,7 @@
                     <span class="font-bold text-emerald-800">SESUDAH (Formula STAR Google X-Y-Z):</span>
                     <button onclick="copyAtsPlainText()" class="text-blue-600 underline font-semibold text-xs hover:text-blue-800">Salin Teks</button>
                   </div>
-                  <p id="previewAfter" class="text-slate-800 font-medium leading-relaxed">Formula STAR yang siap lolos ATS akan tampil di sini.</p>
+                  <p id="previewAfter" class="text-slate-800 font-medium leading-relaxed text-xs"></p>
                   
                   <div class="pt-2 border-t border-emerald-200/60 flex items-center justify-between gap-2">
                     <button type="button" onclick="applyStarResultToInput()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-xs flex items-center gap-1">
@@ -13442,7 +13442,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         } else {
           // Jika berkas non-txt (PDF/Word), lampirkan berkas asli dan berikan format STAR awal jika textarea kosong
           if (textarea && (!textarea.value || textarea.value.trim().length === 0)) {
-            textarea.value = `• Menginisiasi dan mengelola proyek berbasis ${file.name.replace(/\.[^/.]+$/, "")} bersama tim lintas fungsi yang meningkatkan efisiensi tugas sebesar 28%.\n• Menyusun dokumentasi terstruktur dan pelaporan berkala yang memangkas durasi koordinasi mingguan.\n• Menganalisis kebutuhan operasional dan mengimplementasikan solusi yang berdampak positif pada pencapaian target.`;
+            // Berkas PDF/Word tidak dapat dibaca langsung di browser tanpa library parsing.
+            // Biarkan textarea tetap kosong agar pengguna mengisi sendiri atau AI Inline Suggestion aktif.
+            textarea.value = '';
           }
           runCVAnalysis();
           if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
@@ -13609,20 +13611,20 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     function compileGrillMeToHarvardCv() {
-      const name = document.getElementById('grillFullName')?.value.trim() || ((currentUser && currentUser.name) ? currentUser.name : 'DIMAS PRATAMA, S.M.');
-      const phone = document.getElementById('grillPhone')?.value.trim() || '+62 812-3456-7890';
+      const name = document.getElementById('grillFullName')?.value.trim() || (currentUser?.name || '');
+      const phone = document.getElementById('grillPhone')?.value.trim() || '';
       const email = (currentUser && currentUser.email) ? currentUser.email : 'dimas.pratama@gmail.com';
-      const campus = document.getElementById('grillCampus')?.value.trim() || 'Universitas Indonesia – Fakultas Ekonomi & Bisnis';
-      const majorGpa = document.getElementById('grillMajorGpa')?.value.trim() || 'Sarjana Manajemen (S.M.) – IPK 3.72 / 4.00, Cum Laude';
-      const orgName = document.getElementById('grillOrgName')?.value.trim() || 'PT Telkom Indonesia (Persero) Tbk';
-      const orgRole = document.getElementById('grillOrgRole')?.value.trim() || 'Digital Project Coordinator Intern';
-      const orgPeriod = document.getElementById('grillOrgPeriod')?.value.trim() || 'Jakarta, Indonesia | Jan 2024 – Jun 2024';
-      const rawTasks = document.getElementById('grillTasksRaw')?.value.trim() || 'Memfasilitasi pengujian User Acceptance Testing (UAT) dan menyusun 25+ dokumen BRD terstruktur.';
+      const campus = document.getElementById('grillCampus')?.value.trim() || '';
+      const majorGpa = document.getElementById('grillMajorGpa')?.value.trim() || '';
+      const orgName = document.getElementById('grillOrgName')?.value.trim() || '';
+      const orgRole = document.getElementById('grillOrgRole')?.value.trim() || '';
+      const orgPeriod = document.getElementById('grillOrgPeriod')?.value.trim() || '';
+      const rawTasks = document.getElementById('grillTasksRaw')?.value.trim() || '';
 
       const extraSkills = document.getElementById('grillSkillsInput')?.value.trim() || '';
       const allSkillsArray = [...selectedGrillSkills];
       if (extraSkills) allSkillsArray.push(...extraSkills.split(',').map(s => s.trim()).filter(Boolean));
-      const skillsStr = allSkillsArray.length ? allSkillsArray.join(', ') : 'Microsoft Excel (Advanced), Google Workspace, BPMN, SQL, Figma, Trello, Notion';
+      const skillsStr = allSkillsArray.join(', ');
 
       const roleElem = document.getElementById('targetRole');
       const roleText = (roleElem && roleElem.value === 'custom') 
@@ -13637,8 +13639,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       // Generate polished STAR bullet points from raw story
-      let starBullet1 = 'Menginisiasi koordinasi alur kerja lintas fungsi di ' + orgName + ' yang memangkas waktu approval tugas operasional sebesar 28%.';
-      let starBullet2 = 'Memimpin pengujian dan dokumentasi proses kerja terstruktur bersama 8+ anggota tim dengan tingkat akurasi pencapaian 98%.';
+      let starBullet1 = '';
+      let starBullet2 = '';
       if (rawTasks.length > 20) {
         starBullet1 = 'Mengorkestrasi ' + rawTasks.substring(0, 100) + '... dengan pencapaian metrik terukur yang meningkatkan efisiensi tugas tim sebesar 32%.';
       }
@@ -13804,9 +13806,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       if (!text || text.length === 0) {
         updateScoreUI({ overall: 0, metric: 0, verb: 0, keyword: 0, format: 0 });
         const beforeEl = document.getElementById('previewBefore');
-        if (beforeEl) beforeEl.innerText = 'Menunggu input pengalaman...';
+        if (beforeEl) beforeEl.innerText = '';
         const afterEl = document.getElementById('previewAfter');
-        if (afterEl) afterEl.innerText = 'Formula STAR yang siap lolos ATS akan tampil di sini.';
+        if (afterEl) afterEl.innerText = '';
         const metricsBadge = document.getElementById('detectedMetricsBadge');
         if (metricsBadge) {
           metricsBadge.innerText = '0 Angka Terdeteksi';
@@ -19695,5 +19697,79 @@ ${senderName}`;
 
     </div>
   </div>
+<!-- AI INLINE SUGGESTION ENGINE (Contextual, Zero Template) -->
+<script>
+const _grillHintTimers = {};
+function aiGrillHint(el) {
+  const id = el.id;
+  clearTimeout(_grillHintTimers[id]);
+  const val = el.value.trim();
+  const hintId = "hint_" + id;
+  let hintEl = document.getElementById(hintId);
+  if (!hintEl) {
+    hintEl = document.createElement("div");
+    hintEl.id = hintId;
+    hintEl.className = "mt-1.5 text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-1.5 leading-relaxed transition-all duration-200 hidden";
+    el.parentNode.appendChild(hintEl);
+  }
+  if (!val || val.length < 3) { hintEl.classList.add("hidden"); hintEl.innerText = ""; return; }
+  _grillHintTimers[id] = setTimeout(function() {
+    const s = _grillSuggest(id, val);
+    if (s) { hintEl.innerHTML = s; hintEl.classList.remove("hidden"); }
+    else { hintEl.classList.add("hidden"); }
+  }, 350);
+}
+function _grillSuggest(f, val) {
+  const v = val.toLowerCase();
+  if (f === "grillFullName") {
+    if (!val.includes(",") && val.length > 4) {
+      const hasG = /s\.?\s*(e|t|m|kom|st|mn|si|pd|farm|ked|gz|h|sh|ab|sos|pi|i|hum|ip|psi|an|ap)/i.test(val);
+      if (!hasG) return "Tambahkan gelar di belakang nama. Misal: <em>" + val + ", S.T.</em> atau <em>" + val + ", S.M.</em>";
+    }
+    return "Format ATS: kapital per kata \u2014 <strong>" + val.replace(/\b\w/g, function(c){return c.toUpperCase();}) + "</strong>";
+  }
+  if (f === "grillPhone") {
+    if (/^08/.test(val)) return "Standar internasional: <strong>+62" + val.slice(1) + "</strong>";
+    if (/^62/.test(val) && !val.startsWith("+")) return "Tambahkan tanda plus: <strong>+" + val + "</strong>";
+    if (val.replace(/[^0-9]/g, "").length >= 10) return "Nomor valid!";
+  }
+  if (f === "grillCampus") {
+    const map = {"ui":"Universitas Indonesia","ugm":"Universitas Gadjah Mada","itb":"Institut Teknologi Bandung","its":"Institut Teknologi Sepuluh Nopember","unpad":"Universitas Padjadjaran","undip":"Universitas Diponegoro","binus":"BINUS University","ub":"Universitas Brawijaya","unair":"Universitas Airlangga","telkom":"Universitas Telkom","tel u":"Universitas Telkom","uii":"Universitas Islam Indonesia","gunadarma":"Universitas Gunadarma","umm":"Universitas Muhammadiyah Malang"};
+    for (const k of Object.keys(map)) { if (v === k || v.startsWith(k)) return "Nama ATS lengkap: <strong>" + map[k] + "</strong>"; }
+    if (val.length >= 4 && !/universitas|institut|sekolah|akademi/i.test(val)) return "Tulis nama kampus lengkap, misal: Universitas " + val.replace(/\b\w/g,function(c){return c.toUpperCase();});
+  }
+  if (f === "grillMajorGpa") {
+    const m = val.match(/(\d[.,]\d+)/);
+    if (m) { const ipk = parseFloat(m[1].replace(",",".")); let lbl = ipk>=3.75?"(Cum Laude)":ipk>=3.5?"(Memuaskan)":ipk>=3.0?"(Cukup Baik)":"(Opsional dicantumkan)"; return "IPK " + ipk.toFixed(2) + " " + lbl; }
+    if (!/ipk|gpa/i.test(val) && val.length > 4) return "Tambahkan IPK. Misal: <em>" + val + " (IPK 3.72)</em>";
+  }
+  if (f === "grillOrgName") {
+    if (/\bpt\b|tbk|persero/i.test(val)) return "Perusahaan terdeteksi \u2014 gunakan nama resmi lengkap.";
+    if (/\bbem\b|\bhmj\b|\bhima\b|ukm|osis/i.test(val)) return "Organisasi kampus \u2014 pengalaman ini bernilai tinggi di CV fresh graduate!";
+    if (val.length >= 4) return "Pastikan nama resmi lengkap, bukan singkatan.";
+  }
+  if (f === "grillOrgRole") {
+    if (!/intern|officer|staff|coordinator|analyst|manager|head|lead|engineer|specialist|trainee|asisten|ketua|koordinator|sekretaris|bendahara/i.test(val))
+      return "Tambahkan level jabatan. Misal: <em>" + val + " Intern</em> atau <em>" + val + " Officer</em>";
+    return "Jabatan terdeteksi. Pastikan sesuai dengan surat kontrak/SK.";
+  }
+  if (f === "grillOrgPeriod") {
+    if (!val.includes("|")) return "Format ATS: <em>Kota | Bulan Tahun \u2013 Bulan Tahun</em>. Contoh: <em>Jakarta | Jan 2024 \u2013 Jun 2024</em>";
+    if (!/(jan|feb|mar|apr|mei|jun|jul|agu|sep|okt|nov|des)/i.test(val)) return "Sertakan singkatan bulan, misal: Jan, Feb, Mar\u2026";
+  }
+  if (f === "grillTasksRaw") {
+    const hasNum = /\d+/.test(val);
+    const hasAct = /memimpin|mengkoordinasi|menyusun|membangun|mengelola|meningkatkan|mengembangkan|menganalisis|merancang|memfasilitasi/i.test(val);
+    const hasRes = /persen|%|efisiensi|berhasil|tercapai|lolos|naik|meningkat|lebih cepat|hasil/i.test(val);
+    const h = [];
+    if (!hasAct) h.push("\u2022 Tambahkan <strong>kata kerja tindakan</strong> \u2014 Memimpin, Menyusun, Mengembangkan...");
+    if (!hasNum) h.push("\u2022 Tambahkan <strong>angka</strong> \u2014 8 anggota, 25 dokumen, 3 bulan, 40%...");
+    if (!hasRes) h.push("\u2022 Tambahkan <strong>hasil terukur</strong> \u2014 ...sehingga efisiensi naik 30%, berhasil lolos UAT...");
+    if (h.length === 0) return "\u2705 STAR terdeteksi! Ada tindakan, angka, dan hasil. Bagus!";
+    return h.join("<br>");
+  }
+  return null;
+}
+</script>
 </body>
 </html>
