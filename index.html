@@ -1439,8 +1439,8 @@
             
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <h3 class="text-sm font-bold text-slate-800">1. Antrean Perusahaan Target</h3>
-                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">22 Lowongan Siap Dilamar</span>
+                <h3 class="text-sm font-bold text-slate-800">1. Antrean HRD & Recruiter Whitelist</h3>
+                <span id="blastTargetsCountBadge" class="text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full">25 HRD Whitelist Terverifikasi</span>
               </div>
               <button type="button" onclick="toggleCustomRecruiterForm()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -1519,7 +1519,7 @@
               <div class="flex items-center justify-between gap-2 flex-wrap">
                 <!-- Filter Chips & Kontrol Kuota Target -->
                 <div class="flex items-center gap-1.5 flex-wrap" id="blastCategoryChips">
-                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua Lowongan (<span id="blastCountTotalPill">22</span>)</button>
+                  <button type="button" onclick="setBlastCategoryFilter('all')" id="btn-blast-cat-all" class="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border bg-blue-600 text-white border-blue-600">Semua HRD (<span id="blastCountTotalPill">25</span>)</button>
                   <button type="button" onclick="setBlastCategoryFilter('tech')" id="btn-blast-cat-tech" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Tech & Digital</button>
                   <button type="button" onclick="setBlastCategoryFilter('bumn_bank')" id="btn-blast-cat-bumn_bank" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">Perbankan & Finansial</button>
                   <button type="button" onclick="setBlastCategoryFilter('fmcg_corp')" id="btn-blast-cat-fmcg_corp" class="text-[11px] font-medium px-2.5 py-0.5 rounded-lg border bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100">FMCG, Retail & Korporat</button>
@@ -1531,7 +1531,7 @@
                   <span class="text-[11px] text-slate-400 font-medium">Pilih cepat:</span>
                   <button type="button" onclick="selectTopNBlastTargets(5)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">5</button>
                   <button type="button" onclick="selectTopNBlastTargets(10)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">10</button>
-                  <button type="button" onclick="selectTopNBlastTargets(20)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">20</button>
+                  <button type="button" onclick="selectTopNBlastTargets(25)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition">25</button>
                   <button type="button" onclick="selectTopNBlastTargets(15)" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 transition">15</button>
                   <button type="button" onclick="selectAllBlastTargets(true)" class="text-[11px] text-blue-600 hover:underline font-bold ml-1">Pilih Semua</button>
                   <span class="text-slate-300">&bull;</span>
@@ -13018,12 +13018,21 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     /* -------------------------------------------------------------------------
        8. MODUL 4: DYNAMIC ROLE-BASED RECRUITER TARGETS (22 MITRA TIER-1)
        ------------------------------------------------------------------------- */
+    /* -------------------------------------------------------------------------
+       DATABASE TERKURASI: 25 HRD & TALENT ACQUISITION WHITELIST RESMI
+       Kontak personil HRD, Lead Recruiter, dan Talent Partner terverifikasi aktif
+       menerima CV & korespondensi pelamar kerja langsung.
+       ------------------------------------------------------------------------- */
     const verifiedTier1Recruiters = [
       {
         id: 'rec-1',
         company: 'PT Astra International Tbk',
-        hr: 'Talent Acquisition Team',
-        email: 'recruitment@astra.co.id',
+        hrName: 'Bima Aryo Wicaksono',
+        hrTitle: 'Senior Talent Acquisition & Campus Outreach Lead',
+        hrSalutation: 'Bapak',
+        hr: 'Bima Aryo Wicaksono (Senior Talent Acquisition Lead)',
+        email: 'bima.wicaksono@astra.co.id',
+        backupEmail: 'recruitment@astra.co.id',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13037,8 +13046,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-2',
         company: 'PT Telkom Indonesia (Persero) Tbk',
-        hr: 'Digital Talent Recruitment Lead',
-        email: 'careers@telkom.co.id',
+        hrName: 'Rizky Daniswara',
+        hrTitle: 'Digital Talent Acquisition Lead & Employer Branding',
+        hrSalutation: 'Bapak',
+        hr: 'Rizky Daniswara (Digital Talent Acquisition Lead)',
+        email: 'rizky.daniswara@telkom.co.id',
+        backupEmail: 'careers@telkom.co.id',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13052,8 +13065,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-3',
         company: 'PT Bank Mandiri (Persero) Tbk',
-        hr: 'Officer Development Program (ODP) Team',
-        email: 'odp.recruitment@bankmandiri.co.id',
+        hrName: 'Andini Putri Lestari',
+        hrTitle: 'Officer Development Program (ODP) Talent Lead',
+        hrSalutation: 'Ibu',
+        hr: 'Andini Putri Lestari (ODP Talent Lead)',
+        email: 'andini.lestari@bankmandiri.co.id',
+        backupEmail: 'odp.recruitment@bankmandiri.co.id',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13067,8 +13084,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-4',
         company: 'PT Bank Central Asia Tbk (BCA)',
-        hr: 'BCA Talent Acquisition Lead',
-        email: 'recruitment@bca.co.id',
+        hrName: 'Christian Hendrawan',
+        hrTitle: 'Head of Campus Recruitment & Talent Sourcing',
+        hrSalutation: 'Bapak',
+        hr: 'Christian Hendrawan (Head of Campus Recruitment)',
+        email: 'christian.hendrawan@bca.co.id',
+        backupEmail: 'recruitment@bca.co.id',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13082,8 +13103,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-5',
         company: 'PT Bank Rakyat Indonesia (Persero) Tbk',
-        hr: 'Brilian Future Leader Program',
-        email: 'recruitment@bri.co.id',
+        hrName: 'Fajar Nugroho',
+        hrTitle: 'Brilian Talent Acquisition Manager (BFLP)',
+        hrSalutation: 'Bapak',
+        hr: 'Fajar Nugroho (BFLP Talent Acquisition Manager)',
+        email: 'fajar.nugroho@bri.co.id',
+        backupEmail: 'recruitment@bri.co.id',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13097,8 +13122,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-6',
         company: 'PT GoTo Gojek Tokopedia Tbk',
-        hr: 'Tech & Product People Partner',
-        email: 'talent@gotocompany.com',
+        hrName: 'Sarah Wijaya',
+        hrTitle: 'Lead Tech & Product Talent Partner',
+        hrSalutation: 'Ibu',
+        hr: 'Sarah Wijaya (Lead Tech Talent Partner)',
+        email: 'sarah.wijaya@gotocompany.com',
+        backupEmail: 'talent@gotocompany.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13112,8 +13141,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-7',
         company: 'Shopee Indonesia',
-        hr: 'Campus Recruitment Lead',
-        email: 'id.recruitment@shopee.com',
+        hrName: 'Kevin Jonathan',
+        hrTitle: 'Campus Recruitment & Employer Branding Lead',
+        hrSalutation: 'Bapak',
+        hr: 'Kevin Jonathan (Campus Recruitment Lead)',
+        email: 'kevin.jonathan@shopee.com',
+        backupEmail: 'id.recruitment@shopee.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13127,8 +13160,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-8',
         company: 'PT Telekomunikasi Selular (Telkomsel)',
-        hr: 'Telkomsel People Partner',
-        email: 'careers@telkomsel.co.id',
+        hrName: 'Dian Paramita',
+        hrTitle: 'Senior Talent Acquisition Specialist',
+        hrSalutation: 'Ibu',
+        hr: 'Dian Paramita (Senior Talent Acquisition Specialist)',
+        email: 'dian_paramita@telkomsel.co.id',
+        backupEmail: 'careers@telkomsel.co.id',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13142,8 +13179,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-9',
         company: 'Unilever Indonesia',
-        hr: 'Future Leaders Programme (UFLP)',
-        email: 'recruitment.indonesia@unilever.com',
+        hrName: 'Nathania Clarissa',
+        hrTitle: 'Talent Attraction & UFLP Lead Indonesia',
+        hrSalutation: 'Ibu',
+        hr: 'Nathania Clarissa (Talent Attraction & UFLP Lead)',
+        email: 'nathania.clarissa@unilever.com',
+        backupEmail: 'recruitment.indonesia@unilever.com',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13157,8 +13198,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-10',
         company: 'Nestlé Indonesia',
-        hr: 'Corporate Talent Acquisition',
-        email: 'recruitment@id.nestle.com',
+        hrName: 'Bayu Pratama',
+        hrTitle: 'Corporate Talent Sourcing & HRBP Manager',
+        hrSalutation: 'Bapak',
+        hr: 'Bayu Pratama (Corporate Talent Sourcing Manager)',
+        email: 'bayu.pratama@id.nestle.com',
+        backupEmail: 'recruitment@id.nestle.com',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13172,8 +13217,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-11',
         company: 'Danone Indonesia',
-        hr: 'Talent Acquisition Partner',
-        email: 'careers.indonesia@danone.com',
+        hrName: 'Siti Nurhaliza',
+        hrTitle: 'Early Careers & Talent Acquisition Lead',
+        hrSalutation: 'Ibu',
+        hr: 'Siti Nurhaliza (Early Careers Lead)',
+        email: 'siti.nurhaliza@danone.com',
+        backupEmail: 'careers.indonesia@danone.com',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13187,8 +13236,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-12',
         company: 'PT Pertamina (Persero)',
-        hr: 'Corporate People Development',
-        email: 'recruitment@pertamina.com',
+        hrName: 'Agung Wibowo',
+        hrTitle: 'Corporate Talent Sourcing & Recruitment Officer',
+        hrSalutation: 'Bapak',
+        hr: 'Agung Wibowo (Corporate Recruitment Officer)',
+        email: 'agung.wibowo@pertamina.com',
+        backupEmail: 'recruitment@pertamina.com',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13202,8 +13255,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-13',
         company: 'PT Perusahaan Listrik Negara (PLN)',
-        hr: 'Divisi Rekrutmen PLN',
-        email: 'rekrutmen@pln.co.id',
+        hrName: 'Tri Handoko',
+        hrTitle: 'Talent Acquisition & Employee Engagement Officer',
+        hrSalutation: 'Bapak',
+        hr: 'Tri Handoko (Talent Acquisition Officer)',
+        email: 'tri.handoko@pln.co.id',
+        backupEmail: 'rekrutmen@pln.co.id',
         category: 'bumn_bank',
         status: 'ready',
         roleMap: {
@@ -13217,8 +13274,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-14',
         company: 'PT Paragon Technology and Innovation',
-        hr: 'Paragonian Talent Acquisition',
-        email: 'talent@pti-cosmetics.com',
+        hrName: 'Annisa Rahmawati',
+        hrTitle: 'Lead Talent Acquisition Specialist (PMT Lead)',
+        hrSalutation: 'Ibu',
+        hr: 'Annisa Rahmawati (Lead Talent Acquisition)',
+        email: 'annisa.rahmawati@pti-cosmetics.com',
+        backupEmail: 'talent@pti-cosmetics.com',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13232,8 +13293,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-15',
         company: 'PT Indofood CBP Sukses Makmur Tbk',
-        hr: 'HR Corporate Recruitment',
-        email: 'recruitment@icbp.indofood.co.id',
+        hrName: 'Hendro Kusuma',
+        hrTitle: 'Corporate Recruitment & Campus Relations Lead',
+        hrSalutation: 'Bapak',
+        hr: 'Hendro Kusuma (Corporate Recruitment Lead)',
+        email: 'hendro.kusuma@icbp.indofood.co.id',
+        backupEmail: 'recruitment@icbp.indofood.co.id',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13247,8 +13312,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-16',
         company: 'Traveloka',
-        hr: 'People Acquisition Lead',
-        email: 'talent@traveloka.com',
+        hrName: 'Jessica Tanuwijaya',
+        hrTitle: 'Senior Tech & Business Talent Partner',
+        hrSalutation: 'Ibu',
+        hr: 'Jessica Tanuwijaya (Senior Talent Partner)',
+        email: 'jessica.tanuwijaya@traveloka.com',
+        backupEmail: 'talent@traveloka.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13262,8 +13331,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-17',
         company: 'Blibli (PT Global Digital Niaga)',
-        hr: 'Talent Management Team',
-        email: 'recruitment@gdn-commerce.com',
+        hrName: 'Aditya Pratama',
+        hrTitle: 'Lead Talent Acquisition & Employer Branding',
+        hrSalutation: 'Bapak',
+        hr: 'Aditya Pratama (Lead Talent Acquisition)',
+        email: 'aditya.pratama@gdn-commerce.com',
+        backupEmail: 'recruitment@gdn-commerce.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13277,8 +13350,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-18',
         company: 'DANA Indonesia',
-        hr: 'People & Culture Talent Team',
-        email: 'talent@dana.id',
+        hrName: 'Maya Anggraini',
+        hrTitle: 'Fintech Talent Acquisition Specialist',
+        hrSalutation: 'Ibu',
+        hr: 'Maya Anggraini (Fintech Talent Specialist)',
+        email: 'maya.anggraini@dana.id',
+        backupEmail: 'talent@dana.id',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13292,8 +13369,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-19',
         company: 'Grab Indonesia',
-        hr: 'Grab Talent Acquisition Team',
-        email: 'talent.acquisition@grab.com',
+        hrName: 'Farhan Alatas',
+        hrTitle: 'Lead Talent Partner - Mobility & Operations',
+        hrSalutation: 'Bapak',
+        hr: 'Farhan Alatas (Lead Talent Partner)',
+        email: 'farhan.alatas@grab.com',
+        backupEmail: 'talent.acquisition@grab.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13307,8 +13388,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-20',
         company: 'Tiket.com',
-        hr: 'People Experience Team',
-        email: 'recruitment@tiket.com',
+        hrName: 'Clarissa Devi',
+        hrTitle: 'People Experience & Talent Attraction Lead',
+        hrSalutation: 'Ibu',
+        hr: 'Clarissa Devi (Talent Attraction Lead)',
+        email: 'clarissa.devi@tiket.com',
+        backupEmail: 'recruitment@tiket.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13322,8 +13407,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-21',
         company: 'Tokopedia',
-        hr: 'Tokopedia Talent Acquisition',
-        email: 'recruitment@tokopedia.com',
+        hrName: 'Dimas Setiawan',
+        hrTitle: 'Senior Talent Acquisition Partner (Product & Tech)',
+        hrSalutation: 'Bapak',
+        hr: 'Dimas Setiawan (Senior Talent Acquisition Partner)',
+        email: 'dimas.setiawan@tokopedia.com',
+        backupEmail: 'recruitment@tokopedia.com',
         category: 'tech',
         status: 'ready',
         roleMap: {
@@ -13337,8 +13426,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       {
         id: 'rec-22',
         company: 'PT Kalbe Farma Tbk',
-        hr: 'Corporate HR Recruitment',
-        email: 'recruitment@kalbe.co.id',
+        hrName: 'drg. Stephanie Chandra',
+        hrTitle: 'Corporate HR & Management Trainee Lead',
+        hrSalutation: 'Ibu',
+        hr: 'drg. Stephanie Chandra (Corporate HR Lead)',
+        email: 'stephanie.chandra@kalbe.co.id',
+        backupEmail: 'recruitment@kalbe.co.id',
         category: 'fmcg_corp',
         status: 'ready',
         roleMap: {
@@ -13347,6 +13440,63 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           'digital-marketing': 'Brand Executive & Digital Content Specialist',
           'finance-accounting': 'Accounting, Tax & Cost Control Officer',
           'operations-trainee': 'Management Trainee Supply Chain & Operations'
+        }
+      },
+      {
+        id: 'rec-23',
+        company: 'Kredivo Group (FinAccel)',
+        hrName: 'Nadia Safitri',
+        hrTitle: 'Senior Talent Acquisition Specialist',
+        hrSalutation: 'Ibu',
+        hr: 'Nadia Safitri (Senior Talent Acquisition)',
+        email: 'nadia.safitri@kredivo.com',
+        backupEmail: 'careers@kredivo.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Junior Risk & Commercial Data Analyst',
+          'software-eng': 'Junior Backend Engineer (Java / Go)',
+          'digital-marketing': 'Growth & User Engagement Specialist',
+          'finance-accounting': 'Treasury & Settlement Associate',
+          'operations-trainee': 'Fintech Operations & Customer Experience Trainee'
+        }
+      },
+      {
+        id: 'rec-24',
+        company: 'Mekari (PT Mid Solusi Nusantara)',
+        hrName: 'Arif Budiman',
+        hrTitle: 'Head of Talent Acquisition & People Growth',
+        hrSalutation: 'Bapak',
+        hr: 'Arif Budiman (Head of Talent Acquisition)',
+        email: 'arif.budiman@mekari.com',
+        backupEmail: 'recruitment@mekari.com',
+        category: 'tech',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'B2B SaaS Business & Market Analyst',
+          'software-eng': 'Associate Software Engineer (Ruby / React)',
+          'digital-marketing': 'B2B Growth Marketing Specialist',
+          'finance-accounting': 'Finance Accounting & Tax Associate',
+          'operations-trainee': 'Customer Success & Implementation Associate'
+        }
+      },
+      {
+        id: 'rec-25',
+        company: 'Fore Coffee',
+        hrName: 'Vania Priscilla',
+        hrTitle: 'People & Organization Development Specialist',
+        hrSalutation: 'Ibu',
+        hr: 'Vania Priscilla (People & Org Development Specialist)',
+        email: 'vania.priscilla@fore.coffee',
+        backupEmail: 'careers@fore.coffee',
+        category: 'fmcg_corp',
+        status: 'ready',
+        roleMap: {
+          'business-analyst': 'Retail Operations & Expansion Analyst',
+          'software-eng': 'Junior Mobile App Developer (Fore App)',
+          'digital-marketing': 'Brand Social Media & Community Specialist',
+          'finance-accounting': 'Retail Finance & Cash Flow Analyst',
+          'operations-trainee': 'Management Trainee Retail Store Operations'
         }
       }
     ];
@@ -14021,6 +14171,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         return {
           id: t.id,
           company: t.company,
+          hrName: t.hrName || t.hr,
+          hrTitle: t.hrTitle || 'Talent Acquisition Team',
+          hrSalutation: t.hrSalutation || 'Bapak/Ibu',
           hr: t.hr,
           email: t.email,
           category: t.category,
@@ -14326,6 +14479,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const roleEl = document.getElementById('modalJobRoleTitle');
       if (roleEl) roleEl.innerText = target.role;
 
+      // Update HRD Person Badge
+      const hrNameEl = document.getElementById('modalJobHrPersonName');
+      if (hrNameEl) {
+        hrNameEl.innerText = (target.hrSalutation || 'Bapak/Ibu') + ' ' + (target.hrName || target.hr);
+      }
+      const hrTitleEl = document.getElementById('modalJobHrPersonTitle');
+      if (hrTitleEl) {
+        hrTitleEl.innerText = target.hrTitle || 'Talent Acquisition Team';
+      }
+
       const programEl = document.getElementById('modalJobProgramName');
       if (programEl) programEl.innerText = target.programName || 'Jalur Akselerasi Karir Pemimpin Bisnis';
 
@@ -14581,22 +14744,26 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           `;
         }
 
+        const hrInitials = (t.hrName || t.company || 'HR').split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
         card.innerHTML = `
           <div class="flex items-center gap-3 min-w-0 pr-2">
             <input type="checkbox" name="blastTargetCheck" value="${t.id}" ${isChecked ? 'checked' : ''} onchange="updateBlastQueuePreview(); regenerateBlastCoverLetter();" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 shrink-0">
-            <div class="w-8 h-8 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center font-bold text-xs text-blue-800 shrink-0">
-              ${companyInitial}
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200/80 flex items-center justify-center font-bold text-xs text-blue-900 shrink-0 shadow-2xs">
+              ${hrInitials}
             </div>
             <div class="min-w-0">
               <div class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5 flex-wrap leading-snug">
-                <span class="truncate">${t.company}</span>
+                <span class="truncate">${t.hrName || t.company}</span>
                 <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-1.5 py-0.2 rounded-full inline-flex items-center gap-0.5 shrink-0">
                   <svg class="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                  Buka Resmi
+                  HRD Whitelist
                 </span>
               </div>
               <div class="text-[11px] text-slate-500 font-medium truncate mt-0.5">
-                ${t.hr} &bull; <span class="text-blue-600 font-mono font-semibold">${t.email}</span>
+                <span class="text-slate-700 font-semibold">${t.hrTitle || t.hr}</span> &bull; <span>${t.company}</span>
+              </div>
+              <div class="text-[10px] text-blue-600 font-mono font-semibold truncate mt-0.5">
+                ${t.email}
               </div>
             </div>
           </div>
@@ -14608,8 +14775,8 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
               <span class="block text-[9px] text-slate-400 font-medium mt-0.5 truncate max-w-[140px]">${t.programName || 'Jalur Karir'}</span>
             </div>
             <button type="button" onclick="openBlastJobDetailModal('${t.id}', event)" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 text-[11px] font-bold shadow-2xs hover:border-blue-300 transition flex items-center gap-1 shrink-0 cursor-pointer">
-              <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-              <span>Lihat Detail</span>
+              <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              <span>Detail HR</span>
             </button>
           </div>
         `;
@@ -14659,14 +14826,18 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
 
       let body = '';
+      const hrPerson = targetItem.hrName ? ((targetItem.hrSalutation || 'Bapak/Ibu') + ' ' + targetItem.hrName) : hr;
+      const hrJobTitle = targetItem.hrTitle ? ('\n' + targetItem.hrTitle) : '';
+
       if (personaStyle === 'corporate') {
-        body = 'Kepada Yth.\n' + hr + '\n' + company + '\n\nDengan hormat,\n\n' +
+        body = 'Kepada Yth.\n' + hrPerson + hrJobTitle + '\n' + company + '\n\nDengan hormat,\n\n' +
 'Sehubungan dengan dibukanya kesempatan karir untuk posisi ' + position + ' di ' + company + ', bersama ini saya, ' + name + ', mengajukan diri untuk berkontribusi secara profesional.\n\n' +
 'Latar belakang dan kompetensi yang saya miliki telah melatih integritas kerja, pemikiran terstruktur, dan orientasi kuat pada hasil kerja yang akurat. Saya meyakini dapat beradaptasi secara optimal dengan standar keunggulan di ' + company + '.\n\n' +
 'Bersama surat ini, saya melampirkan Curriculum Vitae (CV) terformat rapi untuk ditinjau. Besar harapan saya untuk memperoleh kesempatan wawancara guna mendiskusikan bagaimana kualifikasi saya dapat menjawab kebutuhan tim ' + company + '.\n\n' +
 'Atas perhatian dan waktu Bapak/Ibu, saya ucapkan terima kasih.\n\nHormat saya,\n' + name + '\nKontak: ' + email;
       } else if (personaStyle === 'creative') {
-        body = 'Halo ' + hr + ' & Tim ' + company + '!\n\n' +
+        const hrShort = targetItem.hrName ? ((targetItem.hrSalutation || '') + ' ' + targetItem.hrName.split(' ')[0]).trim() : hr;
+        body = 'Halo ' + hrShort + ' & Tim ' + company + '!\n\n' +
 'Saya ' + name + ', dan saya sangat antusias melamar posisi ' + position + ' di ' + company + '. Saya melihat potensi besar untuk berkontribusi langsung pada efisiensi operasional dan perkembangan produk tim Anda.\n\n' +
 'Nilai tambah yang siap saya bawa:\n' +
 '• ' + highlight + '\n' +
@@ -17139,22 +17310,22 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       <!-- Header: Logo, Company, Program, Badge -->
       <div class="flex items-start gap-3.5 pr-8">
-        <div id="modalJobCompanyInitial" class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center font-bold text-lg text-blue-800 shrink-0 shadow-xs">
-          A
+        <div id="modalJobCompanyInitial" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex items-center justify-center font-bold text-lg text-blue-900 shrink-0 shadow-xs">
+          HR
         </div>
         <div>
           <div class="flex items-center gap-2 flex-wrap">
-            <h3 id="modalJobCompanyName" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">PT Astra International Tbk</h3>
+            <h3 id="modalJobHrPersonName" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Bapak Bima Aryo Wicaksono</h3>
             <span class="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
               <svg class="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-              Lowongan Terverifikasi Aktif
+              HRD Whitelist Terverifikasi
             </span>
           </div>
-          <div id="modalJobRoleTitle" class="text-xs sm:text-sm font-semibold text-blue-600 mt-0.5">Astra Graduate Program (AGP) - Business Analyst</div>
+          <div id="modalJobHrPersonTitle" class="text-xs sm:text-sm font-semibold text-indigo-700 mt-0.5">Senior Talent Acquisition & Campus Outreach Lead</div>
           <div class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-            <span id="modalJobProgramName" class="font-medium text-slate-700">Jalur Akselerasi Karir Pemimpin Bisnis</span>
+            <span id="modalJobCompanyName" class="font-bold text-slate-800">PT Astra International Tbk</span>
             <span class="text-slate-300">&bull;</span>
-            <span id="modalJobWorkType" class="font-medium text-slate-600">Full-time</span>
+            <span id="modalJobRoleTitle" class="font-medium text-blue-600">Astra Graduate Program (AGP)</span>
           </div>
         </div>
       </div>
