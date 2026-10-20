@@ -175,7 +175,13 @@ async function runAudit() {
   window.logoutUser();
   assertTest('T28_logout', 'User Logout clears session cleanly', window.currentUser.isLoggedIn === false, 'Logged out state verified');
 
-  // Test Email Login Flow
+  // Test Email Login Flow with Invalid Password (Security rejection check)
+  document.getElementById('authEmailInput').value = 'rangga.danis@telkomuniversity.ac.id';
+  document.getElementById('authPasswordInput').value = 'passwordsalah123';
+  await window.handleEmailLogin();
+  assertTest('T28_pass_security', 'Email Login rejects invalid password', lastAlert && lastAlert.includes('Kata sandi yang Anda masukkan salah'), 'Security rejection verified');
+
+  // Test Email Login Flow with Valid Password
   document.getElementById('authEmailInput').value = 'rangga.danis@telkomuniversity.ac.id';
   document.getElementById('authPasswordInput').value = 'rahasia123';
   await window.handleEmailLogin();
@@ -245,6 +251,21 @@ async function runAudit() {
   // Admin User Quota Adjustment
   window.adjustUserQuota(0, 10);
   assertTest('T41', 'Admin can adjust user quota (+10)', window.adminState.users[0].quota > 0, `User 0 quota: ${window.adminState.users[0].quota}`);
+
+  // Admin User Password Field & Rendering Check
+  const modalPasswordInput = document.getElementById('modalUserPasswordInput');
+  assertTest('T42', 'Admin User Modal contains password input field', !!modalPasswordInput, 'modalUserPasswordInput verified');
+
+  window.openAdminUserModal(true, 0);
+  assertTest('T43', 'Admin User Modal populates existing password', modalPasswordInput && modalPasswordInput.value.length > 0, `Password: ${modalPasswordInput.value}`);
+
+  // Admin User Edit Password & Save
+  modalPasswordInput.value = 'passwordBaruDimitri2026';
+  window.handleSaveAdminUser({ preventDefault: () => {} });
+  assertTest('T44', 'Admin can update candidate password', window.adminState.users[0].password === 'passwordBaruDimitri2026', `Updated: ${window.adminState.users[0].password}`);
+
+  const adminUsersTable = document.getElementById('adminUsersTableBody').innerHTML;
+  assertTest('T45', 'Admin Users table displays password label & value', adminUsersTable.includes('Sandi:') && adminUsersTable.includes('passwordBaruDimitri2026'), 'Monospace password indicator visible in table');
 
   console.log('\n=================================================================');
   console.log('                    EXECUTIVE QA SUMMARY REPORT                  ');

@@ -15795,25 +15795,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
     }
 
     async function loginWithGoogle() {
-      // Redirect langsung ke Endpoint Resmi Google OAuth 2.0 (Google Accounts Consent Screen)
-      // Ini 100% membuka halaman login resmi Google (Google Sign-In, 2FA, password, akun selector asli)
-      const currentOrigin = window.location.origin;
-      const currentPath = window.location.pathname;
-      const redirectUri = (currentOrigin.startsWith('http') ? currentOrigin + currentPath : 'https://lolos-kerja-seven.vercel.app');
-      
-      const googleAuthParams = new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        redirect_uri: redirectUri,
-        response_type: 'token id_token',
-        scope: 'email profile openid',
-        prompt: 'select_account',
-        nonce: Math.random().toString(36).substring(2)
-      });
-
-      const googleAuthUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + googleAuthParams.toString();
-      
-      console.log('[GOOGLE-OAUTH] Membuka Google Accounts Authorization URL Resmi:', googleAuthUrl);
-      window.location.href = googleAuthUrl;
+      // Dimitri HQ: Batasi redirect Google OAuth asli, prioritaskan Email & Password
+      const useDemo = confirm("Google Sign-In resmi saat ini dibatasi dalam mode pengembangan sistem.\n\nSangat disarankan mendaftar atau masuk menggunakan formulir Email & Kata Sandi yang Anda buat.\n\nApakah Anda ingin masuk menggunakan akun simulasi demo (Kandidat Pelamar)?");
+      if (useDemo) {
+        selectGoogleAccount('Kandidat Pelamar (Demo)', 'kandidat@gmail.com');
+        closeAuthModal();
+      } else {
+        const emailInput = document.getElementById('authEmailInput') || document.getElementById('registerEmailInput');
+        if (emailInput) emailInput.focus();
+      }
     }
 
     function selectGoogleAccount(name, email, avatar) {
@@ -15949,10 +15939,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         adminState.users.unshift({
           name: name,
           email: email,
+          password: password,
           tier: newTier,
           tierName: newTierName,
           quota: newQuota,
-          status: 'Active (Email Registered)'
+          status: 'Active (Email Registered)',
+          role: newRole
         });
         saveAdminUsersToStorage();
         renderAdminUsers();
@@ -16031,12 +16023,17 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       if (!matchedUser && typeof adminState !== 'undefined' && adminState.users) {
         const local = adminState.users.find(u => u.email.toLowerCase() === email);
         if (local) {
+          if (local.password && local.password !== passwordInput) {
+            alert('Kata sandi yang Anda masukkan salah. Mohon periksa kembali.');
+            return;
+          }
           matchedUser = {
             name: local.name,
             email: local.email,
+            password: local.password,
             tier: local.tier || 'FREE',
             blastQuota: local.quota !== undefined ? local.quota : 10,
-            role: (local.email === 'dimitriahmad000@gmail.com') ? 'owner' : 'user',
+            role: (local.email === 'dimitriahmad000@gmail.com') ? 'owner' : (local.role || 'user'),
             avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'
           };
         }
@@ -16236,8 +16233,9 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
        7. PORTAL ADMIN & REVENUE ANALYTICS (EXECUTIVE DASHBOARD LOGIC - FULL CRUD)
        ------------------------------------------------------------------------- */
     const defaultAdminUsers = [
-      { name: 'Dimas Pratama', email: 'dimas.pratama@gmail.com', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (VIP Member)' },
-      { name: 'Sarah Anastasya', email: 'sarah.anastasya@gmail.com', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 20, status: 'Active' }
+      { name: 'Dimitri Ahmad', email: 'dimitriahmad000@gmail.com', password: 'password123', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (Owner)', role: 'owner' },
+      { name: 'Dimas Pratama', email: 'dimas.pratama@gmail.com', password: 'password123', tier: 'VIP', tierName: 'Dikerjain VIP', quota: 50, status: 'Active (VIP Member)', role: 'user' },
+      { name: 'Sarah Anastasya', email: 'sarah.anastasya@gmail.com', password: 'password123', tier: 'DIBANTUIN', tierName: 'Dibantuin', quota: 20, status: 'Active', role: 'user' }
     ];
 
     const defaultAdminTransactions = [
@@ -16262,9 +16260,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const savedTx = localStorage.getItem('lolos_kerja_admin_transactions');
         const savedSent = localStorage.getItem('lolos_kerja_admin_emails_sent');
         const savedReqs = localStorage.getItem('lolos_kerja_admin_scraping_requests');
+        let users = savedUsers ? JSON.parse(savedUsers) : defaultAdminUsers;
+        if (Array.isArray(users)) {
+          users.forEach(u => {
+            if (!u.password) u.password = 'password123';
+          });
+        }
         return {
           currentSubTab: 'orders',
-          users: savedUsers ? JSON.parse(savedUsers) : defaultAdminUsers,
+          users: users,
           transactions: savedTx ? JSON.parse(savedTx) : defaultAdminTransactions,
           totalEmailsSent: savedSent !== null ? parseInt(savedSent, 10) : 0,
           scrapingRequests: savedReqs ? JSON.parse(savedReqs) : defaultAdminScrapingRequests
@@ -16670,7 +16674,13 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
               ${u.status && u.status.includes('Owner') ? '<span class="text-xs bg-slate-900 text-white px-1.5 py-0.2 rounded font-mono">OWNER</span>' : ''}
             </div>
           </td>
-          <td class="py-3 px-4 text-slate-500 font-mono text-xs">${u.email}</td>
+          <td class="py-3 px-4 font-mono text-xs">
+            <div class="text-slate-700 font-semibold">${u.email}</div>
+            <div class="text-xs text-indigo-600 font-bold mt-0.5 flex items-center gap-1 font-mono">
+              <span class="text-slate-400 font-normal">Sandi:</span>
+              <span class="bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 text-indigo-700">${u.password || 'password123'}</span>
+            </div>
+          </td>
           <td class="py-3 px-4">
             <span class="px-2 py-0.5 rounded text-xs font-bold ${u.tier === 'VIP' ? 'bg-amber-100 text-amber-800' : u.tier === 'DIBANTUIN' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-600'}">
               ${u.tierName || u.tier}
@@ -16873,6 +16883,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       const titleEl = document.getElementById('adminUserModalTitle');
       const nameInput = document.getElementById('modalUserNameInput');
       const emailInput = document.getElementById('modalUserEmailInput');
+      const passwordInput = document.getElementById('modalUserPasswordInput');
       const tierInput = document.getElementById('modalUserTierInput');
       const quotaInput = document.getElementById('modalUserQuotaInput');
       const statusInput = document.getElementById('modalUserStatusInput');
@@ -16883,6 +16894,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         titleEl.innerText = 'Edit Data Pelamar & Kuota';
         nameInput.value = u.name || '';
         emailInput.value = u.email || '';
+        if (passwordInput) passwordInput.value = u.password || 'password123';
         tierInput.value = u.tier || 'VIP';
         quotaInput.value = u.quota !== undefined ? u.quota : 20;
         statusInput.value = u.status || 'Active';
@@ -16891,6 +16903,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         titleEl.innerText = 'Tambah Pelamar Baru';
         nameInput.value = '';
         emailInput.value = '';
+        if (passwordInput) passwordInput.value = 'password123';
         tierInput.value = 'VIP';
         quotaInput.value = '20';
         statusInput.value = 'Active';
@@ -16909,6 +16922,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       e.preventDefault();
       const name = document.getElementById('modalUserNameInput').value.trim();
       const email = document.getElementById('modalUserEmailInput').value.trim();
+      const password = document.getElementById('modalUserPasswordInput')?.value?.trim() || 'password123';
       const tier = document.getElementById('modalUserTierInput').value;
       const quota = parseInt(document.getElementById('modalUserQuotaInput').value, 10) || 0;
       const status = document.getElementById('modalUserStatusInput').value;
@@ -16926,6 +16940,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         const u = adminState.users[adminEditingUserIndex];
         u.name = name;
         u.email = email;
+        u.password = password;
         u.tier = tier;
         u.tierName = tierName;
         u.quota = quota;
@@ -16934,7 +16949,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       } else {
         // Add new
         adminState.users.unshift({
-          name, email, tier, tierName, quota, status, role
+          name, email, password, tier, tierName, quota, status, role
         });
       }
 
@@ -17234,25 +17249,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           <p class="text-xs text-slate-500">Lanjutin persiapan karirmu, pantau skor CV & kuota email</p>
         </div>
 
-        <!-- Official Google Sign-In Button Container (Rendered by Google SDK) -->
-        <div id="googleBtnContainerLogin" class="w-full flex justify-center py-1"></div>
-        <button id="googleCustomButtonLogin" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
-          <svg class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span>Masuk dengan Akun Google Resmi</span>
-        </button>
-
-        <!-- Divider ATAU -->
-        <div class="relative flex items-center justify-center">
-          <div class="border-t border-slate-200 w-full"></div>
-          <span class="bg-white px-3 text-xs font-bold text-slate-400 uppercase tracking-wider relative">ATAU MASUK DENGAN EMAIL</span>
-        </div>
-
-        <!-- Email & Password Form -->
+        <!-- Email & Password Form (Primary) -->
         <form onsubmit="handleEmailLogin(event)" class="space-y-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Email</label>
@@ -17261,7 +17258,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           <div>
             <div class="flex items-center justify-between mb-1">
               <label class="block text-xs font-semibold text-slate-700">Kata Sandi</label>
-              <a href="javascript:void(0)" onclick="alert('Silakan login menggunakan Google Sign-In untuk akses instan tanpa perlu mengingat kata sandi.')" class="text-xs text-blue-600 hover:underline">Lupa password?</a>
+              <a href="javascript:void(0)" onclick="alert('Kata sandi akun dapat dilihat atau direset oleh Admin di Admin Command Center.')" class="text-xs text-blue-600 hover:underline">Lupa sandi?</a>
             </div>
             <div class="relative">
               <input type="password" id="authPasswordInput" placeholder="Masukkan kata sandi akun" required class="dospem-input w-full p-2.5 pr-10 rounded-xl text-xs">
@@ -17285,6 +17282,24 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           </button>
         </form>
 
+        <!-- Divider ATAU -->
+        <div class="relative flex items-center justify-center pt-1">
+          <div class="border-t border-slate-200 w-full"></div>
+          <span class="bg-white px-3 text-xs font-bold text-slate-400 uppercase tracking-wider relative">ATAU MASUK CEPAT DEMO</span>
+        </div>
+
+        <!-- Google Demo Button (Secondary) -->
+        <div id="googleBtnContainerLogin" class="hidden"></div>
+        <button id="googleCustomButtonLogin" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Masuk Cepat Demo (Simulasi Akun Google)</span>
+        </button>
+
         <p class="text-center text-xs text-slate-500 pt-1">
           Belum punya akun? <a href="javascript:void(0)" onclick="switchAuthTab('register')" class="font-bold text-blue-600 hover:underline">Daftar akun gratis sekarang</a>
         </p>
@@ -17303,25 +17318,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           <p class="text-xs text-slate-500">Mulai bedah CV Harvard ATS & nikmati 10 kuota email recruiter gratis</p>
         </div>
 
-        <!-- Official Google Sign-Up Button Container (Rendered by Google SDK) -->
-        <div id="googleBtnContainerRegister" class="w-full flex justify-center py-1"></div>
-        <button id="googleCustomButtonRegister" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition shadow-sm hover:border-slate-400 cursor-pointer">
-          <svg class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-          </svg>
-          <span>Daftar dengan Akun Google Resmi</span>
-        </button>
-
-        <!-- Divider ATAU -->
-        <div class="relative flex items-center justify-center">
-          <div class="border-t border-slate-200 w-full"></div>
-          <span class="bg-white px-3 text-xs font-bold text-slate-400 uppercase tracking-wider relative">ATAU DAFTAR DENGAN EMAIL</span>
-        </div>
-
-        <!-- Register Form -->
+        <!-- Register Form (Primary) -->
         <form onsubmit="handleEmailRegister(event)" class="space-y-3">
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap</label>
@@ -17362,6 +17359,24 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
             Daftar & Dapatkan Kuota Gratis
           </button>
         </form>
+
+        <!-- Divider ATAU -->
+        <div class="relative flex items-center justify-center pt-1">
+          <div class="border-t border-slate-200 w-full"></div>
+          <span class="bg-white px-3 text-xs font-bold text-slate-400 uppercase tracking-wider relative">ATAU DAFTAR CEPAT DEMO</span>
+        </div>
+
+        <!-- Google Demo Button (Secondary) -->
+        <div id="googleBtnContainerRegister" class="hidden"></div>
+        <button id="googleCustomButtonRegister" type="button" onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl text-xs transition cursor-pointer">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          <span>Daftar Cepat Demo (Simulasi Akun Google)</span>
+        </button>
 
         <p class="text-center text-xs text-slate-500 pt-1">
           Sudah punya akun? <a href="javascript:void(0)" onclick="switchAuthTab('login')" class="font-bold text-blue-600 hover:underline">Masuk ke akun Anda</a>
@@ -17466,6 +17481,12 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email</label>
           <input type="email" id="modalUserEmailInput" required class="dospem-input w-full p-2.5 rounded-xl text-xs font-medium">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi (Password Akun)</label>
+          <input type="text" id="modalUserPasswordInput" required placeholder="Contoh: password123" class="dospem-input w-full p-2.5 rounded-xl text-xs font-mono font-medium">
+          <p class="text-xs text-slate-400 mt-1">Kata sandi akun pelamar untuk login via formulir email.</p>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
