@@ -252,20 +252,22 @@ async function runAudit() {
   window.adjustUserQuota(0, 10);
   assertTest('T41', 'Admin can adjust user quota (+10)', window.adminState.users[0].quota > 0, `User 0 quota: ${window.adminState.users[0].quota}`);
 
-  // Admin User Password Field & Rendering Check
+  // Security Compliance Tests: Zero Plain-Text Password & Access Gate
   const modalPasswordInput = document.getElementById('modalUserPasswordInput');
-  assertTest('T42', 'Admin User Modal contains password input field', !!modalPasswordInput, 'modalUserPasswordInput verified');
+  assertTest('T42', 'Security: Admin User Modal does not expose plaintext password input', !modalPasswordInput, 'Passwords safely delegated to Supabase Auth');
 
   window.openAdminUserModal(true, 0);
-  assertTest('T43', 'Admin User Modal populates existing password', modalPasswordInput && modalPasswordInput.value.length > 0, `Password: ${modalPasswordInput.value}`);
+  assertTest('T43', 'Security: User data does not leak raw plaintext password', !window.adminState.users[0].password, 'Zero plaintext password leak verified');
 
-  // Admin User Edit Password & Save
-  modalPasswordInput.value = 'passwordBaruDimitri2026';
-  window.handleSaveAdminUser({ preventDefault: () => {} });
-  assertTest('T44', 'Admin can update candidate password', window.adminState.users[0].password === 'passwordBaruDimitri2026', `Updated: ${window.adminState.users[0].password}`);
+  // Security Gate: Unauthorized Admin Access is blocked
+  const prevTab = window.appState.currentTab;
+  window.currentUser.role = 'user';
+  window.switchTab('admin-module');
+  assertTest('T44', 'Security: Unauthorized user blocked from Admin Command Center', window.appState.currentTab === prevTab, 'Access Gate safely rejected regular user');
+  window.currentUser.role = 'owner'; // restore owner for subsequent admin tests
 
   const adminUsersTable = document.getElementById('adminUsersTableBody').innerHTML;
-  assertTest('T45', 'Admin Users table displays password label & value', adminUsersTable.includes('Sandi:') && adminUsersTable.includes('passwordBaruDimitri2026'), 'Monospace password indicator visible in table');
+  assertTest('T45', 'Security: Admin Users table does not leak candidate passwords', !adminUsersTable.includes('Sandi:'), 'Clean authenticated badge rendered');
 
   // Reality Check Tests: XSS Sanitization & Category Integrity
   assertTest('T46', 'XSS Protection: escapeHtml escapes script and img tags', typeof window.escapeHtml === 'function' && window.escapeHtml('<script>alert("xss")</script>').includes('&lt;script&gt;'), 'XSS Sanitization active');
@@ -291,6 +293,7 @@ async function runAudit() {
     process.exit(1);
   } else {
     console.log('\nALL END-TO-END QA SCENARIOS PASSED WITH ZERO ERRORS!');
+    process.exit(0);
   }
 }
 

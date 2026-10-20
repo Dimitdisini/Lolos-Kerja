@@ -1,5 +1,23 @@
+# OS & logs
 .DS_Store
 Thumbs.db
 *.log
 .vercel
+
+# Node
 node_modules/
+
+# Env & Secrets
+.env
+.env.*
+!.env.example
+
+# Temporary scraped data & local test artifacts
+scrape-apify.js
+apify-raw-jobs.json
+new-apify-scraped-jobs.json
+hasil_test_cv/
+dospem-reverse-engineering/
+simulate-5-accounts.js
+fix_inline_custom_role.js
+flutter_lolos_kerja_app.dart

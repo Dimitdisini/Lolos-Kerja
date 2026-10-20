@@ -1,23 +1,40 @@
 /**
  * =========================================================================
- * GOOGLE APPS SCRIPT WEBHOOK: LOLOS KERJA MASTER DATABASE (V2 - REALTIME EMAIL)
+ * GOOGLE APPS SCRIPT WEBHOOK: LOLOS KERJA MASTER DATABASE (V2.1 - SECURED)
  * =========================================================================
  * Arsitektur: Dimitri HQ (PT Xavortree Digital Solution & PT Fleek Group)
- * Versi: 2.0.0 (Presisi Kolom Sesuai Template Spreadsheet + Auto Send Email)
+ * Versi: 2.1.0 (Token Authenticated & Safe Variable Scoping)
  * =========================================================================
  */
 
+// Secret token for authenticated webhook calls (Set this in Script Properties in production)
+var EXPECTED_WEBHOOK_SECRET = PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET') || 'LK_SECURE_TOKEN_2026';
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(10000);
+  if (!lock.tryLock(10000)) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', message: 'Server busy, lock acquisition failed' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
   try {
+    if (!e || !e.postData || !e.postData.contents) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', message: 'No payload provided' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     var rawData = e.postData.contents;
     var data = JSON.parse(rawData);
+    
+    // 1. AUTHENTICATION TOKEN VERIFICATION (Anti-Open Relay)
+    if (!data.token || data.token !== EXPECTED_WEBHOOK_SECRET) {
+      return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', message: 'Unauthorized webhook call: Invalid security token' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     var action = data.action;
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var now = new Date();
-    // Format tanggal Indonesia: YYYY-MM-DD HH:mm:ss
     var formattedDate = Utilities.formatDate(now, "Asia/Jakarta", "yyyy-MM-dd HH:mm:ss");
 
     if (action === 'REGISTER_OR_LOGIN_USER') {
@@ -29,7 +46,6 @@ function doPost(e) {
       var rows = sheet.getDataRange().getValues();
       var foundIndex = -1;
       for (var i = 1; i < rows.length; i++) {
-        // Cek kolom email (kolom 2 atau 3)
         var rowEmail = rows[i][2] ? rows[i][2].toString().toLowerCase() : (rows[i][1] ? rows[i][1].toString().toLowerCase() : '');
         if (rowEmail === data.email.toLowerCase()) {
           foundIndex = i + 1;
@@ -82,17 +98,6 @@ function doPost(e) {
 
     else if (action === 'RECORD_BLAST_LOG') {
       var sheet = ss.getSheetByName('BlastLogs') || ss.insertSheet('BlastLogs');
-      
-      // URUTAN PERSIS SESUAI HEADER SPREADSHEET DIMITRI (8 KOLOM):
-      // Kolom A: Log ID (BLG-XXXXX)
-      // Kolom B: ID Pengguna / Email Pelamar (data.applicantEmail atau USR-XXX)
-      // Kolom C: Perusahaan Target (data.targetCompany)
-      // Kolom D: Posisi Dilamar (data.position)
-      // Kolom E: Email HRD (data.recruiterEmail)
-      // Kolom F: Tanggal Kirim (formattedDate)
-      // Kolom G: Status Pengiriman ('TERKIRIM') -> Match dengan Dropdown
-      // Kolom H: Catatan HRD / Subjek ATS
-      
       var nextLogId = 'BLG-' + (sheet.getLastRow() + 10000);
       var userIdentifier = data.applicantEmail || data.applicantName || 'USR-1001';
       var catatanAts = data.subject || 'CV ATS Terlampir';
@@ -108,14 +113,14 @@ function doPost(e) {
         catatanAts
       ]);
 
-      // EKSEKUSI PENGIRIMAN FISIK REAL VIA GMAIL
+      // SCOPED EMAIL VARIABLES (Anti ReferenceError)
       var emailSentStatus = false;
       var emailError = '';
+      var emailSubject = data.subject || ('Lamaran Pekerjaan: ' + (data.position || '') + ' - ' + (data.applicantName || 'Dimitri Ahmad'));
+      var emailBody = data.body || ('Yth. Tim Rekrutmen ' + (data.targetCompany || '') + ',\n\nTerlampir surat lamaran dan CV saya untuk posisi ' + (data.position || '') + '.\n\nHormat saya,\n' + (data.applicantName || 'Dimitri Ahmad'));
+
       if (data.sendRealEmail && data.recruiterEmail) {
         try {
-          var emailSubject = data.subject || ('Lamaran Pekerjaan: ' + (data.position || '') + ' - ' + (data.applicantName || 'Dimitri Ahmad'));
-          var emailBody = data.body || ('Yth. Tim Rekrutmen ' + (data.targetCompany || '') + ',\n\nTerlampir surat lamaran dan CV saya untuk posisi ' + (data.position || '') + '.\n\nHormat saya,\n' + (data.applicantName || 'Dimitri Ahmad'));
-          
           GmailApp.sendEmail(data.recruiterEmail, emailSubject, emailBody, {
             name: data.applicantName || 'Dimitri Ahmad',
             replyTo: data.applicantEmail || 'dimitriahmad000@gmail.com'
@@ -140,9 +145,10 @@ function doPost(e) {
 
       return ContentService.createTextOutput(JSON.stringify({ 
         status: 'SUCCESS', 
-        message: 'Blast log saved perfectly', 
+        message: 'Blast log saved',
+        logId: nextLogId,
         emailSent: emailSentStatus,
-        emailError: emailError 
+        emailError: emailError
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
@@ -150,28 +156,9 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
 
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', error: err.toString() }))
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ERROR', message: err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
   }
-}
-
-function doGet(e) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheetUsers = ss.getSheetByName('Users');
-  var usersCount = sheetUsers ? Math.max(0, sheetUsers.getLastRow() - 1) : 0;
-  var sheetTx = ss.getSheetByName('Transactions');
-  var txCount = sheetTx ? Math.max(0, sheetTx.getLastRow() - 1) : 0;
-  var sheetBlast = ss.getSheetByName('BlastLogs');
-  var blastCount = sheetBlast ? Math.max(0, sheetBlast.getLastRow() - 1) : 0;
-
-  return ContentService.createTextOutput(JSON.stringify({
-    status: 'ONLINE',
-    service: 'Lolos Kerja Google Sheets Headless Database API v2',
-    totalUsers: usersCount,
-    totalTransactions: txCount,
-    totalBlastLogs: blastCount,
-    owner: 'Dimitri Ahmad (Dimitri HQ)'
-  })).setMimeType(ContentService.MimeType.JSON);
 }
