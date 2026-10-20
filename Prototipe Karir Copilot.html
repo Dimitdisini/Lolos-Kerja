@@ -318,8 +318,8 @@
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
 
-  <!-- 1. ANNOUNCEMENT BAR (Dospem Style) -->
-  <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-amber-50 border-b border-blue-100 text-xs py-2 px-4 text-center text-slate-700">
+  <!-- 1. ANNOUNCEMENT BAR (Desktop Only to save mobile viewport) -->
+  <div class="hidden sm:block bg-gradient-to-r from-blue-50 via-indigo-50 to-amber-50 border-b border-blue-100 text-xs py-2 px-4 text-center text-slate-700">
     <div class="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
       <span class="inline-flex items-center gap-1.5 font-semibold text-blue-700">
         <span class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
@@ -330,13 +330,13 @@
     </div>
   </div>
 
-  <!-- 2. STICKY NAVBAR (Clean Dospem Style) -->
+  <!-- 2. STICKY NAVBAR (Clean Mobile-First Style) -->
   <header class="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between gap-4">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex h-14 sm:h-16 items-center justify-between gap-3">
       
       <!-- Brand Logo -->
-      <div class="flex items-center gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home-module')">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center shadow-md shadow-blue-500/20 text-sm tracking-tight">
+      <div class="flex items-center gap-2 sm:gap-2.5 cursor-pointer shrink-0" onclick="switchTab('home-module')">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 text-white font-extrabold flex items-center justify-center shadow-sm sm:shadow-md shadow-blue-500/20 text-xs sm:text-sm tracking-tight">
           LK
         </div>
         <div>
@@ -415,34 +415,34 @@
       </nav>
 
       <!-- Right Action & Dynamic Auth -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2">
 
         <!-- Dynamic Auth Navbar Area (Managed by updateUserNavbarUI) -->
-        <div id="userLoggedOutView" class="flex items-center gap-2">
+        <div id="userLoggedOutView" class="flex items-center gap-1.5 sm:gap-2">
           <button type="button" onclick="openAuthModal('login')" class="hidden sm:block text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition cursor-pointer">
             Masuk
           </button>
-          <button type="button" onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer shrink-0">
+          <button type="button" onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-sm sm:shadow-md shadow-blue-500/20 cursor-pointer shrink-0">
             Coba Gratis
           </button>
         </div>
 
-        <div id="userLoggedInView" class="hidden flex items-center gap-2.5">
-          <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1.5 cursor-pointer hover:bg-slate-100 transition" onclick="openProfileDrawer()">
+        <div id="userLoggedInView" class="hidden flex items-center gap-2">
+          <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-50 border border-slate-200 rounded-xl px-2 sm:px-2.5 py-1 sm:py-1.5 cursor-pointer hover:bg-slate-100 transition" onclick="openProfileDrawer()">
             <img id="navUserAvatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=faces" class="w-6 h-6 rounded-full object-cover border border-blue-500" alt="Avatar">
             <div class="text-left hidden sm:block">
               <span id="navUserName" class="text-xs font-bold text-slate-800 block leading-tight">Kandidat Pelamar</span>
               <span id="navUserBadge" class="text-xs font-extrabold text-blue-600 uppercase font-mono">DIBIMBING (FREE)</span>
             </div>
           </div>
-          <button type="button" onclick="logoutUser()" title="Keluar Akun" class="text-slate-400 hover:text-red-600 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+          <button type="button" onclick="logoutUser()" title="Keluar Akun" class="text-slate-400 hover:text-red-600 p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
           </button>
         </div>
 
         <!-- Mobile Menu Toggle Button (Hamburger) -->
-        <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition" aria-label="Toggle Mobile Menu">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        <button type="button" onclick="toggleMobileMenu()" class="md:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition" aria-label="Toggle Mobile Menu">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
       </div>
 
@@ -475,7 +475,7 @@
   </header>
 
   <!-- MAIN CONTAINER (Mobile-First Spacing) -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8 pb-safe md:pb-12 space-y-8 sm:space-y-12">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-8 pb-safe md:pb-12 space-y-4 sm:space-y-12">
 
     <!-- ========================================================================= -->
     <!-- MODUL 0: BERANDA UTAMA (RE-ENGINEERING PERSIS DOSPEM.ID)                  -->
@@ -685,44 +685,44 @@
     <!-- ========================================================================= -->
     <!-- MODUL 1: BEDAH CV INTERAKTIF & ATS (LIGHT CLEAN ALA DOSPEM)               -->
     <!-- ========================================================================= -->
-    <section id="cv-module" class="tab-content space-y-6">
+    <section id="cv-module" class="tab-content space-y-4 sm:space-y-6">
       
       <!-- HEADER MODUL 1 -->
-      <div class="dospem-card p-6 border-l-4 border-l-blue-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="dospem-card p-3.5 sm:p-6 border-l-4 border-l-blue-600 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded">MODUL 01</span>
-            <h2 class="text-lg font-bold text-slate-900">Rapikan CV Kamu (Standar ATS)</h2>
+          <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+            <span class="hidden sm:inline-block text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded">MODUL 01</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Rapikan CV Kamu (Standar ATS)</h2>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600">
+          <p class="hidden sm:block text-xs sm:text-sm text-slate-600">
             Audit skor kesiapan parsing mesin ATS secara presisi. Ubah draf pengalaman pasif menjadi kalimat pencapaian berformula STAR Google X-Y-Z yang siap diekspor menjadi lampiran resmi Modul 4.
           </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <button onclick="switchCvSubTab('comparison')" id="btn-cv-subtab-comparison" class="text-xs bg-blue-600 text-white font-bold px-3.5 py-2 rounded-xl transition shadow-sm">
+          <button onclick="switchCvSubTab('comparison')" id="btn-cv-subtab-comparison" class="text-xs bg-blue-600 text-white font-bold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition shadow-sm">
             Perbandingan STAR
           </button>
-          <button onclick="switchCvSubTab('harvard')" id="btn-cv-subtab-harvard" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold px-3.5 py-2 rounded-xl transition">
+          <button onclick="switchCvSubTab('harvard')" id="btn-cv-subtab-harvard" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl transition">
             Pratinjau CV Harvard ATS
           </button>
         </div>
       </div>
 
-      <!-- VISUAL INFOGRAPHIC: FORMULA STAR & GOOGLE X-Y-Z -->
-      <div class="dospem-card p-5 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/30 border border-blue-200/80">
-        <div class="flex items-center justify-between mb-3">
+      <!-- VISUAL INFOGRAPHIC: FORMULA STAR & GOOGLE X-Y-Z (Compact on Mobile, Full on Desktop) -->
+      <div class="dospem-card p-3 sm:p-5 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/30 border border-blue-200/80">
+        <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wide">Formula STAR: Rahasia Lolos Seleksi ATS</h3>
+            <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wide">Formula STAR (Google X-Y-Z)</h3>
           </div>
-          <span class="text-xs font-semibold text-blue-700 bg-blue-100/70 px-2.5 py-0.5 rounded-full">Standar Parsing Workday & Taleo</span>
+          <span class="text-xs font-semibold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">Standar ATS</span>
         </div>
         
-        <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+        <p class="hidden sm:block text-xs text-slate-600 mt-2 mb-4 leading-relaxed">
           Sistem Applicant Tracking System (ATS) dan HR profesional tidak menyukai uraian tugas pasif seperti <em>"bertanggung jawab membantu tim"</em>. Terapkan rumus <strong>Google X-Y-Z</strong>: <em>"Accomplished [X] as measured by [Y] by doing [Z]"</em>.
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
           <div class="p-3 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-blue-700 font-mono">S • Situation</span>
@@ -1060,16 +1060,16 @@
     <!-- ========================================================================= -->
     <!-- MODUL 2: SIMULASI WAWANCARA SUARA (DUAL-SCORE SASA)                       -->
     <!-- ========================================================================= -->
-    <section id="interview-module" class="tab-content space-y-6">
+    <section id="interview-module" class="tab-content space-y-4 sm:space-y-6">
       
       <!-- HEADER MODUL 2 -->
-      <div class="dospem-card p-6 border-l-4 border-l-amber-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="dospem-card p-3.5 sm:p-6 border-l-4 border-l-amber-500 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">MODUL 02</span>
-            <h2 class="text-lg font-bold text-slate-900">Latihan Wawancara AI (Suara Riil)</h2>
+          <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+            <span class="hidden sm:inline-block text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded">MODUL 02</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Latihan Wawancara AI (Suara Riil)</h2>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600">
+          <p class="hidden sm:block text-xs sm:text-sm text-slate-600">
             Latihan bicara langsung menggunakan mikrofon browser dengan visualizer minimalis ala Apple. Menilai kesesuaian formula STAR dan mengaudit kata gumam (<em>'aaa/eee/kayak'</em>) secara transparan.
           </p>
         </div>
@@ -1260,102 +1260,109 @@
     <!-- ========================================================================= -->
     <!-- MODUL 3: LOKER TERKURASI (GLINTS & LINKEDIN DIRECT QUERY)                 -->
     <!-- ========================================================================= -->
-    <section id="jobs-module" class="tab-content space-y-6">
+    <section id="jobs-module" class="tab-content space-y-3.5 sm:space-y-6">
       
-      <!-- HEADER MODUL 3 -->
-      <div class="dospem-card p-6 border-l-4 border-l-emerald-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- HEADER MODUL 3 (Compact on Mobile, Full on Desktop) -->
+      <div class="dospem-card p-3.5 sm:p-6 border-l-4 border-l-emerald-500 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">MODUL 03</span>
-            <h2 class="text-lg font-bold text-slate-900">Cari Lowongan Kerja Aktif</h2>
+          <div class="flex items-center justify-between sm:justify-start gap-2 mb-0.5 sm:mb-1">
+            <div class="flex items-center gap-1.5 sm:gap-2">
+              <span class="hidden sm:inline-block text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">MODUL 03</span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">Cari Lowongan Kerja Aktif</h2>
+            </div>
+            <span class="inline-flex sm:hidden items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              400+ Loker
+            </span>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600">
+          <p class="hidden sm:block text-xs sm:text-sm text-slate-600">
             Disaring otomatis dari portal Glints & LinkedIn. Meliputi 5 klaster universal pasar kerja Indonesia (Business, Tech, Marketing, Finance, Ops/MT) tanpa loker fiktif.
           </p>
-          <div class="flex items-center gap-2 pt-2 text-xs text-slate-500">
+          <div class="hidden sm:flex items-center gap-2 pt-2 text-xs text-slate-500">
             <span class="inline-flex items-center gap-1 font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              Pembaruan Berkala 1x Per Hari (Hemat Token)
+              Pembaruan Berkala 1x Per Hari
             </span>
             <span>&bull;</span>
             <span class="text-slate-400">Total Lowongan Aktif: 400+ Loker Terverifikasi</span>
           </div>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <div class="relative">
-            <input type="text" id="jobSearchInput" oninput="filterJobs()" placeholder="Cari posisi atau perusahaan..." class="dospem-input text-xs rounded-xl pl-8 pr-3 py-2 w-52 font-medium">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <div class="relative flex-1 sm:flex-initial">
+            <input type="text" id="jobSearchInput" oninput="filterJobs()" placeholder="Cari posisi atau perusahaan..." class="dospem-input text-xs rounded-xl pl-8 pr-3 py-2 w-full sm:w-56 font-medium">
             <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
-          <button onclick="resetJobFilters()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-semibold transition">Reset</button>
+          <button onclick="resetJobFilters()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl font-semibold transition shrink-0">Reset</button>
         </div>
       </div>
-      <!-- PANDUAN PENENTU KARIR FRESH GRADUATE (BELUM TAHU MAU KERJA APA?) -->
-      <div class="p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 border border-blue-200/80 rounded-2xl space-y-3">
+
+      <!-- PANDUAN PENENTU KARIR FRESH GRADUATE (KOMPAS KARIR COMPACT MOBILE CAROUSEL) -->
+      <div class="p-3 sm:p-4 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-slate-50 border border-blue-200/80 rounded-2xl space-y-2">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-            <span class="text-xs font-bold text-slate-900">Belum Tahu Mau Melamar Posisi Apa?</span>
-            <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">Kompas Karir Pemula</span>
+            <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+            <span class="text-xs font-bold text-slate-900">Kompas Jurusan:</span>
+            <span class="text-xs text-slate-500 hidden sm:inline">Pilih rumpun minat atau jurusan kuliahmu untuk melihat lowongan yang relevan</span>
           </div>
-          <span class="text-xs text-slate-500">Pilih rumpun minat atau jurusan kuliahmu untuk melihat lowongan yang relevan:</span>
+          <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full hidden sm:inline-block">Filter Cepat</span>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 pt-0.5">
-          <button type="button" onclick="selectCareerCompass('all_majors')" id="compass-all_majors" class="career-compass-btn text-left p-2.5 rounded-xl border border-blue-300 bg-white hover:bg-blue-50/80 transition-all shadow-xs group">
-            <div class="text-xs font-bold text-blue-700 flex items-center justify-between">
+        <div class="flex sm:grid sm:grid-cols-3 md:grid-cols-5 gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <button type="button" onclick="selectCareerCompass('all_majors')" id="compass-all_majors" class="career-compass-btn shrink-0 text-left p-2 sm:p-2.5 rounded-xl border border-blue-300 bg-white hover:bg-blue-50/80 transition-all shadow-xs group">
+            <div class="text-xs font-bold text-blue-700 flex items-center justify-between gap-1.5 whitespace-nowrap">
               <span>Buka Semua Jurusan</span>
               <span class="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.2 rounded font-mono">FAVORIT</span>
             </div>
-            <div class="text-xs text-slate-500 mt-1 leading-snug">MT, ODP Perbankan, BUMN & Generalist</div>
+            <div class="hidden sm:block text-xs text-slate-500 mt-1 leading-snug">MT, ODP Perbankan, BUMN & Generalist</div>
           </button>
 
-          <button type="button" onclick="selectCareerCompass('business')" id="compass-business" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
-            <div class="text-xs font-bold text-slate-800">Bisnis & Operasional</div>
-            <div class="text-xs text-slate-500 mt-1 leading-snug">Manajemen, BD, Logistik & Admin</div>
+          <button type="button" onclick="selectCareerCompass('business')" id="compass-business" class="career-compass-btn shrink-0 text-left p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-xs font-bold text-slate-800 whitespace-nowrap">Bisnis & Operasional</div>
+            <div class="hidden sm:block text-xs text-slate-500 mt-1 leading-snug">Manajemen, BD, Logistik & Admin</div>
           </button>
 
-          <button type="button" onclick="selectCareerCompass('marketing')" id="compass-marketing" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
-            <div class="text-xs font-bold text-slate-800">Marketing & Media</div>
-            <div class="text-xs text-slate-500 mt-1 leading-snug">Social Media, Content, PR & Ads</div>
+          <button type="button" onclick="selectCareerCompass('marketing')" id="compass-marketing" class="career-compass-btn shrink-0 text-left p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-xs font-bold text-slate-800 whitespace-nowrap">Marketing & Media</div>
+            <div class="hidden sm:block text-xs text-slate-500 mt-1 leading-snug">Social Media, Content, PR & Ads</div>
           </button>
 
-          <button type="button" onclick="selectCareerCompass('tech')" id="compass-tech" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
-            <div class="text-xs font-bold text-slate-800">Teknologi & Data</div>
-            <div class="text-xs text-slate-500 mt-1 leading-snug">IT Support, Junior Dev & Data Analyst</div>
+          <button type="button" onclick="selectCareerCompass('tech')" id="compass-tech" class="career-compass-btn shrink-0 text-left p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-xs font-bold text-slate-800 whitespace-nowrap">Teknologi & Data</div>
+            <div class="hidden sm:block text-xs text-slate-500 mt-1 leading-snug">IT Support, Junior Dev & Data Analyst</div>
           </button>
 
-          <button type="button" onclick="selectCareerCompass('finance')" id="compass-finance" class="career-compass-btn text-left p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
-            <div class="text-xs font-bold text-slate-800">Keuangan & Pajak</div>
-            <div class="text-xs text-slate-500 mt-1 leading-snug">Akuntansi, Billing, Audit & Finansial</div>
+          <button type="button" onclick="selectCareerCompass('finance')" id="compass-finance" class="career-compass-btn shrink-0 text-left p-2 sm:p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 transition-all shadow-xs group">
+            <div class="text-xs font-bold text-slate-800 whitespace-nowrap">Keuangan & Pajak</div>
+            <div class="hidden sm:block text-xs text-slate-500 mt-1 leading-snug">Akuntansi, Billing, Audit & Finansial</div>
           </button>
         </div>
       </div>
 
       <!-- APPLE UI SEGMENTED CONTROL PILLS (UNIVERSAL CATEGORIES) -->
-      <div class="space-y-3">
+      <div class="space-y-2 sm:space-y-3">
         <!-- Bar Kategori Utama (Segmented Pills Glassmorphism) -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1">
-          <div class="inline-flex items-center p-1 bg-slate-100/90 border border-slate-200/80 rounded-full backdrop-blur-md shadow-inner flex-nowrap" id="appleJobCategoryPills">
-            <button type="button" onclick="setJobCategoryPill('all')" data-cat="all" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-bold transition-all shadow-sm apple-pill-active">Semua Kategori (418)</button>
-            <button type="button" onclick="setJobCategoryPill('business')" data-cat="business" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900">Business & Product</button>
-            <button type="button" onclick="setJobCategoryPill('tech')" data-cat="tech" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900">Tech & Software</button>
-            <button type="button" onclick="setJobCategoryPill('marketing')" data-cat="marketing" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900">Marketing & Growth</button>
-            <button type="button" onclick="setJobCategoryPill('finance')" data-cat="finance" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900">Finance & Accounting</button>
-            <button type="button" onclick="setJobCategoryPill('ops-mt')" data-cat="ops-mt" class="job-category-pill text-xs px-4 py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900">Operations & MT</button>
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5 sm:pb-1">
+          <div class="inline-flex items-center p-0.5 sm:p-1 bg-slate-100/90 border border-slate-200/80 rounded-full backdrop-blur-md shadow-inner flex-nowrap" id="appleJobCategoryPills">
+            <button type="button" onclick="setJobCategoryPill('all')" data-cat="all" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-bold transition-all shadow-sm apple-pill-active whitespace-nowrap">Semua Kategori (418)</button>
+            <button type="button" onclick="setJobCategoryPill('business')" data-cat="business" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900 whitespace-nowrap">Business & Product</button>
+            <button type="button" onclick="setJobCategoryPill('tech')" data-cat="tech" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900 whitespace-nowrap">Tech & Software</button>
+            <button type="button" onclick="setJobCategoryPill('marketing')" data-cat="marketing" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900 whitespace-nowrap">Marketing & Growth</button>
+            <button type="button" onclick="setJobCategoryPill('finance')" data-cat="finance" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900 whitespace-nowrap">Finance & Accounting</button>
+            <button type="button" onclick="setJobCategoryPill('ops-mt')" data-cat="ops-mt" class="job-category-pill text-xs px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium transition-all text-slate-600 hover:text-slate-900 whitespace-nowrap">Operations & MT</button>
           </div>
         </div>
 
         <!-- Sub-filter Apple Pills (Level & Lokasi) -->
-        <div class="flex items-center justify-between gap-3 flex-wrap text-xs">
-          <div class="flex items-center gap-1.5 flex-wrap">
-            <span class="text-slate-500 font-semibold mr-1">Tingkat:</span>
-            <button type="button" onclick="setJobLevelPill('all')" data-lvl="all" class="job-level-pill text-xs px-3 py-1 rounded-full border bg-slate-900 text-white font-bold">Semua</button>
-            <button type="button" onclick="setJobLevelPill('Fresh Graduate')" data-lvl="Fresh Graduate" class="job-level-pill text-xs px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium">Fresh Graduate</button>
-            <button type="button" onclick="setJobLevelPill('Internship')" data-lvl="Internship" class="job-level-pill text-xs px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium">Magang / Intern</button>
-            <button type="button" onclick="setJobLevelPill('Junior')" data-lvl="Junior" class="job-level-pill text-xs px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium">Junior (1-2 thn)</button>
+        <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar py-0.5 text-xs">
+          <div class="flex items-center gap-1.5 flex-nowrap shrink-0">
+            <span class="text-slate-500 font-semibold mr-0.5 hidden sm:inline">Tingkat:</span>
+            <button type="button" onclick="setJobLevelPill('all')" data-lvl="all" class="job-level-pill text-xs px-2.5 sm:px-3 py-1 rounded-full border bg-slate-900 text-white font-bold whitespace-nowrap">Semua</button>
+            <button type="button" onclick="setJobLevelPill('Fresh Graduate')" data-lvl="Fresh Graduate" class="job-level-pill text-xs px-2.5 sm:px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium whitespace-nowrap">Fresh Graduate</button>
+            <button type="button" onclick="setJobLevelPill('Internship')" data-lvl="Internship" class="job-level-pill text-xs px-2.5 sm:px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium whitespace-nowrap">Magang</button>
+            <button type="button" onclick="setJobLevelPill('Junior')" data-lvl="Junior" class="job-level-pill text-xs px-2.5 sm:px-3 py-1 rounded-full border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 font-medium whitespace-nowrap">Junior</button>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="hidden sm:flex items-center gap-2 shrink-0">
             <span class="text-slate-500 font-semibold">Status:</span>
             <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -1375,38 +1382,38 @@
     <!-- ========================================================================= -->
     <!-- MODUL 4: SMART DRIP AUTO-BLAST EMAIL (KILLER FEATURE)                     -->
     <!-- ========================================================================= -->
-    <section id="blast-module" class="tab-content space-y-6">
+    <section id="blast-module" class="tab-content space-y-3.5 sm:space-y-6">
       
-      <!-- HEADER MODUL 4 -->
-      <div class="dospem-card p-6 border-l-4 border-l-indigo-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- HEADER MODUL 4 (Compact on Mobile, Full on Desktop) -->
+      <div class="dospem-card p-3.5 sm:p-6 border-l-4 border-l-indigo-600 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded">MODUL 04</span>
-            <h2 class="text-lg font-bold text-slate-900">Kirim Lamaran ke HRD Whitelist</h2>
+          <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+            <span class="hidden sm:inline-block text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded">MODUL 04</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Kirim Lamaran ke HRD Whitelist</h2>
           </div>
-          <p class="text-xs sm:text-sm text-slate-600">
+          <p class="hidden sm:block text-xs sm:text-sm text-slate-600">
             Kirim lamaran kerja terpersonalisasi dengan jeda cerdas (45-90s) langsung ke Inbox HRD terverifikasi. Lampiran CV Harvard dari Modul 1 otomatis tertaut dan kuota terpotong secara atomik per email terkirim.
           </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-          <div class="p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl text-center">
-            <span class="text-xs text-slate-500 font-medium block">Sisa Kuota Blast:</span>
-            <span id="blastUserQuotaDisplay" class="text-base font-extrabold text-indigo-700 font-mono">10 Email</span>
+          <div class="p-2 sm:p-2.5 bg-indigo-50 border border-indigo-200 rounded-xl text-center">
+            <span class="text-xs text-slate-500 font-medium block">Sisa Kuota:</span>
+            <span id="blastUserQuotaDisplay" class="text-sm sm:text-base font-extrabold text-indigo-700 font-mono">10 Email</span>
           </div>
         </div>
       </div>
 
-      <!-- BANNER BOUNDARIES KEPATUHAN HUKUM & DELIVERABILITY (UU PDP & GOOGLE 2024 SENDER RULES) -->
-      <div class="p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-sm space-y-3">
+      <!-- BANNER BOUNDARIES KEPATUHAN HUKUM & DELIVERABILITY (Compact on Mobile) -->
+      <div class="p-3 sm:p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-sm space-y-2 sm:space-y-3">
         <div class="flex items-center justify-between flex-wrap gap-2">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">Boundaries Kepatuhan Hukum & Deliverability</span>
-            <span class="text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full font-mono">UU PDP No. 27/2022 & Google 2024 Policy</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">Boundaries Kepatuhan & Deliverability</span>
+            <span class="hidden sm:inline text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full font-mono">UU PDP No. 27/2022 & Google Policy</span>
           </div>
-          <span class="text-xs text-slate-400">100% Anti-Banned & Anti-Spam Guarantee</span>
+          <span class="text-xs text-emerald-300 sm:text-slate-400 font-medium">100% Anti-Spam</span>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        <div class="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
             <div class="font-bold text-slate-200 flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
@@ -17306,7 +17313,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       <!-- 2. Bedah CV -->
       <button onclick="switchTab('cv-module')" id="mobile-tab-cv-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-        <span class="text-xs tracking-tight">Bedah CV</span>
+        <span class="text-xs tracking-tight">Rapikan CV</span>
       </button>
       <!-- 3. Mock Interview -->
       <button onclick="switchTab('interview-module')" id="mobile-tab-interview-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
@@ -17321,7 +17328,7 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       <!-- 5. Auto-Blast -->
       <button onclick="switchTab('blast-module')" id="mobile-tab-blast-module" class="mobile-bottom-tab flex-1 flex flex-col items-center justify-center py-1 rounded-xl transition text-slate-500 hover:text-slate-900 active:scale-95 touch-target">
         <svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-        <span class="text-xs tracking-tight">Auto-Blast</span>
+        <span class="text-xs tracking-tight">Kirim HRD</span>
       </button>
     </div>
   </nav>
