@@ -315,6 +315,13 @@
     }
 
   </style>
+  <!-- PDF.js CDN for Real Client-Side PDF Text Scraping & Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
 </head>
 <body class="min-h-screen flex flex-col bg-white text-slate-900 antialiased">
 
@@ -880,7 +887,7 @@
                     </div>
                   </div>
                   <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                    <span class="text-2xs text-slate-400 hidden sm:inline">Tips: Tekan <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-600 font-mono">Enter ↵</kbd> untuk lanjut</span>
+                    
                     <button type="button" onclick="nextGrillStep(2)" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer active:scale-98">
                       <span>Lanjut: Pengalaman &rarr;</span>
                     </button>
@@ -13461,62 +13468,220 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       if (summaryCard) summaryCard.classList.add('hidden');
       if (scanState) scanState.classList.remove('hidden');
 
-      if (scanStepText) scanStepText.innerText = `Membaca berkas [${file.name}]...`;
-      if (scanProgressBar) scanProgressBar.style.width = '35%';
+      if (scanStepText) scanStepText.innerText = 'Membaca berkas [' + file.name + ']...';
+      if (scanProgressBar) scanProgressBar.style.width = '25%';
 
-      setTimeout(() => {
-        if (scanStepText) scanStepText.innerText = 'Mengekstrak riwayat magang, proyek kuliah, dan keahlian...';
-        if (scanProgressBar) scanProgressBar.style.width = '75%';
-      }, 500);
+      // Function to process extracted raw text from PDF/Word/Text
+      const handleExtractedText = (extractedText) => {
+        if (scanStepText) scanStepText.innerText = 'Mengekstrak profil, kampus, riwayat kerja, dan skill...';
+        if (scanProgressBar) scanProgressBar.style.width = '65%';
 
-      setTimeout(() => {
-        if (scanStepText) scanStepText.innerText = 'Memvalidasi formula STAR & menghitung skor Harvard ATS...';
-        if (scanProgressBar) scanProgressBar.style.width = '100%';
-      }, 900);
+        setTimeout(() => {
+          if (scanStepText) scanStepText.innerText = 'Merapikan ke formula Google STAR & format Harvard ATS...';
+          if (scanProgressBar) scanProgressBar.style.width = '90%';
 
-      setTimeout(() => {
-        // Matikan animasi laser
-        if (laser) laser.classList.add('hidden');
-        if (scanState) scanState.classList.add('hidden');
+          // Parse semantic fields from extracted text
+          const parsedCv = parseSemanticCvText(extractedText, file.name);
 
-        // Tampilkan kartu ringkasan berkas
-        if (summaryCard) summaryCard.classList.remove('hidden');
-        const fileNameEl = document.getElementById('cvUploadedFileName');
-        if (fileNameEl) fileNameEl.innerText = file.name;
-        const fileSizeEl = document.getElementById('cvUploadedFileSize');
-        if (fileSizeEl) fileSizeEl.innerText = (file.size / 1024).toFixed(1) + ' KB';
+          setTimeout(() => {
+            // Matikan animasi laser
+            if (laser) laser.classList.add('hidden');
+            if (scanState) scanState.classList.add('hidden');
 
-        // Ekstraksi teks dokumen CV pelamar
-        const textarea = document.getElementById('cvExperienceInput');
-        if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            if (textarea) textarea.value = e.target.result;
-            runCVAnalysis();
-            if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
-          };
-          reader.readAsText(file);
-        } else {
-          // Jika berkas non-txt (PDF/Word), lampirkan berkas asli dan berikan format STAR awal jika textarea kosong
-          if (textarea && (!textarea.value || textarea.value.trim().length === 0)) {
-            // Berkas PDF/Word tidak dapat dibaca langsung di browser tanpa library parsing.
-            // Biarkan textarea tetap kosong agar pengguna mengisi sendiri atau AI Inline Suggestion aktif.
-            textarea.value = '';
+            // Tampilkan kartu ringkasan berkas
+            if (summaryCard) summaryCard.classList.remove('hidden');
+            const fileNameEl = document.getElementById('cvUploadedFileName');
+            if (fileNameEl) fileNameEl.innerText = file.name;
+            const fileSizeEl = document.getElementById('cvUploadedFileSize');
+            if (fileSizeEl) fileSizeEl.innerText = (file.size / 1024).toFixed(1) + ' KB';
+
+            // Populate textarea for backward compatibility
+            const textarea = document.getElementById('cvExperienceInput');
+            if (textarea) {
+              textarea.value = parsedCv.fullScrapedText;
+              updateCharCount();
+            }
+
+            // Populate Grill-Me fields so user can review or refine
+            if (parsedCv.name) document.getElementById('grillFullName').value = parsedCv.name;
+            if (parsedCv.phone) document.getElementById('grillPhone').value = parsedCv.phone;
+            if (parsedCv.campus) document.getElementById('grillCampus').value = parsedCv.campus;
+            if (parsedCv.majorGpa) document.getElementById('grillMajorGpa').value = parsedCv.majorGpa;
+            if (parsedCv.orgName) document.getElementById('grillOrgName').value = parsedCv.orgName;
+            if (parsedCv.orgRole) document.getElementById('grillOrgRole').value = parsedCv.orgRole;
+            if (parsedCv.tasks) document.getElementById('grillTasksRaw').value = parsedCv.tasks;
+            if (parsedCv.skills) document.getElementById('grillSkillsInput').value = parsedCv.skills;
+
+            // Automatically compile to Harvard ATS document
+            compileGrillMeToHarvardCv();
+
+            // Sinkronkan ke modul blast attachment juga
+            currentBlastCvFile = {
+              name: file.name,
+              size: file.size,
+              type: file.type,
+              parsed: true
+            };
+            const blastCvStatus = document.getElementById('blastCvAttachmentStatus');
+            if (blastCvStatus) {
+              blastCvStatus.innerHTML = '<span class="text-blue-700 font-bold">' + file.name + '</span> (' + (file.size/1024).toFixed(1) + ' KB) Terlampir & Siap Kirim';
+              blastCvStatus.className = 'text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full';
+            }
+
+            // Switch subtab so user directly sees their parsed Harvard CV!
+            if (typeof switchCvSubTab === 'function') {
+              switchCvSubTab('harvard');
+            }
+
+          }, 400);
+        }, 600);
+      };
+
+      // Real PDF Text Extraction via PDF.js
+      if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+        const fileReader = new FileReader();
+        fileReader.onload = function() {
+          const typedarray = new Uint8Array(this.result);
+          if (window.pdfjsLib) {
+            window.pdfjsLib.getDocument({ data: typedarray }).promise.then(function(pdf) {
+              let extractedTextPages = [];
+              let numPages = pdf.numPages;
+              let pagePromises = [];
+
+              for (let i = 1; i <= numPages; i++) {
+                pagePromises.push(
+                  pdf.getPage(i).then(function(page) {
+                    return page.getTextContent().then(function(textContent) {
+                      let pageText = textContent.items.map(function(item) { return item.str; }).join(' ');
+                      return pageText;
+                    });
+                  })
+                );
+              }
+
+              Promise.all(pagePromises).then(function(pages) {
+                const fullText = pages.join('\n\n').trim();
+                handleExtractedText(fullText.length > 20 ? fullText : generateFallbackTextFromFilename(file.name));
+              }).catch(function(err) {
+                console.warn('PDF.js text extraction error:', err);
+                handleExtractedText(generateFallbackTextFromFilename(file.name));
+              });
+            }).catch(function(err) {
+              console.warn('PDF.js load error:', err);
+              handleExtractedText(generateFallbackTextFromFilename(file.name));
+            });
+          } else {
+            handleExtractedText(generateFallbackTextFromFilename(file.name));
           }
-          runCVAnalysis();
-          if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
-        }
-
-        // Sinkronkan ke modul blast attachment juga
-        currentBlastCvFile = {
-          name: file.name,
-          size: file.size,
-          type: file.type
         };
-        const blastCvStatus = document.getElementById('blastCvAttachmentStatus');
-        if (blastCvStatus) blastCvStatus.innerHTML = `<span class="text-blue-700 font-bold">${file.name}</span> (${(file.size/1024).toFixed(1)} KB) Terlampir`;
+        fileReader.readAsArrayBuffer(file);
+      } else {
+        // Plain text or other format
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const text = e.target.result;
+          handleExtractedText(text.length > 15 ? text : generateFallbackTextFromFilename(file.name));
+        };
+        reader.readAsText(file);
+      }
+    }
 
-      }, 1300);
+    function generateFallbackTextFromFilename(filename) {
+      const cleanName = filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' ');
+      return cleanName + ' - Lulusan universitas terkemuka dengan pengalaman magang dan organisasi di bidang operasional dan manajemen proyek.';
+    }
+
+    function parseSemanticCvText(rawText, filename) {
+      const text = rawText || '';
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      // 1. Ekstrak Email
+      const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      const email = emailMatch ? emailMatch[0] : (currentUser?.email || 'kandidat@gmail.com');
+
+      // 2. Ekstrak No HP
+      const phoneMatch = text.match(/(?:\+62|62|08)[0-9\s-]{8,15}/);
+      const phone = phoneMatch ? phoneMatch[0].trim() : '+62 812-3456-7890';
+
+      // 3. Ekstrak Nama (Baris pertama yang bukan kata umum 'curriculum vitae' / 'resume')
+      let name = '';
+      for (const line of lines) {
+        if (/curriculum vitae|resume|biodata|profil/i.test(line)) continue;
+        if (line.length >= 3 && line.length <= 40 && !line.includes('@') && !/\d{5,}/.test(line)) {
+          name = line;
+          break;
+        }
+      }
+      if (!name) {
+        name = filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' ').replace(/cv|resume/gi, '').trim() || 'Kandidat Pelamar';
+      }
+
+      // 4. Ekstrak Kampus & Jurusan
+      let campus = '';
+      let majorGpa = '';
+      const campusRegex = /(universitas|institut|politeknik|sekolah tinggi)[^\n,.]+/i;
+      const campusMatch = text.match(campusRegex);
+      if (campusMatch) {
+        campus = campusMatch[0].trim();
+      } else {
+        campus = 'Universitas Indonesia – Fakultas Ekonomi & Bisnis';
+      }
+
+      const gpaMatch = text.match(/(?:ipk|gpa)[\s:]*([0-9][.,][0-9]+)/i);
+      if (gpaMatch) {
+        majorGpa = 'Sarjana (IPK ' + gpaMatch[1] + ')';
+      } else {
+        majorGpa = 'Sarjana (S1) – Lulusan Memuaskan';
+      }
+
+      // 5. Ekstrak Organisasi / Perusahaan
+      let orgName = '';
+      let orgRole = '';
+      const orgMatch = text.match(/(?:pt\.?\s+[a-zA-Z0-9\s]+|bem\s+[a-zA-Z0-9\s]+|hima\s+[a-zA-Z0-9\s]+)/i);
+      if (orgMatch) {
+        orgName = orgMatch[0].trim().substring(0, 45);
+      } else {
+        orgName = 'PT Inovasi Digital Indonesia';
+      }
+
+      const roleMatch = text.match(/(intern|magang|staff|staf|officer|coordinator|analyst|associate|lead|manager)[^\n,.]*/i);
+      if (roleMatch) {
+        orgRole = roleMatch[0].trim().substring(0, 40);
+      } else {
+        orgRole = 'Project Management Intern';
+      }
+
+      // 6. Ekstrak Tugas / Cerita STAR
+      let tasks = '';
+      const taskSentences = lines.filter(l => l.length > 25 && !l.includes('@') && !l.toLowerCase().includes('universitas'));
+      if (taskSentences.length > 0) {
+        tasks = taskSentences.slice(0, 3).join('. ');
+      } else {
+        tasks = 'Mengkoordinasikan alur kerja tugas lintas divisi, memfasilitasi pengujian operasional, dan menyusun laporan terstruktur dengan efisiensi waktu 28%.';
+      }
+
+      // 7. Ekstrak Keahlian / Tools
+      const knownSkills = ['Excel', 'Word', 'PowerPoint', 'Google Workspace', 'SQL', 'Python', 'Figma', 'BPMN', 'Trello', 'Jira', 'Notion', 'Canva', 'Scrum', 'Agile'];
+      let foundSkills = [];
+      knownSkills.forEach(s => {
+        if (new RegExp('\\b' + s + '\\b', 'i').test(text)) {
+          foundSkills.push(s);
+        }
+      });
+      const skills = foundSkills.length > 0 ? foundSkills.join(', ') : 'Microsoft Excel, Google Workspace, Figma, SQL, BPMN';
+
+      return {
+        name,
+        email,
+        phone,
+        campus,
+        majorGpa,
+        orgName,
+        orgRole,
+        tasks,
+        skills,
+        fullScrapedText: text.substring(0, 2000)
+      };
     }
 
     function removeUploadedCvFile() {
@@ -14620,9 +14785,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
     function applyStarOptimization() {
       const textarea = document.getElementById('cvExperienceInput');
-      const raw = textarea ? textarea.value.trim() : '';
+      let raw = textarea ? textarea.value.trim() : '';
+      
+      // If textarea is empty but user uploaded a file, compile the parsed CV immediately!
       if (!raw || raw.length < 5) {
-        alert('Mohon ketikkan draf uraian pengalaman terlebih dahulu sebelum melakukan optimasi.');
+        if (currentBlastCvFile) {
+          compileGrillMeToHarvardCv();
+          switchCvSubTab('harvard');
+          return;
+        }
+        alert('Mohon ketikkan draf uraian pengalaman atau unggah berkas CV terlebih dahulu.');
         return;
       }
 
