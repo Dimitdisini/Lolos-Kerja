@@ -453,16 +453,16 @@
       <!-- Dynamic Mobile Auth Section -->
       <div id="mobileAuthContainer" class="pb-2 border-b border-slate-100">
         <div class="flex gap-2">
-          <button type="button" onclick="openLoginModal(); toggleMobileMenu();" class="flex-1 text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition">Masuk</button>
-          <button type="button" onclick="openLoginModal(); toggleMobileMenu();" class="flex-1 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">Daftar Gratis</button>
+          <button type="button" onclick="openAuthModal('login'); toggleMobileMenu();" class="flex-1 text-center py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition">Masuk</button>
+          <button type="button" onclick="openAuthModal('register'); toggleMobileMenu();" class="flex-1 text-center py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition">Daftar Gratis</button>
         </div>
       </div>
       <button onclick="switchTab('home-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50 font-bold">Beranda</button>
-      <button onclick="switchTab('cv-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Rapikan CV</button>
+      <button onclick="switchTab('cv-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Studio Bedah CV</button>
       <button onclick="switchTab('interview-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Latihan Interview</button>
-      <button onclick="switchTab('jobs-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Cari Loker</button>
-      <button onclick="switchTab('blast-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Kirim ke HRD</button>
-      <button onclick="switchTab('pricing-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-blue-600 font-bold hover:bg-blue-50">Harga</button>
+      <button onclick="switchTab('jobs-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Katalog Loker</button>
+      <button onclick="switchTab('blast-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-700 hover:bg-slate-50">Kirim Lamaran HRD</button>
+      <button onclick="switchTab('pricing-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-blue-600 font-bold hover:bg-blue-50">Paket Langganan</button>
       <button onclick="switchTab('plan-module'); toggleMobileMenu();" class="w-full text-left py-2 px-3 rounded-lg text-slate-500 hover:bg-slate-50">Panduan Agen</button>
       <button onclick="switchTab('admin-module'); toggleMobileMenu();" id="mobile-tab-admin-module" class="w-full text-left py-2.5 px-3 rounded-xl bg-emerald-50 text-emerald-800 font-bold hidden items-center justify-between border border-emerald-200 mt-2">
         <span class="flex items-center gap-1.5">
@@ -716,54 +716,62 @@
         </div>
       </div>
 
-      <!-- VISUAL INFOGRAPHIC: FORMULA STAR & GOOGLE X-Y-Z (Compact on Mobile, Full on Desktop) -->
-      <div class="dospem-card p-3 sm:p-5 bg-gradient-to-r from-slate-50 via-blue-50/30 to-indigo-50/30 border border-blue-200/80">
-        <div class="flex items-center justify-between gap-2">
+      <!-- PANDUAN FORMULA STAR & GOOGLE X-Y-Z (COLLAPSIBLE / OPTIONAL TO REDUCE CLUTTER) -->
+      <details class="group dospem-card p-3 sm:p-4 bg-slate-50/80 border border-slate-200">
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wide">Formula STAR (Google X-Y-Z)</h3>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wide">Panduan Formula STAR (Google X-Y-Z)</h3>
+            <span class="text-xs font-semibold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full hidden sm:inline-block">Standar ATS</span>
           </div>
-          <span class="text-xs font-semibold text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">Standar ATS</span>
-        </div>
+          <span class="text-xs text-blue-600 font-bold group-open:hidden flex items-center gap-1">
+            <span>Buka Rumus &amp; Contoh</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </span>
+          <span class="text-xs text-slate-400 font-bold hidden group-open:flex items-center gap-1">
+            <span>Tutup Panduan</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+          </span>
+        </summary>
         
-        <p class="hidden sm:block text-xs text-slate-600 mt-2 mb-4 leading-relaxed">
-          Sistem Applicant Tracking System (ATS) dan HR profesional tidak menyukai uraian tugas pasif seperti <em>"bertanggung jawab membantu tim"</em>. Terapkan rumus <strong>Google X-Y-Z</strong>: <em>"Accomplished [X] as measured by [Y] by doing [Z]"</em>.
+        <p class="text-xs text-slate-600 mt-2.5 mb-3 leading-relaxed">
+          Sistem Applicant Tracking System (ATS) dan HR profesional mengutamakan rumus <strong>Google X-Y-Z</strong>: <em>"Accomplished [X] as measured by [Y] by doing [Z]"</em>.
         </p>
 
-        <div class="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-          <div class="p-3 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+          <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-blue-700 font-mono">S • Situation</span>
-              <span class="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-semibold">Konteks</span>
+              <span class="text-xs bg-blue-50 text-blue-600 px-1.5 py-0.2 rounded font-semibold">Konteks</span>
             </div>
-            <p class="text-xs text-slate-600 leading-snug">Jelaskan latar belakang kendala atau masalah operasional di kampus, organisasi, atau magang.</p>
+            <p class="text-xs text-slate-600 leading-snug">Latar belakang kendala atau masalah operasional di organisasi/magang.</p>
           </div>
 
-          <div class="p-3 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1">
+          <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-indigo-700 font-mono">T • Task</span>
-              <span class="text-xs bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-semibold">Tantangan</span>
+              <span class="text-xs bg-indigo-50 text-indigo-600 px-1.5 py-0.2 rounded font-semibold">Tantangan</span>
             </div>
-            <p class="text-xs text-slate-600 leading-snug">Sebutkan tugas spesifik, KPI, atau target deliverable yang dipercayakan kepada Anda.</p>
+            <p class="text-xs text-slate-600 leading-snug">Tugas spesifik, target deliverable, atau KPI yang dipercayakan.</p>
           </div>
 
-          <div class="p-3 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1">
+          <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-amber-700 font-mono">A • Action</span>
-              <span class="text-xs bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded font-semibold">Power Verbs</span>
+              <span class="text-xs bg-amber-50 text-amber-600 px-1.5 py-0.2 rounded font-semibold">Power Verbs</span>
             </div>
-            <p class="text-xs text-slate-600 leading-snug">Aksi nyata Anda menggunakan kata kerja aktif (<em>Menginisiasi, Merancang, Mengoptimalkan</em>).</p>
+            <p class="text-xs text-slate-600 leading-snug">Aksi nyata menggunakan kata kerja aktif (<em>Menginisiasi, Merancang</em>).</p>
           </div>
 
-          <div class="p-3 bg-white rounded-xl border border-slate-200/80 shadow-sm space-y-1">
+          <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-emerald-700 font-mono">R • Result</span>
-              <span class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-semibold">Angka Riil</span>
+              <span class="text-xs bg-emerald-50 text-emerald-700 px-1.5 py-0.2 rounded font-semibold">Angka Riil</span>
             </div>
-            <p class="text-xs text-slate-600 leading-snug">Hasil konkret terukur dengan metrik kuantitatif (%, rupiah, waktu, pengguna, atau efisiensi).</p>
+            <p class="text-xs text-slate-600 leading-snug">Hasil konkret kuantitatif (%, rupiah, waktu, pengguna, efisiensi).</p>
           </div>
         </div>
-      </div>
+      </details>
 
       <!-- MAIN WORKSPACE -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1416,54 +1424,13 @@
         </div>
       </div>
 
-      <!-- BANNER DUKUNGAN LANGSUNG BLAST TANPA REVIEW CV -->
-      <div class="p-3 bg-gradient-to-r from-indigo-50/90 to-blue-50/90 border border-indigo-200 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
-        <div class="flex items-center gap-2 text-indigo-950 font-medium">
-          <span class="w-2 h-2 rounded-full bg-indigo-600 shrink-0"></span>
-          <span><strong>Mau langsung blasting tanpa review CV?</strong> Cukup unggah berkas CV (PDF/Word) Anda di bawah dan pilih target recruiter langsung.</span>
+      <!-- TRUST & DELIVERY BADGE (COMPACT & REASSURING) -->
+      <div class="p-3 bg-slate-50 border border-slate-200/90 rounded-2xl flex items-center justify-between flex-wrap gap-2 text-xs">
+        <div class="flex items-center gap-2 text-slate-700 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+          <span><strong>Kirim Resmi &amp; Aman:</strong> Email dikirim langsung dari akun Anda dengan jeda alami anti-spam (45-90s) ke kontak rekrutmen terverifikasi. Bisa langsung kirim tanpa bedah CV.</span>
         </div>
-        <span class="bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-full font-bold text-xs shrink-0">Bebas & Mandiri</span>
-      </div>
-
-      <!-- BANNER BOUNDARIES KEPATUHAN HUKUM & DELIVERABILITY (Compact on Mobile) -->
-      <div class="p-3 sm:p-4 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-sm space-y-2 sm:space-y-3">
-        <div class="flex items-center justify-between flex-wrap gap-2">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">Boundaries Kepatuhan & Deliverability</span>
-            <span class="hidden sm:inline text-xs bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded-full font-mono">UU PDP No. 27/2022 & Google Policy</span>
-          </div>
-          <span class="text-xs text-emerald-300 sm:text-slate-400 font-medium">100% Anti-Spam</span>
-        </div>
-        <div class="hidden sm:grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-              <span>Email Fungsional B2B Sah</span>
-            </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Target hanya berupa email rekrutmen publik korporat (<code class="text-slate-300">recruitment@</code>, <code class="text-slate-300">careers@</code>). Bukan data pribadi staf HRD perorangan.
-            </p>
-          </div>
-          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <span>Smart Jitter Pacing (45-90s)</span>
-            </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Jeda acak antar email mematuhi batasan UU ITE Pasal 33 (anti-flooding/DoS) & regulasi Yahoo/Google Bulk Sender agar bebas blacklist.
-            </p>
-          </div>
-          <div class="p-3 bg-slate-800/80 rounded-xl border border-slate-700/60 space-y-1">
-            <div class="font-bold text-slate-200 flex items-center gap-1.5">
-              <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
-              <span>Delegated User-Level Sending</span>
-            </div>
-            <p class="text-xs text-slate-400 leading-relaxed">
-              Email dikirim langsung dari inbox Gmail pribadi kandidat dengan footer opt-out resmi sehingga skor reputasi inbox mendekati 99%.
-            </p>
-          </div>
-        </div>
+        <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold text-xs shrink-0">Bebas &amp; Langsung</span>
       </div>
 
       <!-- SUB-NAVIGATION: ANTREAN SIAP KIRIM VS PORTAL LAMARAN TERKIRIM -->
@@ -2821,23 +2788,42 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     };
 
+    /* Helper XSS Sanitizer */
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+    window.escapeHtml = escapeHtml;
+
+    // Backward-compatibility alias
+    window.openLoginModal = function() {
+      if (typeof openAuthModal === 'function') openAuthModal('login');
+    };
+
     /* Helper Universal Categories Mapper */
     function getUniversalJobCategory(job) {
       const title = (job.title || '').toLowerCase();
-      const cat = (job.category || '').toLowerCase();
       const reqs = (job.keyRequirements || []).join(' ').toLowerCase();
-      const text = title + ' ' + cat + ' ' + reqs;
 
-      if (/tax|pajak|akuntan|accounting|finance|keuangan|audit|auditor|treasury|perbankan|bank|credit|teller|kasir|pembukuan/.test(text)) {
+      // Check Ops, Retail, F&B, Hospitality, Education by title first to avoid corrupted category
+      if (/food|beverage|f&b|restaurant|barista|waiter|waitress|steward|housekeeper|hotel|hospitality|store|retail|cashier|kasir|guru|teacher|tutor|pengajar|operator|gudang|warehouse|kurir|driver|logistics|logistik|supply chain|purchasing|procurement|operasional|management trainee|mt |supervisor store|chef|cook|front office/.test(title)) {
+        return 'ops-mt';
+      }
+      if (/tax|pajak|akuntan|accounting|finance|keuangan|audit|auditor|treasury|perbankan|bank|credit|teller|pembukuan/.test(title) || /tax|pajak|akuntan|accounting|finance|keuangan/.test(reqs)) {
         return 'finance';
       }
-      if (/market|pemasaran|growth|content|konten|social media|medsos|copywrit|seo|brand|creative|campaign|pr |public relation|desain|graphic/.test(text)) {
+      if (/market|pemasaran|growth|content|konten|social media|medsos|copywrit|seo|brand|creative|campaign|pr |public relation|desain|graphic|visual merchandising/.test(title) || /marketing|pemasaran|content creator/.test(reqs)) {
         return 'marketing';
       }
-      if (/software|developer|engineer|pemrogram|frontend|backend|fullstack|data engineer|devops|qa|tester|cloud|mobile|android|ios|flutter|prompt|ai |machine learning|cyber|security|it |hardware|iot|jaringan|network|telekomunikasi|geophysicist/.test(text)) {
+      if (/software|developer|engineer|pemrogram|frontend|backend|fullstack|data engineer|devops|qa|tester|cloud|mobile|android|ios|flutter|prompt engineer|machine learning|cyber security|sysadmin|network engineer|jaringan/.test(title) || (/software|developer|frontend|backend|fullstack/.test(reqs) && !/guru|housekeeper|beverage/.test(title))) {
         return 'tech';
       }
-      if (/business|bisnis|product|produk|sales|penjualan|account executive|consultant|konsultan|analyst|commercial|partnership|b2b|procurement|tender|advisor/.test(text)) {
+      if (/business|bisnis|product|produk|sales|penjualan|account executive|consultant|konsultan|analyst|commercial|partnership|b2b|account manager/.test(title)) {
         return 'business';
       }
       return 'ops-mt';
@@ -12018,8 +12004,10 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
           };
           reader.readAsText(file);
         } else {
-          // Injeksi teks dokumen CV pelamar
-          if (textarea) textarea.value = cvPresets.freshgrad_ba.rawText;
+          // Jika berkas non-txt (PDF/Word), lampirkan berkas asli dan berikan format STAR awal jika textarea kosong
+          if (textarea && (!textarea.value || textarea.value.trim().length === 0)) {
+            textarea.value = `• Menginisiasi dan mengelola proyek berbasis ${file.name.replace(/\.[^/.]+$/, "")} bersama tim lintas fungsi yang meningkatkan efisiensi tugas sebesar 28%.\n• Menyusun dokumentasi terstruktur dan pelaporan berkala yang memangkas durasi koordinasi mingguan.\n• Menganalisis kebutuhan operasional dan mengimplementasikan solusi yang berdampak positif pada pencapaian target.`;
+          }
           runCVAnalysis();
           if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
         }
@@ -16367,16 +16355,16 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         if (req.status === 'DIPROSES') statusClass = 'bg-blue-50 text-blue-700 border-blue-200';
 
         tr.innerHTML = `
-          <td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${req.time}</td>
+          <td class="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">${escapeHtml(req.time)}</td>
           <td class="py-3 px-4">
-            <div class="font-bold text-slate-800">${req.name}</div>
-            <div class="text-slate-400 font-mono text-xs">${req.email}</div>
+            <div class="font-bold text-slate-800">${escapeHtml(req.name)}</div>
+            <div class="text-slate-400 font-mono text-xs">${escapeHtml(req.email)}</div>
           </td>
-          <td class="py-3 px-4 font-bold text-blue-900">${req.role}</td>
-          <td class="py-3 px-4 text-slate-600">${req.location}</td>
-          <td class="py-3 px-4 text-slate-500 max-w-xs truncate" title="${req.notes}">${req.notes}</td>
+          <td class="py-3 px-4 font-bold text-blue-900">${escapeHtml(req.role)}</td>
+          <td class="py-3 px-4 text-slate-600">${escapeHtml(req.location)}</td>
+          <td class="py-3 px-4 text-slate-500 max-w-xs truncate" title="${escapeHtml(req.notes)}">${escapeHtml(req.notes)}</td>
           <td class="py-3 px-4 whitespace-nowrap">
-            <span class="text-xs px-2 py-0.5 rounded-full border font-bold ${statusClass}">${req.status}</span>
+            <span class="text-xs px-2 py-0.5 rounded-full border font-bold ${statusClass}">${escapeHtml(req.status)}</span>
           </td>
           <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
             ${req.status !== 'SELESAI' ? `
@@ -16588,23 +16576,23 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
 
       tbody.innerHTML = filtered.map((tx, idx) => `
         <tr class="hover:bg-slate-50 transition">
-          <td class="py-3 px-4 font-mono font-bold text-blue-600">${tx.id}</td>
+          <td class="py-3 px-4 font-mono font-bold text-blue-600">${escapeHtml(tx.id)}</td>
           <td class="py-3 px-4">
-            <div class="font-bold text-slate-900">${tx.name}</div>
-            <div class="text-xs text-slate-400 font-mono">${tx.email}</div>
+            <div class="font-bold text-slate-900">${escapeHtml(tx.name)}</div>
+            <div class="text-xs text-slate-400 font-mono">${escapeHtml(tx.email)}</div>
           </td>
           <td class="py-3 px-4">
             <span class="inline-block px-2 py-0.5 rounded text-xs font-bold ${tx.plan.includes('VIP') ? 'bg-amber-100 text-amber-800' : tx.plan.includes('Dibantuin') ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'}">
-              ${tx.plan}
+              ${escapeHtml(tx.plan)}
             </span>
           </td>
-          <td class="py-3 px-4 text-slate-600 font-semibold">${tx.method}</td>
+          <td class="py-3 px-4 text-slate-600 font-semibold">${escapeHtml(tx.method)}</td>
           <td class="py-3 px-4 font-bold text-slate-900">Rp ${tx.amount.toLocaleString('id-ID')}</td>
-          <td class="py-3 px-4 text-slate-400 text-xs">${tx.time}</td>
+          <td class="py-3 px-4 text-slate-400 text-xs">${escapeHtml(tx.time)}</td>
           <td class="py-3 px-4">
             <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-              ${tx.status}
+              ${escapeHtml(tx.status)}
             </span>
           </td>
           <td class="py-3 px-4 text-right space-x-1">
@@ -16670,15 +16658,15 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
         <tr class="hover:bg-slate-50 transition">
           <td class="py-3 px-4">
             <div class="font-bold text-slate-900 flex items-center gap-1.5">
-              <span>${u.name}</span>
+              <span>${escapeHtml(u.name)}</span>
               ${u.status && u.status.includes('Owner') ? '<span class="text-xs bg-slate-900 text-white px-1.5 py-0.2 rounded font-mono">OWNER</span>' : ''}
             </div>
           </td>
           <td class="py-3 px-4 font-mono text-xs">
-            <div class="text-slate-700 font-semibold">${u.email}</div>
+            <div class="text-slate-700 font-semibold">${escapeHtml(u.email)}</div>
             <div class="text-xs text-indigo-600 font-bold mt-0.5 flex items-center gap-1 font-mono">
               <span class="text-slate-400 font-normal">Sandi:</span>
-              <span class="bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 text-indigo-700">${u.password || 'password123'}</span>
+              <span class="bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-100 text-indigo-700">${escapeHtml(u.password || 'password123')}</span>
             </div>
           </td>
           <td class="py-3 px-4">

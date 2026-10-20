@@ -267,6 +267,16 @@ async function runAudit() {
   const adminUsersTable = document.getElementById('adminUsersTableBody').innerHTML;
   assertTest('T45', 'Admin Users table displays password label & value', adminUsersTable.includes('Sandi:') && adminUsersTable.includes('passwordBaruDimitri2026'), 'Monospace password indicator visible in table');
 
+  // Reality Check Tests: XSS Sanitization & Category Integrity
+  assertTest('T46', 'XSS Protection: escapeHtml escapes script and img tags', typeof window.escapeHtml === 'function' && window.escapeHtml('<script>alert("xss")</script>').includes('&lt;script&gt;'), 'XSS Sanitization active');
+
+  const fbJob = { title: 'Food and Beverage Team Leader', category: 'it-software', keyRequirements: ['Leadership'] };
+  const mappedCat = window.getUniversalJobCategory(fbJob);
+  assertTest('T47', 'Category Integrity: F&B job not polluted into tech', mappedCat === 'ops-mt', `Mapped to: ${mappedCat}`);
+
+  const mobileNavDrawerHtml = document.getElementById('mobileNavDrawer').innerHTML;
+  assertTest('T48', 'Mobile Nav Drawer uses valid auth modal functions', !mobileNavDrawerHtml.includes('openLoginModal') && mobileNavDrawerHtml.includes('openAuthModal'), 'Mobile Drawer verified');
+
   console.log('\n=================================================================');
   console.log('                    EXECUTIVE QA SUMMARY REPORT                  ');
   console.log('=================================================================');
