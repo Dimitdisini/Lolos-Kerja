@@ -124,7 +124,7 @@
       --sab: env(safe-area-inset-bottom, 0px);
     }
     .pb-safe {
-      padding-bottom: calc(4.75rem + var(--sab));
+      padding-bottom: calc(6rem + var(--sab));
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -342,7 +342,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Lolos Kerja</span>
-            <span class="text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.2 rounded-full">AI Platform</span>
+            <span class="hidden sm:inline-block text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.2 rounded-full">AI Platform</span>
           </div>
           <p class="text-[11px] text-slate-400 hidden sm:block">Akselerasi Karir Mahasiswa & Fresh Graduate</p>
         </div>
@@ -419,10 +419,10 @@
 
         <!-- Dynamic Auth Navbar Area (Managed by updateUserNavbarUI) -->
         <div id="userLoggedOutView" class="flex items-center gap-2">
-          <button type="button" onclick="openAuthModal('login')" class="text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition cursor-pointer">
+          <button type="button" onclick="openAuthModal('login')" class="hidden sm:block text-xs font-bold text-slate-700 hover:text-blue-600 px-3 py-2 rounded-xl hover:bg-slate-100 transition cursor-pointer">
             Masuk
           </button>
-          <button type="button" onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer">
+          <button type="button" onclick="openAuthModal('register')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer shrink-0">
             Coba Gratis
           </button>
         </div>
@@ -487,40 +487,42 @@
         <div class="hero-glow-1"></div>
         <div class="hero-glow-2"></div>
 
-        <div class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50/80 px-4 py-1.5 text-xs text-blue-700 shadow-sm backdrop-blur-sm">
-          <span class="relative flex h-2 w-2">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
-          </span>
-          <span class="font-semibold">Karier Impian Fresh Graduate • Bebas Ghosting HRD</span>
+        <div class="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50/90 px-3.5 py-1 text-xs text-blue-700 shadow-2xs">
+          <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+          <span class="font-bold text-[11px] sm:text-xs">Platform Karir Fresh Graduate &bull; Bebas Ghosting</span>
         </div>
 
-        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-slate-900 max-w-3xl mx-auto">
-          Capek Kirim Ratusan CV Tanpa Pernah Ada Panggilan?<br>
+        <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 max-w-3xl mx-auto leading-tight px-1">
+          Capek Kirim CV Tanpa Panggilan?<br>
           <span class="bg-gradient-to-r from-blue-600 via-indigo-600 to-amber-600 bg-clip-text text-transparent">
-            Bukan Kamu yang Kurang, Cara Lamarmu yang Perlu Dirombak.
+            Bukan Kamu yang Kurang, Tapi Cara Lamarmu.
           </span>
         </h1>
 
-        <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-          94% CV gugur di sistem screening ATS sebelum sempat disentuh HRD. Lolos Kerja mendampingimu dari nol: menyulap draf pengalaman minim jadi prestasi terukur berformula STAR Google X-Y-Z, melatih simulasi wawancara suara sampai hilang rasa grogi, hingga mendistribusikan lamaran ke HRD perusahaan impian.
+        <p class="text-xs sm:text-sm md:text-base text-slate-600 max-w-xl mx-auto leading-relaxed px-2">
+          94% CV fresh graduate gugur di screening ATS. Lolos Kerja membantumu merombak CV berformula STAR Google, melatih wawancara suara, dan mengirimkannya ke HRD terverifikasi.
         </p>
 
-        <!-- HERO FAST INPUT BOX -->
-        <div class="max-w-2xl mx-auto w-full pt-2">
-          <p class="mb-2.5 text-center text-sm font-semibold text-blue-600">Mulai langsung tanpa biaya:</p>
-          <div class="relative flex items-center rounded-2xl border-2 border-blue-500/40 bg-white shadow-xl shadow-blue-500/10 focus-within:border-blue-600 transition-all p-1.5 sm:p-2">
-            <input type="text" id="heroQuickInput" placeholder="Mau ngelamar posisi apa? Ketik di sini... (contoh: Junior Business Analyst, Digital Marketing)" class="flex-1 bg-transparent px-4 py-3 sm:py-4 text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none">
-            <button onclick="handleHeroQuickAction()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 sm:px-6 py-3 sm:py-4 rounded-xl transition flex items-center gap-2 text-sm shrink-0 shadow-md">
-              <span>Audit Peluangmu Gratis</span>
+        <!-- HERO FAST INPUT BOX (Mobile Stacked & Desktop Inline) -->
+        <div class="max-w-xl mx-auto w-full pt-2 px-1">
+          <div class="flex flex-col sm:flex-row gap-2 sm:gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-white sm:border-2 sm:border-blue-500/30 shadow-md sm:shadow-lg focus-within:border-blue-600 transition-all border border-slate-200 sm:border-solid">
+            <input type="text" id="heroQuickInput" placeholder="Ketik posisi impianmu (misal: Business Analyst)..." class="w-full bg-slate-50 sm:bg-transparent rounded-xl sm:rounded-none px-4 py-3.5 sm:py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none border border-slate-200/80 sm:border-0">
+            <button type="button" onclick="handleHeroQuickAction()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3.5 sm:py-3 rounded-xl transition flex items-center justify-center gap-2 text-sm shrink-0 shadow-md shadow-blue-500/20 cursor-pointer active:scale-98">
+              <span>Audit Peluang Karir</span>
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
           </div>
-          <p class="mt-2.5 text-xs text-slate-500">Daftar gratis 30 detik • Tanpa kartu kredit • Mulai dari Rp 0</p>
+          <div class="flex items-center justify-center gap-2 sm:gap-3 mt-2.5 text-[11px] text-slate-400 font-medium flex-wrap">
+            <span>Uji coba gratis</span>
+            <span class="text-slate-300">&bull;</span>
+            <span>Tanpa kartu kredit</span>
+            <span class="text-slate-300">&bull;</span>
+            <span>Mulai dari Rp 0</span>
+          </div>
         </div>
 
         <!-- Powered By Model AI Pill Tags -->
-        <div class="pt-2 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
+        <div class="hidden sm:flex pt-2 flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
           <span class="font-medium mr-1">Didukung oleh:</span>
           <span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-full font-semibold text-slate-700">Formula STAR Google X-Y-Z</span>
           <span class="bg-slate-100 border border-slate-200 px-3 py-1 rounded-full font-semibold text-slate-700">Harvard ATS Standard</span>
@@ -533,7 +535,7 @@
           <div class="grid grid-cols-2 md:grid-cols-4 gap-6 py-4 max-w-4xl mx-auto">
             <div class="text-center">
               <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono">94%</div>
-              <div class="text-xs text-slate-500 mt-0.5">Kelulusan Seleksi ATS</div>
+              <div class="text-xs text-slate-500 mt-0.5 font-medium">Lolos Screening ATS</div>
             </div>
             <div class="text-center">
               <div class="text-2xl sm:text-3xl font-extrabold text-blue-600 font-mono">400+</div>
@@ -541,11 +543,11 @@
             </div>
             <div class="text-center">
               <div class="text-2xl sm:text-3xl font-extrabold text-amber-600 font-mono">Dual-Score</div>
-              <div class="text-xs text-slate-500 mt-0.5">Relevansi & Delivery Wawancara</div>
+              <div class="text-xs text-slate-500 mt-0.5 font-medium">Dual-Score Interview</div>
             </div>
             <div class="text-center">
               <div class="text-2xl sm:text-3xl font-extrabold text-emerald-600 font-mono">Smart Drip</div>
-              <div class="text-xs text-slate-500 mt-0.5">Auto-Blast Email Anti-Spam</div>
+              <div class="text-xs text-slate-500 mt-0.5 font-medium">Auto-Blast HRD</div>
             </div>
           </div>
         </div>
@@ -564,28 +566,28 @@
           <div class="dospem-card p-6 space-y-3 cursor-pointer hover:border-blue-400 group apple-card-hover" onclick="switchTab('cv-module')">
             <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold group-hover:scale-105 transition-transform">1</div>
             <h3 class="text-base font-bold text-slate-900">Bedah CV & Harvard ATS</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">Ubah kalimat pasif tanpa angka menjadi pencapaian berformula STAR Google X-Y-Z yang terbaca 100% oleh parser ATS.</p>
+            <p class="text-xs text-slate-600 leading-relaxed">Ubah kalimat pasif jadi formula STAR Google berbobot angka yang terbaca 100% oleh parser ATS.</p>
             <span class="text-xs font-bold text-blue-600 inline-flex items-center gap-1">Buka Modul 1 &rarr;</span>
           </div>
 
           <div class="dospem-card p-6 space-y-3 cursor-pointer hover:border-amber-400 group apple-card-hover" onclick="switchTab('interview-module')">
             <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 font-bold group-hover:scale-105 transition-transform">2</div>
             <h3 class="text-base font-bold text-slate-900">Simulasi Wawancara Suara</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">Latihan bicara langsung. Dapatkan skor Relevansi STAR dan audit transparan filler words ('aaa/eee/kayak') pengikis grogi.</p>
+            <p class="text-xs text-slate-600 leading-relaxed">Latihan bicara suara riil dengan penilaian Relevansi STAR & audit kata gumam ('aaa/eee') pengikis grogi.</p>
             <span class="text-xs font-bold text-amber-600 inline-flex items-center gap-1">Buka Modul 2 &rarr;</span>
           </div>
 
           <div class="dospem-card p-6 space-y-3 cursor-pointer hover:border-emerald-400 group apple-card-hover" onclick="switchTab('jobs-module')">
             <div class="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-bold group-hover:scale-105 transition-transform">3</div>
             <h3 class="text-base font-bold text-slate-900">Katalog Loker Terkurasi</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">400+ lowongan kerja pasar universal terverifikasi aktif (Business, Tech, Marketing, Finance, Ops/MT) dengan filter Apple UI.</p>
+            <p class="text-xs text-slate-600 leading-relaxed">400+ loker aktif terkurasi semua jurusan (Business, Tech, Marketing, Finance, MT) siap lamar.</p>
             <span class="text-xs font-bold text-emerald-600 inline-flex items-center gap-1">Buka Modul 3 &rarr;</span>
           </div>
 
           <div class="dospem-card p-6 space-y-3 cursor-pointer hover:border-indigo-400 group apple-card-hover" onclick="switchTab('blast-module')">
             <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 font-bold group-hover:scale-105 transition-transform">4</div>
             <h3 class="text-base font-bold text-slate-900">Smart Drip Auto-Blast</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">Kirim lamaran personal beserta lampiran PDF CV Harvard teroptimasi dengan jeda cerdas (45-90s) langsung ke Inbox HRD.</p>
+            <p class="text-xs text-slate-600 leading-relaxed">Kirim lamaran personal dan lampiran CV Harvard PDF dengan jeda cerdas langsung ke inbox HRD Whitelist.</p>
             <span class="text-xs font-bold text-indigo-600 inline-flex items-center gap-1">Buka Modul 4 &rarr;</span>
           </div>
 
@@ -593,13 +595,41 @@
       </div>
 
       <!-- PERBANDINGAN CHATGPT VS LOLOS KERJA -->
-      <div class="dospem-card p-6 sm:p-8 space-y-6">
+      <div class="dospem-card p-5 sm:p-8 space-y-5">
         <div class="text-center max-w-2xl mx-auto space-y-1">
           <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Perbandingan Solusi</span>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">ChatGPT Sering Halusinasi.<br>Lolos Kerja Bikin Kamu Dipanggil HR.</h2>
+          <h2 class="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">ChatGPT Sering Halusinasi.<br>Lolos Kerja Bikin Kamu Dipanggil HR.</h2>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- Mobile Clean Comparison View (sm:hidden) -->
+        <div class="sm:hidden space-y-2.5">
+          <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2 text-xs">
+            <div class="font-bold text-blue-900 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <span>Format Standar ATS Harvard 1-Kolom</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed pl-5">Audit skor 0-100 dan ekspor PDF tanpa risiko rusak di sistem ATS (beda dengan format teks polos ChatGPT).</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2 text-xs">
+            <div class="font-bold text-blue-900 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <span>Simulasi Wawancara Suara Riil</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed pl-5">Melatih tempo bicara dan mendeteksi kata gumam 'aaa/eee', bukan cuma mengetik teks.</p>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2 text-xs">
+            <div class="font-bold text-blue-900 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+              <span>Auto-Blast Langsung ke HRD Whitelist</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed pl-5">Pesan terkirim ke personil recruiter resmi dengan jeda aman anti-spam tanpa copy-paste manual.</p>
+          </div>
+        </div>
+
+        <!-- Desktop Full Table (hidden sm:block) -->
+        <div class="hidden sm:block overflow-x-auto">
           <table class="w-full text-xs sm:text-sm text-left border-collapse">
             <thead>
               <tr class="border-b border-slate-200 text-slate-500 uppercase text-[11px]">
