@@ -2,7 +2,6 @@
   "name": "lolos-kerja",
   "version": "2.2.0",
   "description": "Lolos Kerja - AI Career Copilot for Indonesian Fresh Graduates",
-  "main": "index.html",
   "type": "module",
   "scripts": {
     "dev": "vite",

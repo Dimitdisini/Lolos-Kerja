@@ -4,6 +4,9 @@ Thumbs.db
 *.log
 .vercel
 
+# Build Output
+dist/
+
 # Node
 node_modules/
 
