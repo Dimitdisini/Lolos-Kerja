@@ -51,11 +51,20 @@ ${sanitizeUserData(bulletText.trim())}`;
       temperature: 0.1
     });
 
-    return res.status(200).json({
-      success: true,
+    const item = {
       original: bulletText.trim(),
       suggested: result.suggested,
+      needsInput: result.needs_input || null,
       needs_input: result.needs_input || null
+    };
+
+    return res.status(200).json({
+      success: true,
+      original: item.original,
+      suggested: item.suggested,
+      needs_input: item.needs_input,
+      needsInput: item.needsInput,
+      items: [item]
     });
   } catch (err) {
     console.error('CV Rewrite Error:', err);

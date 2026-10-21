@@ -5,7 +5,7 @@
  */
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { verifyAuth } from '../_lib/auth.js';
+import { verifyAuth, getSupabaseAdmin } from '../_lib/auth.js';
 import { isFeatureAllowed } from '../_lib/limits.js';
 import { applyRateLimit } from '../_lib/rateLimit.js';
 
@@ -22,11 +22,29 @@ export default async function handler(req, res) {
   const userTier = authSession ? authSession.effectiveTier : 'FREE';
   const shouldWatermark = !isFeatureAllowed(userTier, 'clean_pdf_export');
 
-  const { masterProfile } = req.body || {};
+  let { masterProfile, cvId, variantId, returnJson = false } = req.body || {};
+
+  if (!masterProfile && cvId && authSession) {
+    try {
+      const supabase = getSupabaseAdmin();
+      const { data: cvDoc } = await supabase
+        .from('cv_documents')
+        .select('master_profile')
+        .eq('id', cvId)
+        .eq('user_id', authSession.user.id)
+        .maybeSingle();
+
+      if (cvDoc?.master_profile) {
+        masterProfile = cvDoc.master_profile;
+      }
+    } catch (fetchErr) {
+      console.warn('Gagal mengambil cv_documents:', fetchErr.message);
+    }
+  }
 
   if (!masterProfile || typeof masterProfile !== 'object') {
     return res.status(400).json({
-      error: 'Data masterProfile diperlukan untuk menghasilkan PDF Harvard ATS.'
+      error: 'Data masterProfile atau cvId yang valid diperlukan untuk menghasilkan PDF Harvard ATS.'
     });
   }
 
@@ -250,6 +268,38 @@ export default async function handler(req, res) {
     }
 
     const pdfBytes = await pdfDoc.save();
+
+    if (returnJson || req.headers['accept']?.includes('application/json')) {
+      const fileName = `CV_${(masterProfile.identity?.name || 'Kandidat').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      let storagePath = null;
+      let signedUrl = null;
+
+      if (authSession) {
+        try {
+          const supabase = getSupabaseAdmin();
+          storagePath = `cv-pdf/${authSession.user.id}/${Date.now()}_${fileName}`;
+          const { error: upErr } = await supabase.storage
+            .from('cv-pdf')
+            .upload(storagePath, Buffer.from(pdfBytes), { contentType: 'application/pdf', upsert: true });
+
+          if (!upErr) {
+            const { data: signData } = await supabase.storage.from('cv-pdf').createSignedUrl(storagePath, 86400 * 7);
+            signedUrl = signData?.signedUrl;
+          }
+        } catch (stErr) {
+          console.warn('Storage upload notice:', stErr.message);
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        url: signedUrl,
+        path: storagePath,
+        pages: pdfDoc.getPageCount(),
+        size: pdfBytes.length,
+        base64: Buffer.from(pdfBytes).toString('base64')
+      });
+    }
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="CV_Harvard_ATS_Lolos_Kerja.pdf"');

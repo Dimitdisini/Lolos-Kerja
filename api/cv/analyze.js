@@ -160,12 +160,21 @@ ${sanitizeUserData(rawText)}`;
 
     return res.status(200).json({
       success: true,
+      cvId: documentId,
       document_id: documentId,
+      atsScore: result.ats_score,
       ats_score: result.ats_score,
+      subScores: result.sub_scores,
       sub_scores: result.sub_scores,
+      feedbackSummary: result.feedback_summary,
       feedback_summary: result.feedback_summary,
       suggestions: result.suggestions,
-      master_profile: result.master_profile
+      masterProfile: result.master_profile,
+      master_profile: result.master_profile,
+      report: {
+        criteria: result.sub_scores || {},
+        suggestions: result.suggestions || []
+      }
     });
   } catch (err) {
     console.error('CV Analyze Error:', err);
