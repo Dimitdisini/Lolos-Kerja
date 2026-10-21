@@ -1,12 +1,30 @@
 /**
  * /api/blast/plan.js: Daily Blast Queue Planning & Tailored Cover Letter Synthesis
- * Node.js ESM Vercel Serverless Function
+ * Aligned with Section 3.1 & B8 fix (accurate WIB day start)
+ * Node.js ESM format
  */
 
 import { requireAuth, getSupabaseAdmin } from '../_lib/auth.js';
 import { callJson, sanitizeUserData } from '../_lib/llm.js';
 import { checkQuota } from '../_lib/quota.js';
 import { applyRateLimit } from '../_lib/rateLimit.js';
+
+/**
+ * Menghitung batas awal hari WIB secara akurat menggunakan Intl timeZone (B8)
+ */
+export function getWibDayStartIso() {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+  const parts = formatter.formatToParts(new Date());
+  const year = parts.find(p => p.type === 'year').value;
+  const month = parts.find(p => p.type === 'month').value;
+  const day = parts.find(p => p.type === 'day').value;
+  return new Date(`${year}-${month}-${day}T00:00:00+07:00`).toISOString();
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -32,17 +50,14 @@ export default async function handler(req, res) {
     const userId = authSession.user.id;
     const dailyLimit = authSession.profile.daily_blast_limit || 10;
 
-    // 1. Cek berapa lamaran yang sudah direncanakan/dikirim hari ini
-    const startOfDayWib = new Date();
-    startOfDayWib.setHours(startOfDayWib.getHours() + 7); // WIB offset
-    startOfDayWib.setUTCHours(0, 0, 0, 0);
-    startOfDayWib.setHours(startOfDayWib.getHours() - 7);
+    // 1. Cek berapa lamaran yang sudah direncanakan/dikirim hari ini (WIB akurat - B8)
+    const startOfDayWibIso = getWibDayStartIso();
 
     const { count: sentTodayCount } = await supabase
       .from('applications')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
-      .gte('created_at', startOfDayWib.toISOString());
+      .gte('created_at', startOfDayWibIso);
 
     const remainingSlots = Math.max(0, dailyLimit - (sentTodayCount || 0));
     if (remainingSlots <= 0) {
@@ -54,14 +69,14 @@ export default async function handler(req, res) {
     // 2. Ambil master profile pengguna
     const { data: cvDoc } = await supabase
       .from('cv_documents')
-      .select('master_profile')
+      .select('id, master_profile, parsed_data, pdf_path')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    const candidateProfile = cvDoc?.master_profile || {};
-    const candidateName = candidateProfile.identity?.name || authSession.profile.full_name || 'Kandidat Pelamar';
+    const candidateProfile = cvDoc?.master_profile || cvDoc?.parsed_data || {};
+    const candidateName = candidateProfile.identity?.fullName || candidateProfile.identity?.name || authSession.profile.full_name || 'Kandidat Pelamar';
 
     // 3. Ambil daftar perusahaan yang sudah pernah dikirimi email oleh user ini dalam 30 hari
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -71,117 +86,108 @@ export default async function handler(req, res) {
       .eq('user_id', userId)
       .gte('created_at', thirtyDaysAgo);
 
-    const appliedCompanies = new Set((recentApps || []).map(a => a.company.toLowerCase()));
-    const appliedEmails = new Set((recentApps || []).map(a => a.to_email.toLowerCase()));
+    const contactedCompanies = new Set((recentApps || []).map(a => (a.company || '').toLowerCase().trim()));
+    const contactedEmails = new Set((recentApps || []).map(a => (a.to_email || '').toLowerCase().trim()));
 
-    // 4. Ambil email blocklist
-    const { data: blocklist } = await supabase
-      .from('email_blocklist')
-      .select('email');
-    const blockedEmails = new Set((blocklist || []).map(b => b.email.toLowerCase()));
-
-    // 5. Cari loker target yang memenuhi syarat
-    const { data: targetJobs, error: jobErr } = await supabase
+    // 4. Ambil lowongan yang punya email resmi valid dan belum pernah dikontak
+    const { data: availableJobs, error: jobsErr } = await supabase
       .from('jobs')
-      .select('id, title, company, apply_email, description, skills')
-      .eq('is_active', true)
+      .select('id, company, title, apply_email, email_kind, email_source_url, description, requirements')
       .eq('apply_via', 'email')
-      .eq('email_valid', true)
-      .gt('expires_at', new Date().toISOString())
+      .eq('is_active', true)
+      .not('apply_email', 'is', null)
       .limit(50);
 
-    if (jobErr || !targetJobs || targetJobs.length === 0) {
-      return res.status(404).json({
-        error: 'Tidak ditemukan loker aktif berbasis email yang tersedia saat ini.'
-      });
-    }
+    if (jobsErr) throw jobsErr;
 
-    // Filter deduplikasi perusahaan & blocklist
-    const validJobs = targetJobs.filter(job => {
-      if (!job.apply_email) return false;
-      const emailLower = job.apply_email.toLowerCase();
-      const compLower = job.company.toLowerCase();
-      if (blockedEmails.has(emailLower)) return false;
-      if (appliedEmails.has(emailLower)) return false;
-      if (appliedCompanies.has(compLower)) return false;
-      return true;
+    // Filter kandidat lowongan
+    const eligibleJobs = (availableJobs || []).filter(job => {
+      const compKey = (job.company || '').toLowerCase().trim();
+      const emailKey = (job.apply_email || '').toLowerCase().trim();
+      return !contactedCompanies.has(compKey) && !contactedEmails.has(emailKey);
     }).slice(0, remainingSlots);
 
-    if (validJobs.length === 0) {
+    if (eligibleJobs.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'Semua lowongan yang cocok sudah ada di antrean atau telah dilamar dalam 30 hari terakhir.',
-        planned: []
+        message: 'Tidak ada kontak rekruter baru yang tersedia untuk antrean hari ini.',
+        items: [],
+        remainingToday: remainingSlots
       });
     }
 
-    // 6. Buat Cover Letter personal untuk setiap loker target
-    const plannedApplications = [];
+    const plannedItems = [];
 
-    for (const job of validJobs) {
-      let subject = `Lamaran Pekerjaan: ${job.title} - ${candidateName}`;
-      let body = `Yth. Tim Rekrutmen ${job.company},\n\nPerkenalkan saya ${candidateName}. Saya bermaksud mengajukan lamaran untuk posisi ${job.title}.\n\nTerlampir resume lengkap saya untuk bahan pertimbangan.\n\nSalam hormat,\n${candidateName}`;
+    // 5. Susun Cover Letter Personal untuk Tiap Lowongan
+    for (const job of eligibleJobs) {
+      const coverLetterPrompt = `Tulis email lamaran kerja formal (120 - 180 kata) kepada tim rekrutmen ${job.company} untuk posisi "${job.title}".
+Gunakan HANYA 2-3 fakta pengalaman relevan dari kandidat:
+${sanitizeUserData(JSON.stringify(candidateProfile))}
 
-      try {
-        const coverPromptSystem = `Tulis email lamaran 120-180 kata kepada tim rekrutmen perusahaan itu untuk posisi itu, memakai 2-3 fakta paling relevan dari master_profile.
-Nada sopan dan lugas, tanpa klise, tanpa klaim palsu yang tidak ada di profil. Akhiri dengan ajakan singkat wawancara dan sebutkan CV terlampir.
-Kembalikan JSON: {"subject": string, "body": string}`;
+Catatan tambahan dari kandidat: "${customNotes}"
 
-        const coverPromptUser = `Perusahaan: ${job.company}
-Posisi: ${job.title}
-Profil Kandidat: ${JSON.stringify(candidateProfile)}
-Catatan Pengguna: ${customNotes}`;
+ATURAN KETAT:
+1. Nada sopan, profesional, dan lugas.
+2. Dilarang mengarang klaim atau angka di luar profil kandidat.
+3. Sebutkan bahwa Curriculum Vitae lengkap terlampir pada email.
+4. Akhiri dengan ajakan wawancara singkat.
 
-        const llmResult = await callJson({
-          model: 'strong',
-          system: coverPromptSystem,
-          user: coverPromptUser,
-          maxTokens: 600
+Kembalikan format JSON:
+{
+  "subject": "Lamaran: [Judul Posisi] - [Nama Lengkap] (Fresh Graduate)",
+  "body": "Isi lengkap email..."
+}`;
+
+      const coverLetterResult = await callJson({
+        model: 'strong',
+        system: 'Anda adalah Senior Career Consultant standar HR BUMN & Multinasional.',
+        user: coverLetterPrompt,
+        maxTokens: 500,
+        temperature: 0.2
+      });
+
+      // 6. Buat entri applications berstatus 'queued'
+      const { data: newApp, error: appErr } = await supabase
+        .from('applications')
+        .insert({
+          user_id: userId,
+          job_id: job.id,
+          company: job.company,
+          position: job.title,
+          to_email: job.apply_email.toLowerCase().trim(),
+          subject: coverLetterResult.subject,
+          body: coverLetterResult.body,
+          status: 'queued',
+          approved: false,
+          attachment_path: cvDoc?.pdf_path || null,
+          attachment_name: `CV_${candidateName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+        })
+        .select('id, company, position, to_email, subject, body, status')
+        .single();
+
+      if (!appErr && newApp) {
+        plannedItems.push({
+          applicationId: newApp.id,
+          company: newApp.company,
+          position: newApp.position,
+          toEmail: newApp.to_email,
+          emailKind: job.email_kind || 'recruiting',
+          subject: newApp.subject,
+          body: newApp.body
         });
-
-        if (llmResult?.subject && llmResult?.body) {
-          subject = llmResult.subject;
-          body = llmResult.body;
-        }
-      } catch (err) {
-        console.warn('Fallback standard cover letter due to LLM error:', err.message);
       }
-
-      plannedApplications.push({
-        user_id: userId,
-        job_id: job.id,
-        company: job.company,
-        position: job.title,
-        to_email: job.apply_email,
-        subject,
-        body,
-        cv_variant_id: cvVariantId || null,
-        status: 'queued',
-        approved: false
-      });
-    }
-
-    // 7. Simpan rencana ke tabel applications
-    const { data: insertedApps, error: insertErr } = await supabase
-      .from('applications')
-      .insert(plannedApplications)
-      .select('id, company, position, to_email, subject, body, status, approved, created_at');
-
-    if (insertErr) {
-      console.error('Insert Applications Error:', insertErr);
-      return res.status(500).json({ error: 'Gagal menyimpan rencana antrean blast.' });
     }
 
     return res.status(200).json({
       success: true,
-      count: insertedApps.length,
-      remainingDailyLimit: remainingSlots - insertedApps.length,
-      applications: insertedApps
+      items: plannedItems,
+      plannedCount: plannedItems.length,
+      remainingToday: remainingSlots - plannedItems.length
     });
   } catch (err) {
-    console.error('Blast Plan Handler Error:', err);
+    console.error('[Blast Plan Error]:', err);
     return res.status(500).json({
-      error: 'Terjadi kesalahan sistem saat merencanakan blast email.',
+      error: 'Gagal menyusun antrean harian Auto-Blast.',
       details: err.message
     });
   }
