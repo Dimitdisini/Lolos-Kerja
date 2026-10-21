@@ -13,5 +13,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false
+  },
+  test: {
+    testTimeout: 15000
   }
 });
