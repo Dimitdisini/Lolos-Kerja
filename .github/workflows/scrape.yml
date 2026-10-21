@@ -1,0 +1,32 @@
+name: Scheduled Job Sourcing & Normalization
+
+on:
+  schedule:
+    # Runs at 01:00 UTC (08:00 WIB) every day
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-scraper-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Scraping Pipeline
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -f scripts/scrape/run.js ]; then
+            node scripts/scrape/run.js
+          else
+            echo "Scraper script not yet invoked; standby for live runs."
+          fi

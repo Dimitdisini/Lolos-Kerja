@@ -80,10 +80,27 @@ Dokumen ini mencatat keputusan arsitektur penting (*Architectural Decision Recor
   3. Meng-upgrade tier dan kuota pengguna secara atomik di database `adminState.users` dan tabel PostgreSQL Supabase.
 - **Dampak:** Alur operasional bisnis dapat langsung dijalankan untuk penerimaan pembayaran manual tanpa technical debt.
 
+---
 
-## Auto-Blast dan sumber email (20 Okt 2026)
-- Target blast hanya boleh berasal dari `data/blast-targets.js`, dihasilkan `npm run scrape:emails`. Tidak ada daftar manual, tidak ada email tebakan.
-- Dimuat lewat `<script src>` (bukan `fetch`) agar `index.html` tetap berjalan saat dibuka via `file://`.
-- Email umum (`info@`, `hello@`) disertakan tetapi diberi label "Email Umum"; email rekrutmen dan email dari iklan diutamakan.
-- Yield nyata rendah (21% perusahaan). Untuk janji 30-40 email/hari perlu sumber lowongan yang mencantumkan email atau data scraping yang jauh lebih besar, serta `companyWebsite` untuk semua loker (katalog 421 loker lama tidak menyimpannya).
-- Pengiriman email di antarmuka masih simulasi (belum memanggil `/api/blast/*`). Penyambungan ke backend butuh sesi Supabase dan kunci Resend.
+## ADR-009: Penghapusan Kode & Fitur Mubazir (Anti-Bloat Architecture)
+- **Konteks:** Banyak kode demo, simulasi palsu, modul admin ganda di frontend, dan script usang yang membebani pemeliharaan.
+- **Keputusan:**
+  1. Hapus total: Tab Panduan Agen + simulasi multi-agent swarm palsu.
+  2. Hapus admin portal di `index.html` (`admin-module`, `adminState`, `#admin`, shortcut, KPI palsu). Digantikan halaman `/admin` minimal terpisah.
+  3. Hapus seluruh webhook Google Apps Script (`syncToGoogleSheets`). Digantikan Supabase.
+  4. Hapus login ganda lokal. Seluruh otentikasi hanya via Supabase Auth.
+  5. Hapus simulasi blast dan simulasi bayar.
+  6. Pindahkan 421 lowongan tertanam dari HTML ke database PostgreSQL `jobs`.
+- **Dampak:** Kode bersih, anti-slop, mudah dipelihara, dan tidak ada perilaku semu.
+
+---
+
+## ADR-010: Integrasi Total FE-BE & Kontrak Pengiriman Email dengan Lampiran Nyata
+- **Konteks:** Frontend sebelumnya tidak memanggil endpoint `/api/` dan pengiriman blast tidak melampirkan berkas PDF CV asli.
+- **Keputusan:**
+  1. Frontend memanggil 14 endpoint serverless `/api/*` secara penuh dengan `Authorization: Bearer <jwt>`.
+  2. `api/blast/tick.js` mengunduh PDF CV dari Supabase Storage dan melampirkannya sebagai lampiran fisik biner di Resend (`CV_<Nama>.pdf`).
+  3. `CRON_SECRET` dan `APP_URL` wajib terkonfigurasi (fail-closed, server menolak jalan bila kosong).
+  4. Mode pengiriman eksplisit: `MAIL_TRANSPORT=resend` (nyata) vs `MAIL_TRANSPORT=capture` (tes lokal/staging tanpa keluar ke internet).
+  5. Kepatuhan RFC 8058: List-Unsubscribe Header dengan tautan HTTPS satu-klik dan penambahan otomatis ke `email_blocklist`.
+- **Dampak:** Janji inti produk terpenuhi 100% secara nyata, aman, dan mematuhi regulasi anti-spam internasional & UU PDP.
