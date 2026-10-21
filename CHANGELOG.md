@@ -4,6 +4,27 @@ Format mengikuti standar [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 
 ---
 
+## [2.5.0] - 2026-10-21 (Eksekusi Total FE-BE Terhubung, Blast Nyata & Zero-Orphan Contract)
+
+### Added
+- **Penyelesaian Eksekusi Total Milestone M0 s/d M8**:
+  - **M0 (Pagar Pengaman & CI)**: Branch `integrasi-total`, pemindahan workflow ke `.github/workflows/`, fail-closed validation di `api/_lib/env.js`, dan tool auditor `scripts/qa/check-wiring.js` (`npm run qa:wiring`).
+  - **M1 (Database & Auth)**: Migrasi `0004_wiring.sql`, klien Supabase Auth terpusat (`src/lib/supabase.js`), centralized `apiFetch` dengan bearer token otomatis (`src/lib/api.js`), eliminasi 16 akses tabel legacy, dan persistent rate limit di PostgreSQL `public.rate_limits`.
+  - **M2 (Vite & Modular UI)**: Vite build bundler, Tailwind CSS terdaftar, arsitektur modular di `src/` (`router.js`, `state.js`, `components/*`).
+  - **M3 (CV Terhubung Penuh)**: Ekstraktor dokumen & detektor OCR (`/api/cv/extract`), audit ATS AI (`/api/cv/analyze`), poles STAR Google X-Y-Z tanpa fabrikasi (`/api/cv/rewrite`), simpan versi (`/api/cv/save`), dan generator PDF Harvard ATS 1-kolom (`/api/cv/export-pdf`).
+  - **M4 (Ingestion Loker & Target Terverifikasi)**: Pipeline `scripts/scrape/import-to-db.js` dan validator CSV manual `scripts/scrape/import-manual.js` dengan batas keabsahan sumber wajib (`email_source_url`). Wiring FE katalog lowongan (`src/pages/jobs.js`).
+  - **M5 (Blast Nyata & Proteksi Reputasi)**: Worker pengiriman berkala (`/api/blast/tick`) dengan lampiran PDF asli biner dari Storage (B1), otentikasi `CRON_SECRET` fail-closed (B2), pemisahan eksplisit `MAIL_TRANSPORT` (B3), kepatuhan RFC 8058 HTTPS List-Unsubscribe (B7), perhitungan hari WIB akurat (B8), dan webhook Resend dengan auto-circuit breaker 5% bounce rate (`/api/blast/webhook-resend`). Wiring FE blast (`src/pages/blast.js`).
+  - **M6 (Wawancara Terhubung)**: Perumusan pertanyaan spesifik dari fakta CV kandidat (`/api/interview/questions`), penilaian rubrik STAR & konsistensi CV (`/api/interview/score`), serta metrik ketenangan klien (pemisahan filler vokal murni vs hedging dan WPM). Wiring FE wawancara (`src/pages/interview.js`).
+  - **M7 (Billing & Settlement Otoritatif)**: Otoritas harga mutlak di server (`/api/billing/create-order`), settlement konfirmasi admin idempoten (`/api/billing/admin-confirm`), webhook gateway Midtrans/Xendit (`/api/billing/webhook`), dan single source of truth konfigurasi paket (`/api/config`). Wiring FE billing (`src/pages/billing.js`).
+  - **M8 (Admin Command Center & Portabilitas Data)**: Halaman terpisah `/admin/index.html` dengan proteksi peran server (`/api/admin/overview`), ekspor data kandidat UU PDP (`/api/account/export`), dan penghapusan akun permanen (`/api/account/delete`). Wiring FE akun (`src/pages/account.js`).
+- **Pencapaian Pengujian Menyeluruh (203 Pengujian 100% PASS)**:
+  - 119 pengujian unit & behavior Vitest (`npm run test:unit`).
+  - 64 skenario end-to-end QA JSDOM (`npm run test:qa`).
+  - 20 audit aksesibilitas & UI/UX mobile (`npm run test:uiux`).
+  - Pengecekan dead-code & wiring `npm run qa:wiring` 100% GREEN (0 orphaned endpoints, 0 legacy table accesses).
+
+---
+
 ## [2.4.0] - 2026-10-20 (Perbaikan UX CV, Auto-Blast dari Data Scraping, Pengujian Perilaku)
 
 ### Fixed

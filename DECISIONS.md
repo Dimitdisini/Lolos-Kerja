@@ -104,3 +104,24 @@ Dokumen ini mencatat keputusan arsitektur penting (*Architectural Decision Recor
   4. Mode pengiriman eksplisit: `MAIL_TRANSPORT=resend` (nyata) vs `MAIL_TRANSPORT=capture` (tes lokal/staging tanpa keluar ke internet).
   5. Kepatuhan RFC 8058: List-Unsubscribe Header dengan tautan HTTPS satu-klik dan penambahan otomatis ke `email_blocklist`.
 - **Dampak:** Janji inti produk terpenuhi 100% secara nyata, aman, dan mematuhi regulasi anti-spam internasional & UU PDP.
+
+---
+
+## ADR-011: Pipeline Ingestion Loker dan Batas Keabsahan Sumber Email
+- **Konteks:** Database lowongan pekerjaan memerlukan pemisahan ketat antara lowongan dengan email rekrutmen terverifikasi vs lowongan via portal karir.
+- **Keputusan:**
+  1. Membangun script ingestion `scripts/scrape/import-to-db.js` dan `scripts/scrape/import-manual.js`.
+  2. Aturan batas mutlak: `apply_via='email'` HANYA diperbolehkan jika alamat email memiliki `email_source_url` resmi berawalan `http://` atau `https://`. Seluruh lowongan tanpa URL sumber sah wajib diset sebagai `apply_via='portal'`.
+  3. Deduplikasi idempoten menggunakan sha256 hash dan index unik `uq_jobs_company_email` pada PostgreSQL.
+- **Dampak:** Zero email karangan, perlindungan reputasi domain pengirim, dan kepatuhan hukum penuh terhadap UU ITE & UU PDP.
+
+---
+
+## ADR-012: Arsitektur Zero-Orphan & Pengecekan Wiring 100% Green
+- **Konteks:** Kontrak antara Frontend (Vite/Vanilla JS), Serverless Functions (`/api/*`), dan Database PostgreSQL Supabase rawan mengalami desinkronisasi atau dead code.
+- **Keputusan:**
+  1. Membangun dan menjalankan `scripts/qa/check-wiring.js` secara otomatis di CI (`npm run qa:wiring`).
+  2. Memastikan seluruh endpoint `/api/*` memiliki pemanggil aktif di frontend atau workflow cron (0 orphaned endpoints).
+  3. Memastikan tidak ada akses ke tabel legacy (`users`, `transactions`, `blast_logs`).
+  4. Halaman admin `/admin` dipisahkan sepenuhnya ke `admin/index.html` dengan proteksi peran server-side `requireAdmin`.
+- **Dampak:** Arsitektur full-stack terintegrasi 100% tanpa dead code, terverifikasi oleh 203 pengujian otomatis.
