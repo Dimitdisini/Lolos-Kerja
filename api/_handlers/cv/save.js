@@ -3,8 +3,8 @@
  * Node.js ESM format
  */
 
-import { verifyAuth, getSupabaseAdmin } from '../_lib/auth.js';
-import { applyRateLimit } from '../_lib/rateLimit.js';
+import { verifyAuth, getSupabaseAdmin } from '../../_lib/auth.js';
+import { applyRateLimit } from '../../_lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

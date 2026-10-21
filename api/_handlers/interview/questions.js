@@ -3,10 +3,10 @@
  * Node.js ESM Vercel Serverless Function
  */
 
-import { verifyAuth, getSupabaseAdmin } from '../_lib/auth.js';
-import { callJson, sanitizeUserData } from '../_lib/llm.js';
-import { checkQuota } from '../_lib/quota.js';
-import { applyRateLimit } from '../_lib/rateLimit.js';
+import { verifyAuth, getSupabaseAdmin } from '../../_lib/auth.js';
+import { callJson, sanitizeUserData } from '../../_lib/llm.js';
+import { checkQuota } from '../../_lib/quota.js';
+import { applyRateLimit } from '../../_lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

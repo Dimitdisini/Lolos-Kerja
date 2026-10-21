@@ -4,7 +4,7 @@
  * Node.js ESM format
  */
 
-import { applyRateLimit } from '../_lib/rateLimit.js';
+import { applyRateLimit } from '../../_lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

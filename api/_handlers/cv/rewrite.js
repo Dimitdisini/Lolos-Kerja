@@ -3,8 +3,8 @@
  * Node.js ESM Vercel Serverless Function
  */
 
-import { callJson, sanitizeUserData } from '../_lib/llm.js';
-import { applyRateLimit } from '../_lib/rateLimit.js';
+import { callJson, sanitizeUserData } from '../../_lib/llm.js';
+import { applyRateLimit } from '../../_lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

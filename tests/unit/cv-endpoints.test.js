@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import extractHandler from '../../api/cv/extract.js';
-import analyzeHandler from '../../api/cv/analyze.js';
-import rewriteHandler from '../../api/cv/rewrite.js';
-import exportPdfHandler from '../../api/cv/export-pdf.js';
-import saveHandler from '../../api/cv/save.js';
+import extractHandler from '../../api/_handlers/cv/extract.js';
+import analyzeHandler from '../../api/_handlers/cv/analyze.js';
+import rewriteHandler from '../../api/_handlers/cv/rewrite.js';
+import exportPdfHandler from '../../api/_handlers/cv/export-pdf.js';
+import saveHandler from '../../api/_handlers/cv/save.js';
 
 function createMockReqRes(method = 'POST', body = {}, headers = {}) {
   const req = {

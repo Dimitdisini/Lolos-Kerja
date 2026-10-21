@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import exportHandler from '../../api/account/export.js';
-import deleteHandler from '../../api/account/delete.js';
-import adminOverviewHandler from '../../api/admin/overview.js';
+import exportHandler from '../../api/_handlers/account/export.js';
+import deleteHandler from '../../api/_handlers/account/delete.js';
+import adminOverviewHandler from '../../api/_handlers/admin/overview.js';
 
 function createMockReqRes(method = 'GET', body = {}, headers = {}) {
   const req = {

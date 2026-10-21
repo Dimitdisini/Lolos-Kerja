@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import tickHandler from '../../api/blast/tick.js';
-import webhookResendHandler from '../../api/blast/webhook-resend.js';
-import { getWibDayStartIso } from '../../api/blast/plan.js';
+import tickHandler from '../../api/_handlers/blast/tick.js';
+import webhookResendHandler from '../../api/_handlers/blast/webhook-resend.js';
+import { getWibDayStartIso } from '../../api/_handlers/blast/plan.js';
 
 function createMockReqRes(method = 'POST', body = {}, headers = {}) {
   const req = {

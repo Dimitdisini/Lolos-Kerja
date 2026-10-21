@@ -5,9 +5,9 @@
  */
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { verifyAuth, getSupabaseAdmin } from '../_lib/auth.js';
-import { isFeatureAllowed } from '../_lib/limits.js';
-import { applyRateLimit } from '../_lib/rateLimit.js';
+import { verifyAuth, getSupabaseAdmin } from '../../_lib/auth.js';
+import { isFeatureAllowed } from '../../_lib/limits.js';
+import { applyRateLimit } from '../../_lib/rateLimit.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

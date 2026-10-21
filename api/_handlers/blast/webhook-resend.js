@@ -6,7 +6,7 @@
  * Node.js ESM format
  */
 
-import { getSupabaseAdmin } from '../_lib/auth.js';
+import { getSupabaseAdmin } from '../../_lib/auth.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

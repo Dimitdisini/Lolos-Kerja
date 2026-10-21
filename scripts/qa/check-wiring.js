@@ -30,26 +30,38 @@ const report = {
   missingHtmlEventHandlers: []
 };
 
-// 1. Gather all API endpoint files
-function getApiEndpoints(dir, base = '') {
+// 1. Gather all API endpoint files (from _handlers and root config)
+function getApiEndpoints() {
   const endpoints = [];
-  if (!fs.existsSync(dir)) return endpoints;
-  const items = fs.readdirSync(dir, { withFileTypes: true });
-  for (const item of items) {
-    if (item.name.startsWith('_')) continue; // skip _lib
-    const fullPath = path.join(dir, item.name);
-    const relRoute = path.join(base, item.name);
-    if (item.isDirectory()) {
-      endpoints.push(...getApiEndpoints(fullPath, relRoute));
-    } else if (item.name.endsWith('.js')) {
-      const endpointRoute = '/api/' + relRoute.replace(/\\/g, '/').replace(/\.js$/, '');
-      endpoints.push({ route: endpointRoute, file: fullPath });
+  const handlersDir = path.join(rootDir, 'api/_handlers');
+  
+  function walkHandlers(dir, base = '') {
+    if (!fs.existsSync(dir)) return;
+    const items = fs.readdirSync(dir, { withFileTypes: true });
+    for (const item of items) {
+      const fullPath = path.join(dir, item.name);
+      const relRoute = path.join(base, item.name);
+      if (item.isDirectory()) {
+        walkHandlers(fullPath, relRoute);
+      } else if (item.name.endsWith('.js')) {
+        const endpointRoute = '/api/' + relRoute.replace(/\\/g, '/').replace(/\.js$/, '');
+        endpoints.push({ route: endpointRoute, file: fullPath });
+      }
     }
   }
+
+  walkHandlers(handlersDir);
+  
+  // Also check top-level endpoints like /api/config
+  const topConfig = path.join(rootDir, 'api/config.js');
+  if (fs.existsSync(topConfig)) {
+    endpoints.push({ route: '/api/config', file: topConfig });
+  }
+
   return endpoints;
 }
 
-const apiEndpoints = getApiEndpoints(path.join(rootDir, 'api'));
+const apiEndpoints = getApiEndpoints();
 const apiRoutes = apiEndpoints.map(e => e.route);
 
 // 2. Gather valid tables from migrations

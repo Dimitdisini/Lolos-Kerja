@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import questionsHandler from '../../api/interview/questions.js';
-import scoreHandler from '../../api/interview/score.js';
+import questionsHandler from '../../api/_handlers/interview/questions.js';
+import scoreHandler from '../../api/_handlers/interview/score.js';
 import { analyzeDeliveryMetrics } from '../../src/pages/interview.js';
 
 function createMockReqRes(method = 'POST', body = {}) {

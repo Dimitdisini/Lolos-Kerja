@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import configHandler from '../../api/config.js';
-import createOrderHandler from '../../api/billing/create-order.js';
+import createOrderHandler from '../../api/_handlers/billing/create-order.js';
 
 function createMockReqRes(method = 'GET', body = {}, headers = {}) {
   const req = {

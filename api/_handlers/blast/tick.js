@@ -9,8 +9,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { getSupabaseAdmin } from '../_lib/auth.js';
-import { getEffectiveTier } from '../_lib/quota.js';
+import { getSupabaseAdmin } from '../../_lib/auth.js';
+import { getEffectiveTier } from '../../_lib/quota.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST' && req.method !== 'GET') {
