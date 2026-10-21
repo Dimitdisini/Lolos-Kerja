@@ -4,6 +4,28 @@ Format mengikuti standar [Keep a Changelog](https://keepachangelog.com/en/1.0.0/
 
 ---
 
+## [2.4.0] - 2026-10-20 (Perbaikan UX CV, Auto-Blast dari Data Scraping, Pengujian Perilaku)
+
+### Fixed
+- **Langkah 2 CV terisi sendiri.** Draf lama di `localStorage` dimasukkan diam-diam ke kolom tersembunyi sehingga skor, teks "Sesudah", dan stepper langkah 2 muncul padahal formulir kosong. Sekarang draf tidak dimuat otomatis: muncul banner "Lanjutkan draf ini / Mulai dari kosong". Memilih lanjut menampilkan teksnya di kolom yang terlihat.
+- **Poles STAR mengarang angka.** Hasil lama menambahkan "38%", "99.5%", dll. dan memaksa skor 98 (termasuk jalan pintas berdasarkan nama preset seperti DIMAS PRATAMA). Sekarang hanya fakta dari teks pengguna yang dipakai, bagian yang belum ada angkanya ditandai `[ISI HASIL TERUKUR ...]`, dan skor dihitung dari isi.
+- Definisi ganda `resetCVInput` dihapus.
+
+### Changed
+- **Auto-Blast sekarang hanya memakai kontak hasil scraping** (`data/blast-targets.js`). Daftar 25 rekruter yang diketik manual dan berlabel "HRD Whitelist terverifikasi" dihapus dari aplikasi (diarsipkan di `_archive/`, bukti: memuat `careers@fore.coffee`, padahal alamat resmi di halaman karier adalah `career@fore.coffee`). `resolveScrapedCompanyEmail` tidak lagi menebak `careers@<domain>`.
+- Tidak ada penerima yang dicentang otomatis. Keadaan kosong menjelaskan jujur bahwa belum ada kontak email. Label sumber email (Email Rekrutmen / Email Umum / Dari Iklan Lowongan), tanggal data scraping, dan filter rumpun posisi "Semua Posisi" ditambahkan. Data scraping di-escape (XSS).
+- Klaim tak berdasar dihapus: "HRD Whitelist", "Update Harian Aktif (Auto-Sync)", "Domain Health 100% OK". Isi bawaan modal detail (nama HR, gaji, email contoh) dikosongkan.
+
+### Added
+- **`scripts/scrape/enrich-emails.js`** (`npm run scrape:emails`): dari hasil scraping lowongan, kelompokkan per perusahaan, ambil email di deskripsi lowongan, crawl halaman karier/kontak website resmi (patuh `robots.txt`, jeda per host, tanpa tebakan), terima hanya domain yang sama dengan website perusahaan, validasi MX, lalu tulis `data/blast-targets.json|js` beserta laporan.
+- `scripts/scrape/classify.js`: fungsi murni untuk ekstraksi dan klasifikasi email, rumpun posisi, robots.txt.
+- **Pengujian baru** (85 tes Vitest, 64 QA, 20 UI/UX semuanya lulus): `tests/unit/email-enrichment.test.js` (termasuk crawl ke server lokal), `tests/behavior/cv-state.test.js`, `tests/behavior/blast-targets.test.js` (memuat `index.html` sungguhan di JSDOM dengan kondisi awal berbeda). `run-full-qa-audit.js` diperbarui: T09/T10 sebelumnya menguji perilaku yang salah (skor naik karena angka karangan).
+
+### Hasil pertama pipeline (28 perusahaan fresh grad dari data scraping yang ada)
+- 6 perusahaan (21%) punya email yang bisa diverifikasi: 3 rekrutmen, 4 umum, 0 dari deskripsi lowongan. Sebagian besar lowongan memang hanya lewat portal.
+
+---
+
 ## [2.3.0] - 2026-10-20 (Sprint 4: Rapi, Pengujian Otomatis, Observabilitas & Kepatuhan UU PDP)
 
 ### Added

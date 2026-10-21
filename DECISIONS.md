@@ -79,3 +79,11 @@ Dokumen ini mencatat keputusan arsitektur penting (*Architectural Decision Recor
      - Paket VIP (Dikerjain VIP): masa aktif 30 hari kalender.
   3. Meng-upgrade tier dan kuota pengguna secara atomik di database `adminState.users` dan tabel PostgreSQL Supabase.
 - **Dampak:** Alur operasional bisnis dapat langsung dijalankan untuk penerimaan pembayaran manual tanpa technical debt.
+
+
+## Auto-Blast dan sumber email (20 Okt 2026)
+- Target blast hanya boleh berasal dari `data/blast-targets.js`, dihasilkan `npm run scrape:emails`. Tidak ada daftar manual, tidak ada email tebakan.
+- Dimuat lewat `<script src>` (bukan `fetch`) agar `index.html` tetap berjalan saat dibuka via `file://`.
+- Email umum (`info@`, `hello@`) disertakan tetapi diberi label "Email Umum"; email rekrutmen dan email dari iklan diutamakan.
+- Yield nyata rendah (21% perusahaan). Untuk janji 30-40 email/hari perlu sumber lowongan yang mencantumkan email atau data scraping yang jauh lebih besar, serta `companyWebsite` untuk semua loker (katalog 421 loker lama tidak menyimpannya).
+- Pengiriman email di antarmuka masih simulasi (belum memanggil `/api/blast/*`). Penyambungan ke backend butuh sesi Supabase dan kunci Resend.

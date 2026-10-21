@@ -11,7 +11,8 @@
     "test:unit": "vitest run",
     "test:qa": "node run-full-qa-audit.js",
     "test:uiux": "node run-ui-ux-audit.js",
-    "test": "npm run test:unit && npm run test:qa && npm run test:uiux"
+    "test": "npm run test:unit && npm run test:qa && npm run test:uiux",
+    "scrape:emails": "node scripts/scrape/enrich-emails.js"
   },
   "keywords": [
     "career",

@@ -16,6 +16,9 @@
   <!-- Google Identity Services (Real Google OAuth Client SDK) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+  <!-- Kontak rekrutmen hasil scraping (dihasilkan scripts/scrape/enrich-emails.js) -->
+  <script src="data/blast-targets.js" onerror="window.BLAST_TARGETS_DATA = null;"></script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -624,7 +627,7 @@
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
             </div>
             <h3 class="text-base font-bold text-slate-900">Kirim Lamaran ke HRD</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">Kirim lamaran personal langsung ke inbox HRD Whitelist terverifikasi dengan jeda aman anti-spam.</p>
+            <p class="text-xs text-slate-600 leading-relaxed">Kirim lamaran personal langsung ke inbox kontak rekrutmen hasil scraping dengan jeda aman anti-spam.</p>
             <span class="text-xs font-bold text-indigo-600 inline-flex items-center gap-1">Buka Fitur Kirim HRD &rarr;</span>
           </div>
 
@@ -659,7 +662,7 @@
           <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2 text-xs">
             <div class="font-bold text-blue-900 flex items-center gap-1.5">
               <svg class="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-              <span>Auto-Blast Langsung ke HRD Whitelist</span>
+              <span>Auto-Blast ke Kontak Rekrutmen Hasil Scraping</span>
             </div>
             <p class="text-slate-600 leading-relaxed pl-5">Pesan terkirim ke personil recruiter resmi dengan jeda aman anti-spam tanpa copy-paste manual.</p>
           </div>
@@ -801,6 +804,16 @@
                   <span>Unggah CV (PDF)</span>
                 </button>
                 <button type="button" id="btnModeTextCv" onclick="switchCvInputMode('text')" class="hidden"></button>
+              </div>
+            </div>
+
+            <!-- Banner draf tersimpan: draf lama tidak pernah dimuat diam-diam, pengguna memilih sendiri -->
+            <div id="cvDraftRestoreBanner" class="hidden rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs space-y-2" role="region" aria-label="Draf CV tersimpan">
+              <div class="font-bold text-amber-900">Ada draf CV tersimpan dari sesi sebelumnya</div>
+              <p id="cvDraftRestoreMeta" class="text-amber-800 leading-relaxed"></p>
+              <div class="flex gap-2 flex-wrap">
+                <button type="button" onclick="restoreSavedCvDraft()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Lanjutkan draf ini</button>
+                <button type="button" onclick="discardSavedCvDraft()" class="bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Mulai dari kosong</button>
               </div>
             </div>
 
@@ -1599,7 +1612,7 @@
       <div class="dospem-card p-3.5 sm:p-6 border-l-4 border-l-indigo-600 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <div class="flex items-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-            <h2 class="text-base sm:text-lg font-bold text-slate-900">Kirim Lamaran ke HRD Whitelist</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Kirim Lamaran ke Kontak Rekrutmen</h2>
             <span class="text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-full">Direct HRD</span>
           </div>
           <p class="hidden sm:block text-xs sm:text-sm text-slate-500">
@@ -1633,7 +1646,7 @@
         <div class="flex items-center gap-2 text-xs text-slate-500">
           <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium text-xs">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            Update Harian Aktif (Auto-Sync)
+            <span id="blastDataFreshness">Memuat data scraping...</span>
           </span>
         </div>
       </div>
@@ -1649,7 +1662,7 @@
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <h3 class="text-sm font-bold text-slate-800">1. Pilih Kontak HRD Tujuan</h3>
-                <span id="blastTargetsCountBadge" class="text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full">25 HRD Whitelist Terverifikasi</span>
+                <span id="blastTargetsCountBadge" class="text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full">25 Kontak Hasil Scraping</span>
               </div>
               <button type="button" onclick="toggleCustomRecruiterForm()" class="text-xs text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -1701,7 +1714,7 @@
                 <div>
                   <div class="text-xs text-slate-500 font-medium">Role Target Lamaran Terpilih:</div>
                   <div class="text-xs font-extrabold text-blue-900 flex items-center gap-1.5" id="blastCurrentRoleTitle">
-                    <span>Junior Business Analyst / Product Specialist</span>
+                    <span>Semua Posisi Fresh Graduate</span>
                     <span class="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">TERPASANG</span>
                   </div>
                 </div>
@@ -1709,6 +1722,7 @@
               <div class="flex items-center gap-2">
                 <span class="text-xs text-slate-500 hidden sm:inline">Ubah Rumpun Posisi:</span>
                 <select id="blastRoleSelector" onchange="applyRoleToBlastTargets(this.value)" class="dospem-input text-xs font-bold text-blue-900 bg-white border border-blue-300 rounded-lg px-2.5 py-1.5 shadow-xs cursor-pointer">
+                  <option value="all">Semua Posisi</option>
                   <option value="business-analyst">1. Business Analyst & PM</option>
                   <option value="software-eng">2. Software & AI Engineering</option>
                   <option value="digital-marketing">3. Digital Marketing & Growth</option>
@@ -1858,7 +1872,7 @@
               </div>
               <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
                 <span class="text-slate-400 text-xs block">Domain Health</span>
-                <span class="text-amber-600 font-bold font-mono">100% OK</span>
+                <span class="text-slate-500 font-bold font-mono" title="Pemantauan reputasi domain belum diaktifkan">Belum dipantau</span>
               </div>
             </div>
 
@@ -2095,7 +2109,7 @@
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span class="text-xs sm:text-sm font-bold text-slate-800">Riwayat Lamaran Terkirim (Real-Time Whitelist)</span>
+            <span class="text-xs sm:text-sm font-bold text-slate-800">Riwayat Lamaran Terkirim</span>
             <span id="accountAppliedCountBadge" class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-full">0 Terkirim</span>
           </div>
           <button type="button" onclick="switchTab('jobs-module')" class="text-xs font-bold text-blue-600 hover:text-blue-800 cursor-pointer">Cari Loker Baru &rarr;</button>
@@ -3223,7 +3237,7 @@
         row.className = 'p-3 rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:border-slate-300 transition flex items-center justify-between gap-3 text-xs';
         const initial = item.company ? item.company.charAt(0).toUpperCase() : 'C';
         const role = typeof escapeHtml === 'function' ? escapeHtml(item.role || 'Posisi Rekrutmen') : (item.role || 'Posisi Rekrutmen');
-        const company = typeof escapeHtml === 'function' ? escapeHtml(item.company || 'Perusahaan Whitelist') : (item.company || 'Perusahaan Whitelist');
+        const company = typeof escapeHtml === 'function' ? escapeHtml(item.company || 'Perusahaan') : (item.company || 'Perusahaan');
         const email = typeof escapeHtml === 'function' ? escapeHtml(item.email || 'hrd@resmi.com') : (item.email || 'hrd@resmi.com');
         row.innerHTML = `
           <div class="flex items-center gap-3">
@@ -14193,17 +14207,6 @@ Data Analyst Intern – PT Finansial Data Cerdas (Jul 2024 – Des 2024)
       }
     }
 
-    function resetCVInput() {
-      const textarea = document.getElementById('cvExperienceInput');
-      if (textarea) textarea.value = '';
-      updateCharCount();
-      updateScoreUI({ overall: 0, metric: 0, verb: 0, keyword: 0, format: 0 });
-      const beforeEl = document.getElementById('previewBefore');
-      if (beforeEl) beforeEl.innerText = 'Menunggu input pengalaman...';
-      const afterEl = document.getElementById('previewAfter');
-      if (afterEl) afterEl.innerText = 'Formula STAR yang siap lolos ATS akan tampil di sini.';
-    }
-
     /* -------------------------------------------------------------------------
        DRAG-AND-DROP & LASER SCANNER LOGIC FOR MODUL 1
        ------------------------------------------------------------------------- */
@@ -15815,51 +15818,32 @@ ${400 + streamLen}
         return;
       }
 
-      const role = document.getElementById('targetRole')?.value || 'business-analyst';
-      let starResult = '';
+      // Penulisan ulang hanya memakai fakta dari teks pengguna. Dilarang mengarang angka atau hasil.
+      // Bagian yang belum ada datanya ditandai [ISI ...] supaya pengguna melengkapi sendiri.
+      const detectedMetrics = raw.match(/\d+(?:[.,]\d+)?\s?%?/g);
+      let leadVerb = 'Menginisiasi dan merancang';
+      if (/kembangkan|bangun|buat|coding/i.test(raw)) leadVerb = 'Merancang dan mengembangkan';
+      else if (/pimpin|koordinasi|kelola|atur/i.test(raw)) leadVerb = 'Memimpin dan mengoptimalkan';
+      else if (/analisis|riset|uji|evaluasi/i.test(raw)) leadVerb = 'Menganalisis dan memvalidasi';
 
-      if (raw.includes('DIMAS PRATAMA')) {
-        starResult = cvPresets.freshgrad_ba.optimizedStar;
-      } else if (raw.includes('RIAN KURNIAWAN')) {
-        starResult = cvPresets.freshgrad_tech.optimizedStar;
-      } else if (raw.includes('ANINDYA LESTARI')) {
-        starResult = cvPresets.freshgrad_marcom.optimizedStar;
-      } else if (raw.includes('BAGAS WICAKSONO')) {
-        starResult = cvPresets.freshgrad_data.optimizedStar;
-      } else {
-        const detectedMetrics = raw.match(/\d+(?:[.,]\d+)?%?|\b(persen|juta|ribu|hari|jam|pengguna|mahasiswa|divisi)\b/gi);
-        let leadVerb = 'Menginisiasi dan merancang';
-        if (/kembangkan|bangun|buat|coding/i.test(raw)) leadVerb = 'Merancang dan mengembangkan';
-        else if (/pimpin|koordinasi|kelola|atur/i.test(raw)) leadVerb = 'Memimpin dan mengoptimalkan';
-        else if (/analisis|riset|uji|evaluasi/i.test(raw)) leadVerb = 'Menganalisis dan memvalidasi';
+      let taskPart = raw.replace(/^(bertanggung jawab|membantu|tugas saya|melakukan|pekerjaan saya|adalah)\s+/i, '')
+        .replace(/\s+/g, ' ')
+        .replace(/[.\s]+$/, '');
+      taskPart = taskPart.charAt(0).toLowerCase() + taskPart.slice(1);
 
-        let taskPart = raw.replace(/^(bertanggung jawab|membantu|tugas saya|melakukan|pekerjaan saya|adalah)\s+/i, '');
-        taskPart = taskPart.charAt(0).toLowerCase() + taskPart.slice(1);
-
-        if (detectedMetrics && detectedMetrics.length > 0) {
-          starResult = leadVerb + ' alur ' + taskPart + ', memangkas waktu proses hingga 38% serta mengoptimalkan operasional dan akurasi rekonsiliasi data hingga 99.5%.';
-        } else {
-          if (role === 'business-analyst') {
-            starResult = leadVerb + ' ' + taskPart + ', memodelkan alur kerja AS-IS ke TO-BE yang memangkas waktu siklus koordinasi sebesar 40% dan merumuskan 20+ user story terstruktur.';
-          } else if (role === 'software-eng') {
-            starResult = leadVerb + ' ' + taskPart + ', membangun arsitektur modular yang memangkas latensi sistem hingga 35% dan melayani 500+ pengguna aktif dengan uptime 99.8%.';
-          } else if (role === 'digital-marketing') {
-            starResult = leadVerb + ' ' + taskPart + ', menaikkan engagement rate organik sebesar 140% dan menjaring 4.500+ prospek aktif dalam tempo 3 bulan.';
-          } else if (role === 'finance-accounting') {
-            starResult = leadVerb + ' ' + taskPart + ', merekonsiliasi 150+ pos transaksi bulanan dengan akurasi 99.9% dan mempercepat penutupan buku sebesar 2 hari kerja.';
-          } else {
-            starResult = leadVerb + ' ' + taskPart + ', meningkatkan throughput operasional sebesar 35% serta memangkas waktu penyelesaian deliverable tim.';
-          }
-        }
+      let starResult = leadVerb + ' ' + taskPart;
+      const needsMetrics = !(detectedMetrics && detectedMetrics.length > 0);
+      if (needsMetrics) {
+        starResult += ', menghasilkan [ISI HASIL TERUKUR: berapa persen, berapa orang, atau berapa rupiah?]';
       }
+      starResult += '.';
 
       const afterEl = document.getElementById('previewAfter');
       if (afterEl) {
-        const textToSet = starResult.startsWith('•') ? starResult : '"' + starResult + '"';
+        const textToSet = '"' + starResult + '"';
         afterEl.textContent = textToSet;
         afterEl.innerText = textToSet;
       }
-
       const beforeEl = document.getElementById('previewBefore');
       if (beforeEl) {
         const textToSet = '"' + raw.slice(0, 300) + (raw.length > 300 ? '...' : '') + '"';
@@ -15867,7 +15851,8 @@ ${400 + streamLen}
         beforeEl.innerText = textToSet;
       }
 
-      updateScoreUI({ overall: 98, metric: 99, verb: 98, keyword: 97, format: 99 });
+      runCVAnalysis(); // skor dihitung dari isi teks, bukan angka tetap
+      if (needsMetrics && typeof showToast === 'function') showToast('Belum ada angka di uraianmu. Lengkapi bagian [ISI ...] dengan hasil yang benar-benar terjadi.', 'info');
       if (typeof syncCvToMasterProfile === 'function') syncCvToMasterProfile();
       if (typeof regenerateBlastCoverLetter === 'function') regenerateBlastCoverLetter();
       if (typeof generateHarvardAtsCv === 'function') generateHarvardAtsCv();
@@ -16700,489 +16685,6 @@ ${senderName}`;
     /* -------------------------------------------------------------------------
        8. MODUL 4: DYNAMIC ROLE-BASED RECRUITER TARGETS (22 MITRA TIER-1)
        ------------------------------------------------------------------------- */
-    /* -------------------------------------------------------------------------
-       DATABASE TERKURASI: 25 HRD & TALENT ACQUISITION WHITELIST RESMI
-       Kontak personil HRD, Lead Recruiter, dan Talent Partner terverifikasi aktif
-       menerima CV & korespondensi pelamar kerja langsung.
-       ------------------------------------------------------------------------- */
-    const verifiedTier1Recruiters = [
-      {
-        id: 'rec-1',
-        company: 'PT Astra International Tbk',
-        hrName: 'Tim Talent Acquisition Astra',
-        hrTitle: 'Astra Recruitment Center (ARC)',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Talent Acquisition (Astra Recruitment Center)',
-        email: 'recruitment@astra.co.id',
-        backupEmail: 'arc@astra.co.id',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Astra Graduate Program (AGP) - Business Analyst',
-          'software-eng': 'Astra Digital Trainee - Junior Software Engineer',
-          'digital-marketing': 'Brand & Digital Marketing Associate',
-          'finance-accounting': 'Astra Financial Management & Accounting Officer',
-          'operations-trainee': 'Astra Management Trainee (Operations & Supply Chain)'
-        }
-      },
-      {
-        id: 'rec-2',
-        company: 'PT Telkom Indonesia (Persero) Tbk',
-        hrName: 'Tim Talent Acquisition Telkom',
-        hrTitle: 'Direktorat Human Capital Management',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Talent Acquisition (HCM Telkom Indonesia)',
-        email: 'careers@telkom.co.id',
-        backupEmail: 'recruitment@telkom.co.id',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Digital Business Specialist / Product Coordinator',
-          'software-eng': 'Telkom Digital Talent - Junior Software Engineer',
-          'digital-marketing': 'Digital Marketing & Community Specialist',
-          'finance-accounting': 'Corporate Financial Analyst Trainee',
-          'operations-trainee': 'Great People Trainee Program (GPTP) - Operations'
-        }
-      },
-      {
-        id: 'rec-3',
-        company: 'PT Bank Mandiri (Persero) Tbk',
-        hrName: 'Tim Rekrutmen Mandiri',
-        hrTitle: 'Human Capital Group Bank Mandiri',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Rekrutmen ODP (Human Capital Bank Mandiri)',
-        email: 'recruitment@bankmandiri.co.id',
-        backupEmail: 'mandirikarier@bankmandiri.co.id',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'ODP Business Development & Process Analyst',
-          'software-eng': 'ODP Information Technology & Digital Banking',
-          'digital-marketing': 'Consumer Marketing & Digital Acquisition Trainee',
-          'finance-accounting': 'ODP Wholesale Banking & Risk Management',
-          'operations-trainee': 'ODP Branch Operations & Service Quality'
-        }
-      },
-      {
-        id: 'rec-4',
-        company: 'PT Bank Central Asia Tbk (BCA)',
-        hrName: 'Tim Biro Rekrutmen BCA',
-        hrTitle: 'Biro Rekrutmen Human Capital BCA',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Biro Rekrutmen (Human Capital BCA)',
-        email: 'recruitment@bca.co.id',
-        backupEmail: 'karir@bca.co.id',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Business Analyst Specialist Development Program (BASDP)',
-          'software-eng': 'BCA IT Trainee / Application Developer',
-          'digital-marketing': 'Relationship Officer & Growth Specialist',
-          'finance-accounting': 'Management Development Program (MDP) - Accounting',
-          'operations-trainee': 'Management Development Program (MDP) - Operations'
-        }
-      },
-      {
-        id: 'rec-5',
-        company: 'PT Bank Rakyat Indonesia (Persero) Tbk',
-        hrName: 'Tim Rekrutmen Human Capital BRI',
-        hrTitle: 'Human Capital Division BRI',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Rekrutmen BFLP (Human Capital BRI)',
-        email: 'recruitment@bri.co.id',
-        backupEmail: 'talent@bri.co.id',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'BFLP General Staff - Business Analyst',
-          'software-eng': 'BFLP IT Staff - Software Engineer & Data Trainee',
-          'digital-marketing': 'BFLP Digital Marketing & Merchant Acquisition',
-          'finance-accounting': 'BFLP Finance, Audit & Accounting Specialist',
-          'operations-trainee': 'BFLP Operations & Micro Banking Officer'
-        }
-      },
-      {
-        id: 'rec-6',
-        company: 'PT GoTo Gojek Tokopedia Tbk',
-        hrName: 'GoTo People & Talent Acquisition',
-        hrTitle: 'People & Culture GoTo Group',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'People & Talent Acquisition Team (GoTo Group)',
-        email: 'careers@gotocompany.com',
-        backupEmail: 'talent@gotocompany.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Associate Product Specialist',
-          'software-eng': 'Associate Software Engineer (Backend / Mobile)',
-          'digital-marketing': 'Performance Marketing & Growth Associate',
-          'finance-accounting': 'Finance & Settlement Operations Analyst',
-          'operations-trainee': 'Business & Merchant Operations Associate'
-        }
-      },
-      {
-        id: 'rec-7',
-        company: 'Shopee Indonesia',
-        hrName: 'Shopee Talent Acquisition Team',
-        hrTitle: 'Campus Recruitment & Employer Branding',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Shopee Talent Acquisition Team (Sea Group)',
-        email: 'id.recruitment@shopee.com',
-        backupEmail: 'careers@shopee.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Business Development & Commercial Analyst',
-          'software-eng': 'Junior Software Engineer (Web / Backend)',
-          'digital-marketing': 'Marketing & Campaign Specialist',
-          'finance-accounting': 'Accounting & Tax Compliance Specialist',
-          'operations-trainee': 'Global Leaders Program (GLP) - Operations'
-        }
-      },
-      {
-        id: 'rec-8',
-        company: 'PT Telekomunikasi Selular (Telkomsel)',
-        hrName: 'Tim Talent Acquisition Telkomsel',
-        hrTitle: 'Human Capital Management Telkomsel',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Talent Acquisition (Telkomsel Human Capital)',
-        email: 'careers@telkomsel.co.id',
-        backupEmail: 'recruitment@telkomsel.co.id',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Digital Solutions & Product Analyst',
-          'software-eng': 'IoT & Cloud Platform Junior Engineer',
-          'digital-marketing': 'Digital Brand & Channel Growth Associate',
-          'finance-accounting': 'Revenue Assurance & Financial Analyst',
-          'operations-trainee': 'Telkomsel Trainee Program - Operations'
-        }
-      },
-      {
-        id: 'rec-9',
-        company: 'Unilever Indonesia',
-        hrName: 'Unilever Talent Attraction Team',
-        hrTitle: 'Human Resources Unilever Indonesia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Unilever Talent Attraction & UFLP Team',
-        email: 'recruitment.indonesia@unilever.com',
-        backupEmail: 'unilever.careers@unilever.com',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'UFLP Customer Development & Commercial Strategy',
-          'software-eng': 'IT & Data Science Graduate Trainee',
-          'digital-marketing': 'UFLP Marketing & Brand Communications',
-          'finance-accounting': 'UFLP Finance & Business Partnering',
-          'operations-trainee': 'UFLP Supply Chain & Plant Operations'
-        }
-      },
-      {
-        id: 'rec-10',
-        company: 'Nestlé Indonesia',
-        hrName: 'Nestlé Corporate Recruitment Team',
-        hrTitle: 'Human Resources PT Nestlé Indonesia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Corporate Talent Acquisition (Nestlé Indonesia)',
-        email: 'recruitment@id.nestle.com',
-        backupEmail: 'careers@id.nestle.com',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Commercial Excellence & Business Analyst Trainee',
-          'software-eng': 'IT Operations & Business Solutions Specialist',
-          'digital-marketing': 'Brand Activation & Consumer Insights Specialist',
-          'finance-accounting': 'Management Trainee Corporate Finance',
-          'operations-trainee': 'Management Trainee Technical & Supply Chain'
-        }
-      },
-      {
-        id: 'rec-11',
-        company: 'Danone Indonesia',
-        hrName: 'Danone Early Careers Team',
-        hrTitle: 'Human Resources Danone Indonesia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Early Careers & Talent Acquisition (Danone Indonesia)',
-        email: 'careers.indonesia@danone.com',
-        backupEmail: 'recruitment.indonesia@danone.com',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Business Development & Strategy Trainee',
-          'software-eng': 'Digital Solutions & IS Trainee',
-          'digital-marketing': 'Digital Brand Associate & Consumer Insights',
-          'finance-accounting': 'Danone Management Trainee - Finance',
-          'operations-trainee': 'Danone Management Trainee - Operations'
-        }
-      },
-      {
-        id: 'rec-12',
-        company: 'PT Pertamina (Persero)',
-        hrName: 'Tim Rekrutmen Pertamina',
-        hrTitle: 'Fungsi Human Capital PT Pertamina (Persero)',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Rekrutmen Human Capital Pertamina',
-        email: 'recruitment@pertamina.com',
-        backupEmail: 'pcc@pertamina.com',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Officer Trainee Business Planning & Commercial',
-          'software-eng': 'IT Junior Specialist (Digital Transformation)',
-          'digital-marketing': 'Corporate Communications & Marketing Officer',
-          'finance-accounting': 'Officer Trainee Finance & Accounting',
-          'operations-trainee': 'Officer Trainee Logistics & Supply Chain'
-        }
-      },
-      {
-        id: 'rec-13',
-        company: 'PT Perusahaan Listrik Negara (PLN)',
-        hrName: 'Tim Rekrutmen PLN',
-        hrTitle: 'Divisi Pengembangan Talenta PLN',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tim Rekrutmen Human Capital (PT PLN Persero)',
-        email: 'rekrutmen@pln.co.id',
-        backupEmail: 'rekrutmen.pln@pln.co.id',
-        category: 'bumn_bank',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Assistant Officer Business Process & Risk Analysis',
-          'software-eng': 'Junior Programmer & System Analyst PLN',
-          'digital-marketing': 'Customer Service & Brand Experience Officer',
-          'finance-accounting': 'Assistant Officer Financial Accounting & Budget',
-          'operations-trainee': 'Assistant Engineer / Operations Management Officer'
-        }
-      },
-      {
-        id: 'rec-14',
-        company: 'PT Paragon Technology and Innovation',
-        hrName: 'Paragon Talent Acquisition Team',
-        hrTitle: 'Human Capital PT Paragon Technology & Innovation',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Paragon Talent Acquisition & PMT Team',
-        email: 'recruitment@paragon-tcd.com',
-        backupEmail: 'talent@pti-cosmetics.com',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Paragon Management Trainee - Commercial',
-          'software-eng': 'Paragon IT & Software Development Specialist',
-          'digital-marketing': 'Paragon Management Trainee - Brand Development',
-          'finance-accounting': 'Paragon Management Trainee - Finance & Accounting',
-          'operations-trainee': 'Paragon Management Trainee - Supply Chain'
-        }
-      },
-      {
-        id: 'rec-15',
-        company: 'PT Indofood CBP Sukses Makmur Tbk',
-        hrName: 'Tim Rekrutmen Indofood CBP',
-        hrTitle: 'Corporate Human Resources Indofood Group',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Corporate Recruitment Team (Indofood CBP)',
-        email: 'recruitment@icbp.indofood.co.id',
-        backupEmail: 'career@indofood.co.id',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Management Trainee Commercial & Sales Strategy',
-          'software-eng': 'Junior IT Application & Network Engineer',
-          'digital-marketing': 'Brand Communication & Digital Media Trainee',
-          'finance-accounting': 'Management Trainee Accounting & Budgeting',
-          'operations-trainee': 'Management Trainee Manufacturing & Operations'
-        }
-      },
-      {
-        id: 'rec-16',
-        company: 'Traveloka',
-        hrName: 'Traveloka Talent Acquisition Team',
-        hrTitle: 'People Operations Traveloka',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Traveloka People & Talent Acquisition Team',
-        email: 'careers@traveloka.com',
-        backupEmail: 'talent@traveloka.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Associate Product Specialist',
-          'software-eng': 'Associate Software Engineer (Web / Mobile)',
-          'digital-marketing': 'Growth & Performance Marketing Specialist',
-          'finance-accounting': 'Finance & Commercial Operations Analyst',
-          'operations-trainee': 'Market Operations & Partner Specialist'
-        }
-      },
-      {
-        id: 'rec-17',
-        company: 'Blibli (PT Global Digital Niaga)',
-        hrName: 'Blibli Talent Acquisition Team',
-        hrTitle: 'People & Culture PT Global Digital Niaga Tbk',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Blibli Talent Acquisition Team',
-        email: 'recruitment@gdn-commerce.com',
-        backupEmail: 'careers@gdn-commerce.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Business & Category Analyst',
-          'software-eng': 'Junior Software Engineer (Fullstack / QA)',
-          'digital-marketing': 'Digital Marketing & Social Media Specialist',
-          'finance-accounting': 'Finance & Accounting Operations Analyst',
-          'operations-trainee': 'Future Leadership Program - Operations'
-        }
-      },
-      {
-        id: 'rec-18',
-        company: 'DANA Indonesia',
-        hrName: 'DANA People & Culture Team',
-        hrTitle: 'People Division DANA Indonesia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'DANA People & Talent Acquisition',
-        email: 'talent@dana.id',
-        backupEmail: 'careers@dana.id',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Product Specialist / Business Analyst',
-          'software-eng': 'Associate Software Development Engineer',
-          'digital-marketing': 'Brand Campaign & User Acquisition Specialist',
-          'finance-accounting': 'Settlement, Reconciliation & Finance Analyst',
-          'operations-trainee': 'Merchant Operations & Compliance Specialist'
-        }
-      },
-      {
-        id: 'rec-19',
-        company: 'Grab Indonesia',
-        hrName: 'Grab Talent Acquisition Team',
-        hrTitle: 'People & Organization Grab Indonesia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Grab Indonesia Talent Partner Team',
-        email: 'careers.id@grab.com',
-        backupEmail: 'talent.acquisition@grab.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Business Process & Strategy Associate',
-          'software-eng': 'Junior Backend / Mobile Software Engineer',
-          'digital-marketing': 'Consumer Marketing & Social Media Specialist',
-          'finance-accounting': 'Finance Operations & Business Partnering Associate',
-          'operations-trainee': 'Operations & Logistics Associate'
-        }
-      },
-      {
-        id: 'rec-20',
-        company: 'Tiket.com',
-        hrName: 'Tiket.com People Experience Team',
-        hrTitle: 'People Division Tiket.com',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tiket.com People Experience & Recruitment',
-        email: 'people@tiket.com',
-        backupEmail: 'recruitment@tiket.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Business Partner / Product Analyst',
-          'software-eng': 'Associate Software Engineer (Backend/Frontend)',
-          'digital-marketing': 'Performance Marketing & SEO Specialist',
-          'finance-accounting': 'Finance Analyst & Revenue Accounting',
-          'operations-trainee': 'Customer Experience & Operations Associate'
-        }
-      },
-      {
-        id: 'rec-21',
-        company: 'Tokopedia',
-        hrName: 'Tokopedia Talent Acquisition Team',
-        hrTitle: 'People Team Tokopedia',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Tokopedia Talent Acquisition Team',
-        email: 'recruitment@tokopedia.com',
-        backupEmail: 'talent@tokopedia.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Associate Product Management',
-          'software-eng': 'Junior Software Engineer (Go / React)',
-          'digital-marketing': 'Merchant Campaign & Growth Associate',
-          'finance-accounting': 'Corporate Finance & Tax Accounting',
-          'operations-trainee': 'Operations & Fulfillment Associate'
-        }
-      },
-      {
-        id: 'rec-22',
-        company: 'PT Kalbe Farma Tbk',
-        hrName: 'Tim Rekrutmen Kalbe Farma',
-        hrTitle: 'Corporate Human Resources PT Kalbe Farma Tbk',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Corporate HR & Recruitment (Kalbe Farma)',
-        email: 'recruitment@kalbe.co.id',
-        backupEmail: 'career@kalbe.co.id',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Commercial Excellence & Business Analyst Officer',
-          'software-eng': 'IT Application & Infrastructure Officer',
-          'digital-marketing': 'Brand Executive & Digital Content Specialist',
-          'finance-accounting': 'Accounting, Tax & Cost Control Officer',
-          'operations-trainee': 'Management Trainee Supply Chain & Operations'
-        }
-      },
-      {
-        id: 'rec-23',
-        company: 'Kredivo Group (FinAccel)',
-        hrName: 'Kredivo People Team',
-        hrTitle: 'People & Culture Kredivo Group',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Kredivo Talent Acquisition Team',
-        email: 'careers@kredivo.com',
-        backupEmail: 'talent@kredivo.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Junior Risk & Commercial Data Analyst',
-          'software-eng': 'Junior Backend Engineer (Java / Go)',
-          'digital-marketing': 'Growth & User Engagement Specialist',
-          'finance-accounting': 'Treasury & Settlement Associate',
-          'operations-trainee': 'Fintech Operations & Customer Experience Trainee'
-        }
-      },
-      {
-        id: 'rec-24',
-        company: 'Mekari (PT Mid Solusi Nusantara)',
-        hrName: 'Mekari Talent Acquisition Team',
-        hrTitle: 'People & Culture PT Mid Solusi Nusantara',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'Mekari Talent Acquisition & People Growth',
-        email: 'recruitment@mekari.com',
-        backupEmail: 'careers@mekari.com',
-        category: 'tech',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'B2B SaaS Business & Market Analyst',
-          'software-eng': 'Associate Software Engineer (Ruby / React)',
-          'digital-marketing': 'B2B Growth Marketing Specialist',
-          'finance-accounting': 'Finance Accounting & Tax Associate',
-          'operations-trainee': 'Customer Success & Implementation Associate'
-        }
-      },
-      {
-        id: 'rec-25',
-        company: 'Fore Coffee',
-        hrName: 'Fore Coffee People & Culture Team',
-        hrTitle: 'People & Organization Development Fore Coffee',
-        hrSalutation: 'Bapak/Ibu',
-        hr: 'People & Org Development (Fore Coffee)',
-        email: 'careers@fore.coffee',
-        backupEmail: 'recruitment@fore.coffee',
-        category: 'fmcg_corp',
-        status: 'ready',
-        roleMap: {
-          'business-analyst': 'Retail Operations & Expansion Analyst',
-          'software-eng': 'Junior Mobile App Developer (Fore App)',
-          'digital-marketing': 'Brand Social Media & Community Specialist',
-          'finance-accounting': 'Retail Finance & Cash Flow Analyst',
-          'operations-trainee': 'Management Trainee Retail Store Operations'
-        }
-      }
-    ];
-
     function getCleanDomain(company) {
       let clean = (company || '').toLowerCase()
         .replace(/^pt\s+|\stbk|\s\(persero\)|\sindonesia/g, '')
@@ -17212,681 +16714,65 @@ ${senderName}`;
       return 'business-analyst';
     }
 
-    const corporateDomains = {
-      "hyatt": "hyatt.com",
-      "seven retail": "sevenretail.com",
-      "bp consulting": "bpconsulting.co.id",
-      "trinova": "trinovatech.com",
-      "fore coffee": "fore.coffee",
-      "viridien": "viridiengroup.com",
-      "noraa": "noraa.co",
-      "ritz-carlton": "ritzcarlton.com",
-      "bureau veritas": "bureauveritas.com",
-      "meratus": "meratusline.com",
-      "marriott": "marriott.com",
-      "grab": "grab.com",
-      "traveloka": "traveloka.com",
-      "kredivo": "kredivo.com",
-      "mekari": "mekari.com",
-      "siloam": "siloamhospitals.com",
-      "techconnect": "techconnect.co.id",
-      "hilton": "hilton.com",
-      "pakuwon": "pakuwonjati.com",
-      "mceasy": "mceasy.com",
-      "savaya": "savaya.com",
-      "kulu": "kulu.id",
-      "larsen": "larsentoubro.com",
-      "pop mart": "popmart.com",
-      "danone": "danone.com",
-      "unilever": "unilever.com",
-      "nestle": "nestle.com",
-      "shopee": "shopee.com",
-      "tokopedia": "tokopedia.com",
-      "goto": "gotocompany.com",
-      "bca": "bca.co.id",
-      "mandiri": "bankmandiri.co.id",
-      "telkom": "telkom.co.id",
-      "astra": "astra.co.id"
-    };
-
+    // Email tidak pernah ditebak dari nama perusahaan. Alamat hanya berasal dari
+    // data/blast-targets.js (hasil crawl halaman karier resmi) atau dari teks lowongan.
     function resolveScrapedCompanyEmail(comp) {
-      const cLower = (comp || '').toLowerCase();
-      for (const [k, d] of Object.entries(corporateDomains)) {
-        if (cLower.includes(k)) return 'careers@' + d;
-      }
-      // Hapus Email Tebakan: Jika tidak ada domain korporat resmi terverifikasi, kembalikan null
       return null;
     }
 
     
-    // =========================================================================
-    // SPESIFIKASI DETAIL RESMI LOWONGAN TERVERIFIKASI (22 KORPORAT & BUMN)
-    // =========================================================================
-    const recruiterDetailedSpecs = {
-      'rec-1': {
-        programName: 'Astra Graduate Program (AGP)',
-        officialCareerUrl: 'https://career.astra.co.id',
-        location: 'Jakarta & Seluruh Unit Bisnis Grup Astra (Nasional)',
-        salary: 'Rp 8.500.000 - Rp 14.000.000 / bulan + Bonus Performa',
-        workType: 'Full-time (Jalur Fast-Track Manajerial)',
-        requirements: [
-          'S1 / D4 Semua Jurusan (Teknik, Ekonomi, Bisnis, MIPA, atau Sosial)',
-          'Lulusan Baru (Fresh Graduate) atau maksimal 2 tahun pengalaman kerja',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki rekam jejak kepemimpinan organisasi kampus atau proyek sosial',
-          'Kemampuan analisa pemecahan masalah (Problem Solving) & bahasa Inggris aktif'
-        ],
-        responsibilities: [
-          'Menjalani program rotasi kerja akselerasi di 7 lini bisnis Astra International',
-          'Menganalisis efisiensi proses bisnis dan menyusun rekomendasi strategi perbaikan',
-          'Memimpin proyek perbaikan operasional lintas departemen',
-          'Mempresentasikan hasil evaluasi proyek inovasi langsung kepada jajaran Direksi'
-        ],
-        benefits: [
-          'Jalur akselerasi karir menuju posisi Executive / Section Head Astra',
-          'Asuransi kesehatan menyeluruh (Rawat Inap & Jalan) untuk karyawan & keluarga',
-          'Program pelatihan intensif kepemimpinan di Astra Leadership Development Center',
-          'Bonus tahunan dan insentif berbasis performa kinerja korporasi'
-        ]
-      },
-      'rec-2': {
-        programName: 'Great People Trainee Program (GPTP) & Digital Specialist',
-        officialCareerUrl: 'https://careers.telkom.co.id',
-        location: 'Telkom Landmark Tower Jakarta & Wilayah Telkom Regional',
-        salary: 'Rp 8.000.000 - Rp 13.500.000 / bulan + Fasilitas BUMN',
-        workType: 'Full-time (Pegawai Tetap BUMN)',
-        requirements: [
-          'S1 / D4 Teknik Informatika, Sistem Informasi, Telekomunikasi, Manajemen, Bisnis',
-          'Lulusan Baru usia maksimal 25 tahun (S1) atau 27 tahun (S2)',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki pemahaman mengenai ekosistem digital, metodologi Agile, atau Business Analysis',
-          'Bersedia menjalani ikatan dinas dan penempatan di unit kerja Telkom Group'
-        ],
-        responsibilities: [
-          'Mengembangkan inovasi produk digital untuk jutaan pelanggan Telkom Group',
-          'Menganalisis kebutuhan klien korporasi B2B dan menyusun solusi transformasi digital',
-          'Mengawal metrik kepuasan pengguna dan performa layanan aplikasi digital Telkom',
-          'Berkolaborasi erat bersama Product Owner, Software Engineer, dan Solution Architect'
-        ],
-        benefits: [
-          'Status kepegawaian BUMN strategis dengan jenjang karir jangka panjang yang stabil',
-          'Fasilitas pemeliharaan kesehatan menyeluruh melalui Telkomedika',
-          'Tunjangan hari raya, insentif semesteran, dan bonus kinerja tahunan',
-          'Peluang beasiswa pascasarjana ke universitas top dunia dan sertifikasi global'
-        ]
-      },
-      'rec-3': {
-        programName: 'Officer Development Program (ODP) - Business & IT',
-        officialCareerUrl: 'https://www.bankmandiri.co.id/karir',
-        location: 'Plaza Mandiri Jakarta & Jaringan Kantor Wilayah Mandiri',
-        salary: 'Rp 9.000.000 - Rp 14.500.000 / bulan + Tunjangan ODP',
-        workType: 'Full-time (Jalur Kader Pimpinan Bank Mandiri)',
-        requirements: [
-          'S1 / S2 Semua Jurusan dari perguruan tinggi terkemuka dalam/luar negeri',
-          'Fresh Graduate usia maksimal 25 tahun (S1) atau 27 tahun (S2)',
-          'IPK minimal 3.00 (S1) atau 3.25 (S2)',
-          'Kemampuan komunikasi interpersonal, presentasi, dan negosiasi yang tangguh',
-          'Bersedia ditempatkan di seluruh jaringan kantor Bank Mandiri di Indonesia'
-        ],
-        responsibilities: [
-          'Menempuh pendidikan perbankan komprehensif di Mandiri University',
-          'Menganalisis kelayakan kredit korporasi dan manajemen risiko finansial',
-          'Mengembangkan portofolio nasabah komersial dan adopsi digital banking Livin by Mandiri',
-          'Mengoptimalkan efisiensi proses operasional cabang dan standar kepatuhan regulasi'
-        ],
-        benefits: [
-          'Jalur percepatan karir menjadi Pimpinan Cabang atau Assistant Vice President',
-          'Asuransi kesehatan eksklusif, tunjangan perumahan, dan fasilitas dana pensiun',
-          'Program pinjaman karyawan dengan bunga khusus dan tunjangan penampilan',
-          'Bonus tahunan kompetitif seiring pencapaian rekor laba Bank Mandiri'
-        ]
-      },
-      'rec-4': {
-        programName: 'Management Development Program (MDP) & BASDP',
-        officialCareerUrl: 'https://karir.bca.co.id',
-        location: 'Menara BCA Grand Indonesia, Jakarta & Kantor Wilayah BCA',
-        salary: 'Rp 9.000.000 - Rp 14.000.000 / bulan + Tunjangan Kinerja',
-        workType: 'Full-time (Jalur Kader Pimpinan BCA)',
-        requirements: [
-          'S1 Semua Jurusan (Teknik, Ekonomi, Komputer, Statistik, Hukum, dll)',
-          'Lulusan Baru usia maksimal 24 tahun (S1) atau 26 tahun (S2)',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki kemampuan berpikir analitis, pemecahan masalah, dan integritas tanpa kompromi',
-          'Keahlian interpersonal yang ramah dan berorientasi pada kepuasan nasabah'
-        ],
-        responsibilities: [
-          'Menjalani pendidikan intensif dan on-the-job training di BCA Learning Institute',
-          'Menganalisis sistem transaksi perbankan dan ekosistem pembayaran digital BCA',
-          'Mengawal kualitas operasional perbankan transaksi serta mitigasi risiko fraud',
-          'Menciptakan terobosan fitur baru untuk jutaan pengguna myBCA dan KlikBCA'
-        ],
-        benefits: [
-          'Lingkungan kerja predikat Great Place to Work dengan budaya kekeluargaan hangat',
-          'Tunjangan hari raya dan bonus tahunan berkali-kali lipat gaji pokok',
-          'Asuransi kesehatan kelas satu untuk karyawan dan keluarga inti',
-          'Jalur karir terstruktur menuju posisi Manajer dan Pimpinan Unit Kerja BCA'
-        ]
-      },
-      'rec-5': {
-        programName: 'Brilian Future Leader Program (BFLP)',
-        officialCareerUrl: 'https://e-recruitment.bri.co.id',
-        location: 'Gedung Kantor Pusat BRI Jakarta & Seluruh Kantor Cabang',
-        salary: 'Rp 8.500.000 - Rp 13.500.000 / bulan + Tunjangan Wilayah',
-        workType: 'Full-time (Kader Pemimpin BRI)',
-        requirements: [
-          'S1 / S2 Semua Jurusan (BFLP General) atau IT/MIPA/Teknik (BFLP IT)',
-          'Fresh Graduate usia maksimal 25 tahun (S1) atau 27 tahun (S2)',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki daya juang tinggi, semangat melayani masyarakat, dan integritas',
-          'Bersedia menjalani ikatan dinas dan ditempatkan di seluruh unit kerja BRI'
-        ],
-        responsibilities: [
-          'Mendalami rantai bisnis keuangan mikro dan korporasi perbankan terbesar nasional',
-          'Mengakselerasi penetrasi transaksi digital BRImo dan produk pembiayaan UMKM',
-          'Menganalisis profil risiko debitur serta merumuskan strategi kredit produktif',
-          'Memimpin inisiatif perbaikan efisiensi operasional berbasis data analytics'
-        ],
-        benefits: [
-          'Jalur tercepat menjadi Pemimpin Cabang dan Regional Leader Bank BRI',
-          'Tunjangan kemahalan daerah, tunjangan cuti, dan asuransi kesehatan keluarga',
-          'Bonus tahunan (tantiem) BUMN dan program penghargaan kinerja istimewa',
-          'Peluang beasiswa S2 luar negeri dari program BRI Brilian Scholarship'
-        ]
-      },
-      'rec-6': {
-        programName: 'GoTo Associate Product & Engineering Trainee',
-        officialCareerUrl: 'https://www.gotocompany.com/careers',
-        location: 'Pasaraya Blok M, Jakarta Selatan (Hybrid Working)',
-        salary: 'Rp 10.000.000 - Rp 16.000.000 / bulan + ESOP Potensial',
-        workType: 'Full-time (Tech Ecosystem Talent)',
-        requirements: [
-          'S1 Teknik Informatika, Sistem Informasi, Bisnis, Desain, atau rumpun sains',
-          'Fresh Graduate atau pengalaman magang di startup/perusahaan teknologi',
-          'Kemampuan analisa berbasis data kuat (SQL, Python, atau Spreadsheet tingkat lanjut)',
-          'Terbiasa bekerja cepat dengan ritme sprint Agile dan target OKR',
-          'Kemampuan komunikasi bahasa Inggris aktif untuk kolaborasi tim regional'
-        ],
-        responsibilities: [
-          'Menganalisis funnel konversi transaksi pengguna aplikasi Gojek dan Tokopedia',
-          'Menyusun Product Requirement Document (PRD) fitur baru yang customer-centric',
-          'Berkolaborasi erat bersama Software Engineer, Data Scientist, dan Product Designer',
-          'Mengawal eksperimen A/B testing dan riset kebutuhan mitra driver serta merchant'
-        ],
-        benefits: [
-          'Sistem kerja fleksibel (Hybrid Working) dengan kultur modern tanpa birokrasi kaku',
-          'Tunjangan komunikasi, internet, serta saldo voucher Gojek dan GoPay bulanan',
-          'Asuransi kesehatan swasta kelas atas dengan cakupan rawat jalan dan inap luas',
-          'Mentoring langsung dari tech leader dan product director terkemuka di Asia'
-        ]
-      },
-      'rec-7': {
-        programName: 'Global Leaders Program (GLP) & Business Associate',
-        officialCareerUrl: 'https://careers.shopee.co.id',
-        location: 'Pacific Century Place SCBD Jakarta',
-        salary: 'Rp 9.500.000 - Rp 15.000.000 / bulan',
-        workType: 'Full-time (Accelerated Leadership Trainee)',
-        requirements: [
-          'S1 Semua Jurusan dari universitas bereputasi tinggi dalam atau luar negeri',
-          'Lulusan Baru dengan rekam jejak akademis serta kepemimpinan unggul',
-          'IPK minimal 3.30 dari skala 4.00',
-          'Pola pikir analitis terstruktur, kegigihan tinggi, dan kemampuan memecahkan masalah',
-          'Kemampuan bahasa Inggris lisan dan tulisan yang fasih'
-        ],
-        responsibilities: [
-          'Menjalani 4 rotasi strategis selama 2 tahun di Business Development, Marketing, Ops, dan ShopeePay',
-          'Merancang strategi kampanye mega sale e-commerce dan akusisi merchant kunci',
-          'Menganalisis efisiensi biaya logistik Shopee Xpress dan pengalaman pengiriman',
-          'Mempresentasikan inisiatif monetisasi bisnis langsung kepada Country Head Shopee'
-        ],
-        benefits: [
-          'Program percepatan karir tercepat di industri e-commerce Asia Tenggara',
-          'Tunjangan transportasi, makan malam, dan asuransi kesehatan premium',
-          'Kesempatan rotasi proyek regional ke kantor Shopee Singapura atau regional',
-          'Peluang memegang posisi manajerial dalam kurun waktu 2 tahun kelulusan program'
-        ]
-      },
-      'rec-8': {
-        programName: 'Telkomsel Trainee Program & Digital Specialist',
-        officialCareerUrl: 'https://recruitment.telkomsel.com',
-        location: 'Telkomsel Smart Office Jakarta & GraPARI Wilayah',
-        salary: 'Rp 8.500.000 - Rp 13.000.000 / bulan',
-        workType: 'Full-time (Digital Telco Talent)',
-        requirements: [
-          'S1 Teknik Telekomunikasi, Elektro, IT, Manajemen, Ilmu Komunikasi',
-          'Fresh Graduate usia maksimal 25 tahun',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memahami ekosistem digital telco, 5G, cloud computing, atau IoT',
-          'Kreatif, tanggap terhadap perubahan perilaku konsumsi konten digital masyarakat'
-        ],
-        responsibilities: [
-          'Mengembangkan portfolio produk konektivitas digital dan layanan B2B enterprise',
-          'Menganalisis tren konsumsi kuota data dan efektivitas paket langganan MyTelkomsel',
-          'Mendukung inisiatif otomasi proses layanan pelanggan dan analitik big data',
-          'Mengelola program retensi pelanggan bernilai tinggi dan kampanye loyalitas'
-        ],
-        benefits: [
-          'Kompensasi menarik dengan tunjangan pulsa dan kuota data tanpa batas',
-          'Asuransi kesehatan lengkap untuk karyawan dan tanggungan keluarga',
-          'Sertifikasi teknologi internasional (Google Cloud, AWS, Cisco) gratis',
-          'Kultur kerja inovatif yang memadukan teknologi telco terdepan di Indonesia'
-        ]
-      },
-      'rec-9': {
-        programName: 'Unilever Future Leaders Programme (UFLP)',
-        officialCareerUrl: 'https://www.unilever.co.id/careers',
-        location: 'Grha Unilever BSD City, Tangerang',
-        salary: 'Rp 11.000.000 - Rp 16.500.000 / bulan + Tunjangan Relokasi',
-        workType: 'Full-time (Fast-Track Management Trainee)',
-        requirements: [
-          'S1 / S2 Semua Jurusan dengan pencapaian kepemimpinan luar biasa',
-          'Lulusan Baru atau pengalaman kerja profesional maksimal 2 tahun',
-          'IPK minimal 3.30 dari skala 4.00',
-          'Passion kuat dalam industri FMCG, inovasi produk konsumen, dan keberlanjutan',
-          'Fasih berbahasa Inggris dalam konteks bisnis internasional'
-        ],
-        responsibilities: [
-          'Menjalani rotasi akselerasi 3 tahun menuju posisi Manajer Unilever',
-          'Memimpin strategi pemasaran brand consumer goods ternama dunia (Pepsodent, Dove, Royco)',
-          'Menganalisis penetrasi pasar di jaringan ritel modern maupun warung tradisional',
-          'Mengelola alokasi anggaran kampanye pemasaran bernilai miliaran rupiah'
-        ],
-        benefits: [
-          'Standar paket remunerasi level tertinggi di industri FMCG Indonesia',
-          'Peluang penugasan kerja internasional (International Assignment) ke luar negeri',
-          'Fasilitas mobil dinas atau tunjangan kendaraan pada level tertentu',
-          'Akses gym, ruang rekreasi, dan kantin berstandar global di kantor Grha Unilever'
-        ]
-      },
-      'rec-10': {
-        programName: 'Management Trainee (MT) Nestlé',
-        officialCareerUrl: 'https://www.nestle.co.id/karir',
-        location: 'Arkadia Green Park TB Simatupang Jakarta & Pabrik Nestlé',
-        salary: 'Rp 9.500.000 - Rp 14.500.000 / bulan',
-        workType: 'Full-time (Global FMCG Leader Trainee)',
-        requirements: [
-          'S1 / S2 Semua Jurusan (Teknik, Teknologi Pangan, Bisnis, Manajemen)',
-          'Fresh Graduate usia maksimal 25 tahun (S1) atau 27 tahun (S2)',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Pola pikir kepemimpinan, integritas tinggi, dan kemampuan komunikasi prima',
-          'Bahasa Inggris aktif dan mampu beradaptasi dalam budaya multinasional'
-        ],
-        responsibilities: [
-          'Rotasi 24 bulan di divisi Commercial, Supply Chain, atau Technical Factory',
-          'Mengoptimalkan jalur distribusi produk nutrisi dan minuman (Milo, Dancow, Bear Brand)',
-          'Menganalisis efisiensi biaya produksi dan jaminan mutu berstandar Nestlé Global',
-          'Membangun hubungan kemitraan strategis dengan jaringan distributor nasional'
-        ],
-        benefits: [
-          'Jenjang karir multinasional yang transparan dan terstruktur rapi',
-          'Tunjangan pemeliharaan kesehatan menyeluruh dan asuransi jiwa',
-          'Program pengembangan kompetensi di Nestlé R&D Center dunia',
-          'Bonus performa tahunan dan paket produk gratis Nestlé setiap bulannya'
-        ]
-      },
-      'rec-11': {
-        programName: 'Danone Management Trainee (DMT)',
-        officialCareerUrl: 'https://careers.danone.com',
-        location: 'RDTX Place Kuningan Jakarta & Unit Operasional Danone',
-        salary: 'Rp 9.000.000 - Rp 14.000.000 / bulan',
-        workType: 'Full-time (Purpose-Driven Leadership Trainee)',
-        requirements: [
-          'S1 Semua Jurusan (Bisnis, Teknik, Ilmu Gizi, Komunikasi, dll)',
-          'Lulusan Baru atau pengalaman kerja profesional maksimal 2 tahun',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Dedikasi tinggi terhadap misi kesehatan dan keberlanjutan One Planet One Health',
-          'Berani mengambil inisiatif mandiri dan mampu berpikir kritis solutif'
-        ],
-        responsibilities: [
-          'Memimpin inisiatif brand Aqua, Mizone, SGM Eksplor, dan Nutricia',
-          'Menganalisis dinamika preferensi konsumen terkait hidrasi sehat dan gizi anak',
-          'Mengembangkan program pemasaran digital dan kampanye pelestarian lingkungan',
-          'Mengoptimalkan efisiensi rantai pasok dari sumber mata air hingga ke konsumen'
-        ],
-        benefits: [
-          'Lingkungan kerja inklusif dan apresiatif tersertifikasi standar global B-Corp',
-          'Asuransi kesehatan menyeluruh untuk karyawan dan keluarga inti',
-          'Akses pelatihan kepemimpinan berjenjang di Danone Academy',
-          'Kesempatan penugasan proyek jangka pendek ke Danone regional Asia-Pasifik'
-        ]
-      },
-      'rec-12': {
-        programName: 'Bimbingan Profesi Sarjana (BPS) / Officer Trainee',
-        officialCareerUrl: 'https://recruitment.pertamina.com',
-        location: 'Kantor Pusat Pertamina Gambir Jakarta & Unit Operasi Energi',
-        salary: 'Rp 9.500.000 - Rp 15.000.000 / bulan + Fasilitas Kedinasan',
-        workType: 'Full-time (Kader Pemimpin Sektor Energi)',
-        requirements: [
-          'S1 Teknik Kimia, Mesin, Elektro, Perminyakan, Industri, Manajemen, Hukum, Akuntansi',
-          'Fresh Graduate usia maksimal 27 tahun pada tahun pendaftaran',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Sehat jasmani rohani, bebas narkoba, dan siap bertugas di wilayah kerja Pertamina',
-          'Memiliki integritas tinggi dan komitmen terhadap kedaulatan energi nasional'
-        ],
-        responsibilities: [
-          'Menempuh pendidikan kedinasan minyak, gas, dan transformasi energi hijau',
-          'Menganalisis kelayakan ekonomi proyek kilang dan energi baru terbarukan',
-          'Menjaga kelancaran rantai distribusi BBM dan logistik energi nusantara',
-          'Menyusun evaluasi tata kelola operasional berstandar keselamatan tinggi (HSSE)'
-        ],
-        benefits: [
-          'Kesejahteraan dan stabilitas karir tertinggi di industri energi nasional',
-          'Fasilitas kesehatan premium di Rumah Sakit Pusat Pertamina (RSPP)',
-          'Tunjangan tempat tinggal, insentif lapangan, dan fasilitas pensiun terjamin',
-          'Kesempatan beasiswa program Master ke luar negeri dari Pertamina Foundation'
-        ]
-      },
-      'rec-13': {
-        programName: 'Rekrutmen Officer Trainee & Engineer PLN',
-        officialCareerUrl: 'https://rekrutmen.pln.co.id',
-        location: 'Kantor Pusat PLN Trunojoyo Jakarta & Unit Induk Wilayah',
-        salary: 'Rp 8.000.000 - Rp 12.500.000 / bulan',
-        workType: 'Full-time (Kader Pegawai Tetap PLN)',
-        requirements: [
-          'S1 / D4 Teknik Elektro, Mesin, Sipil, Industri, IT, Akuntansi, Manajemen',
-          'Lulusan Baru usia maksimal 27 tahun',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Tidak buta warna dan sehat jasmani rohani untuk inspeksi lapangan',
-          'Bersedia ditempatkan di seluruh unit transmisi dan pembangkit listrik PLN'
-        ],
-        responsibilities: [
-          'Memantau keandalan pasokan listrik sistem transmisi dan gardu induk',
-          'Menganalisis neraca daya wilayah dan efisiensi konsumsi energi pelanggan',
-          'Mengembangkan inovasi layanan pelanggan digital via aplikasi PLN Mobile',
-          'Mengelola mitigasi risiko pemeliharaan aset dan pelaporan anggaran proyek'
-        ],
-        benefits: [
-          'Status pegawai tetap BUMN penyedia infrastruktur kelistrikan negara',
-          'Jaminan pemeliharaan kesehatan komprehensif bagi keluarga inti',
-          'Tunjangan hari raya, insentif kinerja berkala, dan dana pensiun PLN',
-          'Peluang pelatihan teknologi smart grid, pembangkit surya, dan kendaraan listrik'
-        ]
-      },
-      'rec-14': {
-        programName: 'Paragon Management Trainee (PMT)',
-        officialCareerUrl: 'https://career.paragon-innovation.com',
-        location: 'Kantor Pusat Paragon Pesanggrahan Jakarta & Pabrik Tangerang',
-        salary: 'Rp 8.500.000 - Rp 13.500.000 / bulan',
-        workType: 'Full-time (Kader Pimpinan Industri Kosmetik)',
-        requirements: [
-          'S1 Semua Jurusan (Teknik, Farmasi, MIPA, Manajemen, Komunikasi, Desain)',
-          'Fresh Graduate atau pengalaman kerja profesional maksimal 1 tahun',
-          'IPK minimal 3.20 dari skala 4.00',
-          'Memiliki integritas berlandaskan nilai keteladanan, kekeluargaan, dan inovasi',
-          'Memiliki ketajaman analisa data dan kepekaan terhadap kebutuhan konsumen'
-        ],
-        responsibilities: [
-          'Menjalani rotasi intensif di Commercial, R&D, Supply Chain, atau Brand Marketing',
-          'Merumuskan strategi brand kosmetik terdepan (Wardah, Make Over, Emina, Kahf)',
-          'Menganalisis preferensi kecantikan halal dan tren kosmetik generasi muda',
-          'Memimpin eksekusi kampanye omnichannel di ribuan gerai dan kanal e-commerce'
-        ],
-        benefits: [
-          'Budaya organisasi yang religius, hangat, dan sangat suportif terhadap talenta muda',
-          'Apresiasi umroh atau wisata religi bagi insan Paragonian yang berprestasi',
-          'Asuransi kesehatan lengkap dan bonus kinerja korporasi yang kompetitif',
-          'Jalur percepatan karir menjadi Brand Manager atau Section Head dalam waktu singkat'
-        ]
-      },
-      'rec-15': {
-        programName: 'Management Trainee (MT) Indofood',
-        officialCareerUrl: 'https://career.indofood.com',
-        location: 'Sudirman Plaza Indofood Tower Jakarta & Pabrik Unit Produksi',
-        salary: 'Rp 8.000.000 - Rp 12.500.000 / bulan',
-        workType: 'Full-time (Kader Manufaktur & Bisnis FMCG)',
-        requirements: [
-          'S1 Teknik Kimia, Mesin, Industri, Teknologi Pangan, Manajemen, Akuntansi',
-          'Fresh Graduate usia maksimal 25 tahun',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki ketahanan kerja tinggi dan ketelitian analisa operasional manufaktur',
-          'Bersedia menjalani penempatan di fasilitas produksi Indofood se-Indonesia'
-        ],
-        responsibilities: [
-          'Mengawal efisiensi lini produksi divisi Noodle, Dairy, Snack, atau Penyedap Makanan',
-          'Menganalisis pasokan bahan baku serta kelancaran distribusi logistik Indomie',
-          'Menegakkan standar keamanan pangan global dan sertifikasi mutu ISO',
-          'Mengembangkan inisiatif optimasi biaya operasional dan pengurangan waste pabrik'
-        ],
-        benefits: [
-          'Stabilitas karir tinggi di perusahaan produsen pangan terbesar di Indonesia',
-          'Paket asuransi kesehatan, jaminan ketenagakerjaan, dan uang lembur terstruktur',
-          'Jalur promosi pasti menuju posisi Supervisor dan Section Head Pabrik',
-          'Tunjangan hari raya dan pembagian produk konsumsi Indofood secara rutin'
-        ]
-      },
-      'rec-16': {
-        programName: 'Traveloka Associate Product & Specialist Program',
-        officialCareerUrl: 'https://www.traveloka.com/en-id/careers',
-        location: 'Traveloka Campus BSD Green Office Park, Tangerang (Hybrid)',
-        salary: 'Rp 9.500.000 - Rp 15.000.000 / bulan',
-        workType: 'Full-time (Tech Travel & Lifestyle Specialist)',
-        requirements: [
-          'S1 Ilmu Komputer, Teknik Industri, Sistem Informasi, Bisnis, atau terkait',
-          'Fresh Graduate atau pengalaman magang di perusahaan teknologi / startup',
-          'Pola pikir analisa data terstruktur (SQL, Spreadsheet, Tableau, atau Mixpanel)',
-          'Kemampuan komunikasi bahasa Inggris tingkat profesional',
-          'Antusias terhadap inovasi teknologi industri perjalanan dan gaya hidup digital'
-        ],
-        responsibilities: [
-          'Menganalisis funnel reservasi tiket transportasi, hotel, dan wahana atraksi',
-          'Menyusun hipotesis fitur baru dan mengawal eksekusi rilis aplikasi bersama engineer',
-          'Mengevaluasi efisiensi promosi diskon serta margin profitabilitas transaksi',
-          'Berkolaborasi lintas fungsi bersama tim marketing dan operasional regional'
-        ],
-        benefits: [
-          'Kultur teknologi berstandar internasional dengan jam kerja fleksibel',
-          'Tunjangan perjalanan (Travel Allowance) dan kupon diskon akomodasi tahunan',
-          'Asuransi kesehatan swasta kelas atas untuk rawat inap dan rawat jalan',
-          'Fasilitas laptop Macbook Pro terbaru dan tunjangan setup ruang kerja rumah'
-        ]
-      },
-      'rec-17': {
-        programName: 'Future Leadership Program (FLP) Blibli',
-        officialCareerUrl: 'https://careers.blibli.com',
-        location: 'Grha Djarum Slipi Jakarta Barat',
-        salary: 'Rp 8.500.000 - Rp 13.500.000 / bulan',
-        workType: 'Full-time (Omnichannel Commerce Leader Trainee)',
-        requirements: [
-          'S1 Semua Jurusan dari universitas terakreditasi baik',
-          'Lulusan Baru atau pengalaman kerja maksimal 1 tahun',
-          'IPK minimal 3.20 dari skala 4.00',
-          'Pribadi energik, komunikatif, dan cepat tanggap terhadap dinamika e-commerce',
-          'Memiliki kemampuan analisa kuantitatif dan negosiasi komersial yang baik'
-        ],
-        responsibilities: [
-          'Rotasi di divisi Merchandising, Marketing, Logistics, dan Omnichannel Strategy',
-          'Mengelola kemitraan eksklusif dengan brand official store terkemuka di Blibli',
-          'Menganalisis tren pembelian konsumen dan efisiensi fulfillment gudang',
-          'Merancang kampanye promosi bulanan dan program loyalitas ekosistem Blibli Tiket'
-        ],
-        benefits: [
-          'Dukungan ekosistem Djarum Group yang kokoh dan berkelanjutan',
-          'Asuransi kesehatan komprehensif serta tunjangan makan siang harian',
-          'Peluang akselerasi karir menuju posisi Category Manager dalam 2-3 tahun',
-          'Suasana kantor modern, kasual, kolaboratif, dan sarat inovasi'
-        ]
-      },
-      'rec-18': {
-        programName: 'DANA Associate Fintech Trainee',
-        officialCareerUrl: 'https://dana.id/career',
-        location: 'Capital Place Gatot Subroto Jakarta Selatan',
-        salary: 'Rp 9.500.000 - Rp 14.500.000 / bulan',
-        workType: 'Full-time (Fintech Talent Program)',
-        requirements: [
-          'S1 Sistem Informasi, Teknik, Finansial, Ekonomi, atau Matematika',
-          'Fresh Graduate atau pengalaman magang di industri finansial/digital',
-          'IPK minimal 3.25 dari skala 4.00',
-          'Memahami mekanisme dompet digital, sistem pembayaran QRIS, dan regulasi BI',
-          'Memiliki ketelitian tinggi dan kemampuan membedah data analitik transaksi'
-        ],
-        responsibilities: [
-          'Menganalisis kestabilan transaksi dan tingkat keberhasilan sistem pembayaran QRIS DANA',
-          'Mendukung ekspansi fitur pinjaman digital, investasi emas, dan transfer antarbank',
-          'Menyusun dashboard metrik retensi pengguna aktif harian dan bulanan',
-          'Berkolaborasi dengan tim regulasi dan kepatuhan hukum transaksi keuangan'
-        ],
-        benefits: [
-          'Tunjangan saldo dompet digital DANA bulanan dan fleksibilitas jam kerja',
-          'Asuransi kesehatan swasta premium dengan kemudahan klaim digital tanpa repot',
-          'Fasilitas kerja di gedung pencakar langit Capital Place Jakarta',
-          'Mentoring langsung dari jajaran eksekutif pionir dompet digital Indonesia'
-        ]
-      },
-      'rec-19': {
-        programName: 'Grab Graduate Associate Program',
-        officialCareerUrl: 'https://grab.careers',
-        location: 'Lippo Kuningan HR Rasuna Said Jakarta',
-        salary: 'Rp 10.000.000 - Rp 15.500.000 / bulan',
-        workType: 'Full-time (Regional Mobility & Tech Trainee)',
-        requirements: [
-          'S1 Semua Jurusan dengan keunggulan analisa kuantitatif dan logika data',
-          'Lulusan Baru dengan rekam jejak kepemimpinan kampus yang aktif',
-          'IPK minimal 3.30 dari skala 4.00',
-          'Fasih berbahasa Inggris dalam lingkungan kerja kolaboratif regional',
-          'Mampu menerjemahkan data besar menjadi langkah inisiatif bisnis konkret'
-        ],
-        responsibilities: [
-          'Menganalisis strategi pertumbuhan ekosistem GrabBike, GrabCar, dan GrabFood',
-          'Mengoptimalkan algoritma penyesuaian tarif dinamis dan efektivitas insentif mitra',
-          'Mengevaluasi kepuasan merchant kuliner dan kecepatan waktu pengantaran pesanan',
-          'Menyusun materi tinjauan bisnis mingguan untuk jajaran manajemen regional Grab'
-        ],
-        benefits: [
-          'Paket gaji dan benefit kompetitif standar perusahaan teknologi Asia Tenggara',
-          'Tunjangan saldo GrabFood dan voucher transportasi harian',
-          'Asuransi kesehatan menyeluruh termasuk perawatan gigi dan kacamata',
-          'Jaringan kerja global dengan talenta teknologi dari berbagai negara Asia'
-        ]
-      },
-      'rec-20': {
-        programName: 'People Experience & Tech Trainee',
-        officialCareerUrl: 'https://www.tiket.com/careers',
-        location: 'Wisma Barito Pacific Slipi Jakarta Barat',
-        salary: 'Rp 9.000.000 - Rp 14.000.000 / bulan',
-        workType: 'Full-time (Online Travel Agency Specialist)',
-        requirements: [
-          'S1 Semua Jurusan / Teknik Komputer / Bisnis / Komunikasi',
-          'Fresh Graduate yang bersemangat dalam industri pariwisata dan teknologi',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki kemampuan komunikasi luwes dan respon cepat terhadap kebutuhan pengguna',
-          'Kemampuan bahasa Inggris aktif untuk berinteraksi dengan mitra hotel dan maskapai global'
-        ],
-        responsibilities: [
-          'Menganalisis pengalaman pengguna dalam pemesanan tiket pesawat dan akomodasi',
-          'Mengidentifikasi kendala transaksi pelanggan dan merumuskan perbaikan sistem',
-          'Mengembangkan kolaborasi promosi bersama maskapai penerbangan dan hotel mitra',
-          'Bekerja sama dengan tim engineer dalam peningkatan performa aplikasi mobile'
-        ],
-        benefits: [
-          'Tunjangan liburan (Happy Vacation Allowance) dan diskon pemesanan hotel tahunan',
-          'Asuransi kesehatan swasta dan fasilitas konsultasi kesehatan mental gratis',
-          'Suasana kantor santai dan seru dilengkapi ruang istirahat dan kudapan gratis',
-          'Program pelatihan akselerasi karir dengan mentor dari pimpinan industri OTA'
-        ]
-      },
-      'rec-21': {
-        programName: 'Associate Product Management & Junior Tech',
-        officialCareerUrl: 'https://www.tokopedia.com/careers',
-        location: 'Tokopedia Tower Ciputra World 2 Kuningan Jakarta',
-        salary: 'Rp 10.000.000 - Rp 16.000.000 / bulan',
-        workType: 'Full-time (E-Commerce Product Specialist)',
-        requirements: [
-          'S1 Ilmu Komputer, Teknik, Bisnis, Desain, atau rumpun sains relevan',
-          'Fresh Graduate atau pengalaman magang maksimal 1 tahun di industri digital',
-          'IPK minimal 3.20 dari skala 4.00',
-          'Pola pikir berpusat pada kepuasan pengguna (Customer-Centric) dan analisa data kuat',
-          'Kemampuan kolaborasi tim lintas fungsi yang solid dan adaptif'
-        ],
-        responsibilities: [
-          'Mengawal siklus pengembangan fitur belanja dan pembayaran di platform Tokopedia',
-          'Menganalisis metrik konversi pembeli dan performa program promo gratis ongkir',
-          'Merancang antarmuka fitur yang sederhana dan mudah digunakan bersama UI Designer',
-          'Memantau keandalan sistem aplikasi saat puncak kampanye Waktu Indonesia Belanja (WIB)'
-        ],
-        benefits: [
-          'Kultur kerja Nakama yang suportif dan saling memberdayakan sesama talenta',
-          'Tunjangan perangkat kerja modern, kuota internet, dan asuransi kesehatan swasta',
-          'Akses ratusan kelas teknologi dan bisnis di portal internal Tokopedia Academy',
-          'Peluang pertumbuhan karir yang luas di ekosistem digital terbesar tanah air'
-        ]
-      },
-      'rec-22': {
-        programName: 'Management Trainee (MT) Kalbe',
-        officialCareerUrl: 'https://kalbe.co.id/careers',
-        location: 'Cempaka Putih Jakarta Pusat & Kawasan Industri Cikarang',
-        salary: 'Rp 8.500.000 - Rp 13.500.000 / bulan',
-        workType: 'Full-time (Healthcare & Pharma Leader Trainee)',
-        requirements: [
-          'S1 Farmasi, Kimia, Biologi, Teknik Industri, Manajemen, Akuntansi',
-          'Fresh Graduate usia maksimal 25 tahun',
-          'IPK minimal 3.00 dari skala 4.00',
-          'Memiliki ketelitian tinggi, kemampuan analisa klinis/bisnis, dan kepemimpinan',
-          'Bersedia menjalani rotasi penugasan ke fasilitas produksi atau kantor cabang Kalbe'
-        ],
-        responsibilities: [
-          'Mendalami rantai nilai industri farmasi dan produk kesehatan konsumen terkemuka',
-          'Menganalisis peluang komersialisasi produk nutrisi preventif dan obat resep',
-          'Mengoptimalkan efisiensi proses jaminan mutu (Quality Assurance) dan logistik farmasi',
-          'Merancang kampanye edukasi kesehatan bersama komunitas tenaga medis dan apotek'
-        ],
-        benefits: [
-          'Kepastian karir di korporasi farmasi nomor satu dengan fundamental bisnis sangat kuat',
-          'Asuransi kesehatan komprehensif, dana pensiun, dan bonus berkala korporasi',
-          'Jalur percepatan karir menjadi Brand Manager atau Plant Production Manager',
-          'Fasilitas pemeriksaan kesehatan lengkap (Medical Check-Up) tahunan bagi karyawan'
-        ]
-      }
-    };
-
-    function buildUnifiedRecruiterTargets(targetRoleKey) {
-      const roleKey = targetRoleKey || getActiveCandidateRoleKey();
-      
-      // HANYA MENGGUNAKAN LOWONGAN RESMI TERVERIFIKASI AKTIF (TANPA SCRAPING EMAIL TEBAKAN)
-      const tier1List = verifiedTier1Recruiters.map(t => {
-        const resolvedRole = (t.roleMap && t.roleMap[roleKey]) ? t.roleMap[roleKey] : 'Business Analyst & Project Trainee';
-        const spec = (typeof recruiterDetailedSpecs !== 'undefined' && recruiterDetailedSpecs[t.id]) ? recruiterDetailedSpecs[t.id] : {};
-        return {
-          id: t.id,
-          company: t.company,
-          hrName: t.hrName || t.hr,
-          hrTitle: t.hrTitle || 'Talent Acquisition Team',
-          hrSalutation: t.hrSalutation || 'Bapak/Ibu',
-          hr: t.hr,
-          email: t.email,
-          category: t.category,
-          subCategory: 'tier1',
-          status: t.status,
-          role: resolvedRole,
-          programName: spec.programName || ('Program Rekrutmen ' + t.company),
-          officialCareerUrl: spec.officialCareerUrl || '#',
-          location: spec.location || 'Jakarta / Penempatan Nasional',
-          salary: spec.salary || 'Standar ODP / MT Korporat',
-          workType: spec.workType || 'Full-time (Jalur Fast-Track)',
-          requirements: spec.requirements || [
-            'S1 / D4 Semua Jurusan (atau bidang ilmu relevan)',
-            'Fresh Graduate atau pengalaman kerja maksimal 2 tahun',
-            'IPK minimal 3.00 dari skala 4.00',
-            'Kemampuan analisa pemecahan masalah dan kepemimpinan',
-            'Kemampuan komunikasi profesional & bahasa Inggris aktif'
-          ],
-          responsibilities: spec.responsibilities || [
-            'Menjalani program rotasi kerja akselerasi bisnis end-to-end',
-            'Menganalisis inisiatif pemecahan masalah operasional dan efisiensi',
-            'Berkolaborasi lintas fungsi untuk peningkatan performa divisi',
-            'Menyusun dan mempresentasikan laporan strategis kepada manajemen'
-          ],
-          benefits: spec.benefits || [
-            'Gaji pokok kompetitif dan bonus performa tahunan',
-            'Asuransi kesehatan lengkap untuk rawat jalan & inap',
-            'Jalur promosi kepemimpinan yang terstruktur dan cepat',
-            'Mentorship eksklusif bersama business leader senior'
-          ]
-        };
-      });
-
-      return tier1List;
+    function getBlastTargetsDataset() {
+      const d = window.BLAST_TARGETS_DATA;
+      return (d && Array.isArray(d.targets)) ? d : { generated_at: null, report: null, targets: [] };
     }
 
-    let verifiedRecruiterTargets = buildUnifiedRecruiterTargets('business-analyst');
+    const BLAST_KIND_LABEL = {
+      recruiting: 'Email Rekrutmen',
+      job_posting: 'Dari Iklan Lowongan',
+      general: 'Email Umum'
+    };
+
+    // Target blast HANYA berasal dari hasil scraping (data/blast-targets.js).
+    // Tidak ada daftar manual dan tidak ada alamat tebakan.
+    function buildUnifiedRecruiterTargets(targetRoleKey) {
+      const roleKey = targetRoleKey || getActiveCandidateRoleKey();
+      const ds = getBlastTargetsDataset();
+      const out = [];
+      ds.targets.forEach(t => {
+        const jobs = Array.isArray(t.jobs) ? t.jobs : [];
+        const matched = roleKey === 'all' ? jobs : jobs.filter(j => (j.role_keys || []).includes(roleKey));
+        if (roleKey !== 'all' && matched.length === 0) return;
+        const job = matched[0] || jobs[0] || {};
+        out.push({
+          id: t.id,
+          company: t.company,
+          hrName: t.kind === 'general' ? 'Kontak Umum ' + t.company : 'Tim Rekrutmen ' + t.company,
+          hrTitle: BLAST_KIND_LABEL[t.kind] || 'Kontak',
+          hrSalutation: 'Bapak/Ibu',
+          hr: 'Tim Rekrutmen ' + t.company,
+          email: t.email,
+          emailKind: t.kind,
+          sourceUrl: t.source_url || '',
+          sourceLabel: BLAST_KIND_LABEL[t.kind] || '',
+          category: t.category || 'tech',
+          subCategory: 'scraped',
+          status: 'ready',
+          role: job.title || 'Posisi Fresh Graduate',
+          programName: job.title || 'Lowongan Fresh Graduate',
+          officialCareerUrl: job.link || (t.website ? 'https://' + t.website : '#'),
+          location: job.location || 'Indonesia',
+          salary: 'Tidak dicantumkan',
+          workType: 'Tidak dicantumkan',
+          requirements: [],
+          responsibilities: [],
+          benefits: [],
+          jobs: matched
+        });
+      });
+      return out;
+    }
+
+    let verifiedRecruiterTargets = buildUnifiedRecruiterTargets('all');
     window.verifiedRecruiterTargets = verifiedRecruiterTargets;
 
     function applyRoleToBlastTargets(roleKey) {
@@ -17898,6 +16784,7 @@ ${senderName}`;
         'operations-trainee': 'Management / Operations Trainee (MT)'
       };
 
+      roleTitles['all'] = 'Semua Posisi Fresh Graduate';
       const titleEl = document.getElementById('blastCurrentRoleTitle');
       if (titleEl) {
         titleEl.innerHTML = `<span>${roleTitles[roleKey] || 'Target Role Terpilih'}</span> <span class="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded font-mono font-bold">TERPASANG</span>`;
@@ -17907,7 +16794,7 @@ ${senderName}`;
       if (selector && selector.value !== roleKey) selector.value = roleKey;
 
       const targetRoleElem = document.getElementById('targetRole');
-      if (targetRoleElem && targetRoleElem.value !== roleKey) {
+      if (roleKey !== 'all' && targetRoleElem && targetRoleElem.value !== roleKey) {
         targetRoleElem.value = roleKey;
         if (typeof runCVAnalysis === 'function') runCVAnalysis();
       }
@@ -18166,19 +17053,19 @@ ${senderName}`;
       }
 
       const programEl = document.getElementById('modalJobProgramName');
-      if (programEl) programEl.innerText = target.programName || 'Jalur Akselerasi Karir Pemimpin Bisnis';
+      if (programEl) programEl.innerText = target.programName || 'Lowongan Fresh Graduate';
 
       const workTypeEl = document.getElementById('modalJobWorkType');
-      if (workTypeEl) workTypeEl.innerText = target.workType || 'Full-time (Jalur Fast-Track)';
+      if (workTypeEl) workTypeEl.innerText = target.workType || 'Tidak dicantumkan';
 
       const locEl = document.getElementById('modalJobLocation');
-      if (locEl) locEl.innerText = target.location || 'Jakarta / Penempatan Nasional';
+      if (locEl) locEl.innerText = target.location || 'Tidak dicantumkan';
 
       const salaryEl = document.getElementById('modalJobSalary');
-      if (salaryEl) salaryEl.innerText = target.salary || 'Standar ODP / MT Korporat';
+      if (salaryEl) salaryEl.innerText = target.salary || 'Tidak dicantumkan';
 
       const emailEl = document.getElementById('modalJobEmail');
-      if (emailEl) emailEl.innerText = target.email;
+      if (emailEl) emailEl.innerText = target.email + (target.sourceLabel ? ' (' + target.sourceLabel + (target.sourceUrl ? ', sumber: ' + target.sourceUrl : '') + ')' : '');
 
       // Populate Responsibilities
       const respEl = document.getElementById('modalJobResponsibilities');
@@ -18447,6 +17334,33 @@ ${senderName}`;
       const quotaDisplay = document.getElementById('blastUserQuotaDisplay');
       if (quotaDisplay) quotaDisplay.innerText = (currentUser.blastQuota !== undefined ? currentUser.blastQuota : 10) + ' Email';
 
+      const freshEl = document.getElementById('blastDataFreshness');
+      if (freshEl) {
+        const ds = getBlastTargetsDataset();
+        if (ds.generated_at) {
+          const d = new Date(ds.generated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+          freshEl.textContent = 'Data scraping ' + d + ' \u2022 ' + (ds.report ? ds.report.companies_with_email : ds.targets.length) + ' perusahaan ber-email';
+        } else {
+          freshEl.textContent = 'Belum ada data scraping';
+        }
+      }
+
+      if (verifiedRecruiterTargets.length === 0 && !availableTargets.length) {
+        const ds = getBlastTargetsDataset();
+        const r = ds.report;
+        const stat = r ? ('Dari ' + r.companies_total + ' perusahaan yang dipindai, ' + r.companies_with_email + ' punya alamat email rekrutmen yang bisa diverifikasi.') : 'Data hasil scraping belum tersedia.';
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 text-slate-500 space-y-2" id="blastEmptyNoData">
+            <div class="text-xs font-bold text-slate-800">Belum ada kontak email untuk posisi ini</div>
+            <p class="text-xs leading-relaxed">${stat} Sebagian besar lowongan hanya menerima lamaran lewat portal. Alamat email tidak pernah ditebak.</p>
+            <button type="button" onclick="switchTab('jobs-module')" class="text-xs font-bold text-blue-600 hover:underline">Lihat Katalog Loker (lamar via portal)</button>
+          </div>
+        `;
+        filterBlastTargets();
+        updateBlastQueuePreview();
+        return;
+      }
+
       if (availableTargets.length === 0) {
         container.innerHTML = `
           <div class="text-center py-10 text-slate-400 space-y-2">
@@ -18460,8 +17374,10 @@ ${senderName}`;
         return;
       }
 
+      const esc = (v) => (typeof escapeHtml === 'function' ? escapeHtml(String(v == null ? '' : v)) : String(v == null ? '' : v));
       availableTargets.forEach((t, i) => {
-        const isChecked = autoCheckedIds.includes(t.id) || (autoCheckedIds.length === 0 && i < 3);
+        const kindLabel = t.custom ? 'Kustom' : (t.sourceLabel || 'Kontak');
+        const isChecked = autoCheckedIds.includes(t.id); // tidak ada yang dicentang otomatis
         const card = document.createElement('label');
         card.setAttribute('data-category', t.category || (t.custom ? 'custom' : 'all'));
         card.setAttribute('data-subcategory', t.subCategory || (t.custom ? 'custom' : 'tier1'));
@@ -18480,14 +17396,14 @@ ${senderName}`;
           badgeHtml = `
             <div class="text-right shrink-0">
               <span class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-2 py-0.5 rounded-full inline-block">Scraping Live</span>
-              <span class="block text-xs text-slate-400 font-medium mt-0.5 max-w-[140px] truncate">${t.role}</span>
+              <span class="block text-xs text-slate-400 font-medium mt-0.5 max-w-[140px] truncate">${esc(t.role)}</span>
             </div>
           `;
         } else {
           badgeHtml = `
             <div class="text-right shrink-0">
               <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full inline-block">Lowongan Aktif</span>
-              <span class="block text-xs text-slate-500 font-medium mt-0.5 max-w-[140px] truncate">${t.role}</span>
+              <span class="block text-xs text-slate-500 font-medium mt-0.5 max-w-[140px] truncate">${esc(t.role)}</span>
             </div>
           `;
         }
@@ -18501,26 +17417,26 @@ ${senderName}`;
             </div>
             <div class="min-w-0">
               <div class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5 flex-wrap leading-snug">
-                <span class="truncate">${t.hrName || t.company}</span>
+                <span class="truncate">${esc(t.hrName || t.company)}</span>
                 <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 shrink-0">
                   <svg class="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-                  HRD Whitelist
+                  ${esc(kindLabel)}
                 </span>
               </div>
               <div class="text-xs text-slate-500 font-medium truncate mt-0.5">
-                <span class="text-slate-700 font-semibold">${t.hrTitle || t.hr}</span> &bull; <span>${t.company}</span>
+                <span class="text-slate-700 font-semibold">${esc(t.hrTitle || t.hr)}</span> &bull; <span>${esc(t.company)}</span>
               </div>
               <div class="text-xs text-blue-600 font-mono font-semibold truncate mt-0.5">
-                ${t.email}
+                ${esc(t.email)}
               </div>
             </div>
           </div>
           <div class="flex items-center gap-2.5 shrink-0">
             <div class="text-right hidden sm:block">
               <span class="text-xs bg-slate-100 text-slate-700 border border-slate-200 font-bold px-2 py-0.5 rounded-full inline-block max-w-[150px] truncate">
-                ${t.role}
+                ${esc(t.role)}
               </span>
-              <span class="block text-xs text-slate-400 font-medium mt-0.5 truncate max-w-[140px]">${t.programName || 'Jalur Karir'}</span>
+              <span class="block text-xs text-slate-400 font-medium mt-0.5 truncate max-w-[140px]">${esc(t.programName || 'Lowongan')}</span>
             </div>
             <button type="button" onclick="openBlastJobDetailModal('${t.id}', event)" class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 text-xs font-bold shadow-xs hover:border-blue-300 transition flex items-center gap-1 shrink-0 cursor-pointer">
               <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -19142,32 +18058,58 @@ ${senderName}`;
     }
 
     // Helper memuat draf CV pengguna dari Cloud / LocalStorage
+    // Draf lama TIDAK dimasukkan diam-diam ke form. Itu yang membuat skor, teks "Sesudah",
+    // dan langkah 2 muncul padahal pengguna belum mengisi apa pun. Sekarang pengguna memilih.
     function loadSavedUserCV() {
       try {
         const savedRaw = localStorage.getItem('lolos_kerja_cv_data');
         if (!savedRaw) return;
         const cvPayload = JSON.parse(savedRaw);
-        if (cvPayload && cvPayload.rawText) {
-          const textarea = document.getElementById('cvExperienceInput');
-          if (textarea && (!textarea.value || textarea.value.trim().length === 0)) {
-            textarea.value = cvPayload.rawText;
-            updateCharCount();
-            runCVAnalysis();
-            if (cvPayload.targetRole) {
-              const roleElem = document.getElementById('targetRole');
-              if (roleElem) roleElem.value = cvPayload.targetRole;
-            }
-            if (cvPayload.starText && cvPayload.starText !== 'Formula STAR yang siap lolos ATS akan tampil di sini.') {
-              const afterEl = document.getElementById('previewAfter');
-              if (afterEl) afterEl.innerText = cvPayload.starText;
-            }
-            console.log('[CV-STORAGE] Draf CV pengguna berhasil dipulihkan dari penyimpanan lokal/cloud.');
-          }
+        if (!cvPayload || !cvPayload.rawText || cvPayload.rawText.trim().length < 5) return;
+
+        window._pendingSavedCv = cvPayload;
+        const banner = document.getElementById('cvDraftRestoreBanner');
+        const meta = document.getElementById('cvDraftRestoreMeta');
+        if (meta) {
+          const when = cvPayload.updatedAt ? new Date(cvPayload.updatedAt).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'waktu tidak diketahui';
+          meta.textContent = cvPayload.rawText.trim().length + ' karakter, disimpan ' + when + '. Draf ini tidak dimuat otomatis.';
         }
+        if (banner) banner.classList.remove('hidden');
       } catch(e) {
-        console.warn('[CV-STORAGE] Gagal memuat draf CV:', e);
+        console.warn('[CV-STORAGE] Gagal membaca draf CV:', e);
       }
     }
+
+    function restoreSavedCvDraft() {
+      const cvPayload = window._pendingSavedCv;
+      if (!cvPayload) return;
+      const textarea = document.getElementById('cvExperienceInput');
+      if (textarea) textarea.value = cvPayload.rawText;
+      if (cvPayload.targetRole) {
+        const roleElem = document.getElementById('targetRole');
+        if (roleElem) roleElem.value = cvPayload.targetRole;
+      }
+      // Tampilkan teksnya di kolom yang terlihat supaya pengguna bisa membaca dan mengeditnya
+      if (typeof switchCvInputMode === 'function') switchCvInputMode('text');
+      updateCharCount();
+      runCVAnalysis();
+      if (cvPayload.starText && cvPayload.starText !== 'Formula STAR yang siap lolos ATS akan tampil di sini.') {
+        const afterEl = document.getElementById('previewAfter');
+        if (afterEl) afterEl.innerText = cvPayload.starText;
+      }
+      const banner = document.getElementById('cvDraftRestoreBanner');
+      if (banner) banner.classList.add('hidden');
+      window._pendingSavedCv = null;
+    }
+
+    function discardSavedCvDraft() {
+      try { localStorage.removeItem('lolos_kerja_cv_data'); } catch(e) {}
+      window._pendingSavedCv = null;
+      const banner = document.getElementById('cvDraftRestoreBanner');
+      if (banner) banner.classList.add('hidden');
+    }
+    window.restoreSavedCvDraft = restoreSavedCvDraft;
+    window.discardSavedCvDraft = discardSavedCvDraft;
 
     async function syncTransactionToSupabase(txData) {
       if (!supabaseClient) return;
@@ -21420,17 +20362,17 @@ ${senderName}`;
         </div>
         <div>
           <div class="flex items-center gap-2 flex-wrap">
-            <h3 id="modalJobHrPersonName" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Bapak Bima Aryo Wicaksono</h3>
+            <h3 id="modalJobHrPersonName" class="text-base sm:text-lg font-bold text-slate-900 leading-tight"></h3>
             <span class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
               <svg class="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
-              HRD Whitelist Terverifikasi
+              Kontak Hasil Scraping
             </span>
           </div>
-          <div id="modalJobHrPersonTitle" class="text-xs sm:text-sm font-semibold text-indigo-700 mt-0.5">Senior Talent Acquisition & Campus Outreach Lead</div>
+          <div id="modalJobHrPersonTitle" class="text-xs sm:text-sm font-semibold text-indigo-700 mt-0.5"></div>
           <div class="text-xs text-slate-500 mt-0.5 flex items-center gap-2 flex-wrap">
-            <span id="modalJobCompanyName" class="font-bold text-slate-800">PT Astra International Tbk</span>
+            <span id="modalJobCompanyName" class="font-bold text-slate-800"></span>
             <span class="text-slate-300">&bull;</span>
-            <span id="modalJobRoleTitle" class="font-medium text-blue-600">Astra Graduate Program (AGP)</span>
+            <span id="modalJobRoleTitle" class="font-medium text-blue-600"></span>
           </div>
         </div>
       </div>
@@ -21439,15 +20381,15 @@ ${senderName}`;
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl p-3 text-xs">
         <div>
           <span class="text-xs text-slate-400 font-medium block">Lokasi Penempatan:</span>
-          <span id="modalJobLocation" class="font-bold text-slate-800 block mt-0.5">Jakarta / Nasional</span>
+          <span id="modalJobLocation" class="font-bold text-slate-800 block mt-0.5"></span>
         </div>
         <div>
           <span class="text-xs text-slate-400 font-medium block">Estimasi Kompensasi:</span>
-          <span id="modalJobSalary" class="font-bold text-emerald-700 block mt-0.5">Standar ODP / MT Korporat</span>
+          <span id="modalJobSalary" class="font-bold text-emerald-700 block mt-0.5"></span>
         </div>
         <div>
           <span class="text-xs text-slate-400 font-medium block">Email HR Penerima:</span>
-          <span id="modalJobEmail" class="font-mono font-bold text-blue-700 block mt-0.5 truncate">recruitment@astra.co.id</span>
+          <span id="modalJobEmail" class="font-mono font-bold text-blue-700 block mt-0.5 truncate"></span>
         </div>
       </div>
 

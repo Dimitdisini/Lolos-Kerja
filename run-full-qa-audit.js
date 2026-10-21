@@ -19,9 +19,24 @@ htmlContent = htmlContent.replace(
 );
 
 // Initialize JSDOM with script execution enabled
+// Data hasil scraping untuk Auto-Blast (pengganti data/blast-targets.js, karena JSDOM tidak memuat berkas eksternal)
+const BLAST_FIXTURE = {
+  generated_at: '2026-10-20T10:00:00.000Z',
+  report: { companies_total: 3, companies_with_email: 3 },
+  targets: [
+    { id: 'tgt-qa1', company: 'Acme Indonesia', email: 'career@acme.co.id', kind: 'recruiting', source_url: 'https://acme.co.id/career', category: 'tech', role_keys: ['business-analyst'], jobs: [{ title: 'Business Analyst Trainee', location: 'Jakarta', link: 'https://example.org/1', role_keys: ['business-analyst'] }] },
+    { id: 'tgt-qa2', company: 'Beta Retail', email: 'recruitment@beta.id', kind: 'recruiting', source_url: 'https://beta.id/karir', category: 'fmcg_corp', role_keys: ['operations-trainee'], jobs: [{ title: 'Store Supervisor', location: 'Bandung', link: 'https://example.org/2', role_keys: ['operations-trainee'] }] },
+    { id: 'tgt-qa3', company: 'Gamma Finance', email: 'info@gamma.id', kind: 'general', source_url: 'https://gamma.id/contact', category: 'bumn_bank', role_keys: ['finance-accounting'], jobs: [{ title: 'Accounting Staff', location: 'Surabaya', link: 'https://example.org/3', role_keys: ['finance-accounting'] }] }
+  ]
+};
+
 const dom = new JSDOM(htmlContent, {
   runScripts: 'dangerously',
-  url: 'https://lolos-kerja-seven.vercel.app/'
+  url: 'https://lolos-kerja-seven.vercel.app/',
+  beforeParse(w) {
+    w.BLAST_TARGETS_DATA = BLAST_FIXTURE;
+    w.scrollTo = () => {};
+  }
 });
 
 const { window } = dom;
@@ -86,8 +101,10 @@ async function runAudit() {
   // Apply STAR Optimization
   window.applyStarOptimization();
   const starScore = parseInt(document.getElementById('atsScoreValue').textContent);
-  assertTest('T09', 'STAR Optimization improves score', starScore > rawScore, `Improved from ${rawScore} to ${starScore}`);
-  assertTest('T10', 'Optimized STAR text contains metrics (%)', document.getElementById('previewAfter').textContent.includes('%') || document.getElementById('previewAfter').textContent.includes('40%') || document.getElementById('previewAfter').textContent.includes('user story'), 'Metrics identified in STAR rewrite');
+  // Poles STAR tidak boleh mengarang skor atau angka: skor tetap hasil analisis isi, angka hanya milik pengguna.
+  assertTest('T09', 'STAR polish does not inflate score with a fixed number', starScore === rawScore && starScore !== 98, `Score tetap ${rawScore} -> ${starScore} (dihitung dari isi, bukan angka tetap)`);
+  const starAfterText = document.getElementById('previewAfter').textContent;
+  assertTest('T10', 'STAR rewrite keeps only the user numbers and invents no percentages', starAfterText.includes('500') && !/\d+\s?%/.test(starAfterText), 'Angka 500 dari pengguna dipertahankan, tidak ada persen karangan');
   assertTest('T11', 'Comparison vs Harvard ATS subtab switchable', typeof window.switchCvSubTab === 'function', 'switchCvSubTab exists');
   
   window.switchCvSubTab('harvard');

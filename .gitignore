@@ -22,3 +22,6 @@ simulate-5-accounts.js
 fix_inline_custom_role.js
 flutter_lolos_kerja_app.dart
 _archive/
+
+# Cache crawl email
+scripts/scrape/.cache/
