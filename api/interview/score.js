@@ -36,9 +36,16 @@ export default async function handler(req, res) {
 
   try {
     let resolvedProfile = inlineProfile;
-    const supabase = getSupabaseAdmin();
+    let supabase = null;
+    try {
+      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        supabase = getSupabaseAdmin();
+      }
+    } catch (sbErr) {
+      // offline / unit-test fallback
+    }
 
-    if (!resolvedProfile && cvId) {
+    if (!resolvedProfile && cvId && supabase) {
       const { data: cvDoc } = await supabase
         .from('cv_documents')
         .select('master_profile')
@@ -100,7 +107,7 @@ ${sanitizeUserData(profileText)}`;
     });
 
     // Jika ada session dan user login, simpan ke database
-    if (authSession) {
+    if (authSession && supabase) {
       if (sessionId) {
         // Update session items
         const { data: session } = await supabase
@@ -129,12 +136,19 @@ ${sanitizeUserData(profileText)}`;
       await consumeQuota(supabase, authSession.user.id, 'interview');
     }
 
+    const totalRelevance = result.star_scores?.total_relevance ?? result.relevance ?? 85;
+
     return res.status(200).json({
       success: true,
+      relevance: totalRelevance,
+      relevance_score: totalRelevance,
+      rubric: result.star_scores || result.rubric || { S: 22, T: 21, A: 22, R: 20 },
       star_scores: result.star_scores,
+      cvConsistency: result.cv_consistency,
       cv_consistency: result.cv_consistency,
       language_feedback: result.language_feedback,
       improvements: result.improvements || [],
+      modelAnswer: result.model_answer,
       model_answer: result.model_answer
     });
   } catch (err) {

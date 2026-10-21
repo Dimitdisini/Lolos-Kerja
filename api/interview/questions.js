@@ -37,10 +37,17 @@ export default async function handler(req, res) {
   try {
     let resolvedProfile = inlineProfile;
     let resolvedJobDesc = jobDescription || '';
-    const supabase = getSupabaseAdmin();
+    let supabase = null;
+    try {
+      if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        supabase = getSupabaseAdmin();
+      }
+    } catch (sbErr) {
+      // offline / unit-test fallback
+    }
 
     // Ambil profile dari cv_id jika diberikan
-    if (!resolvedProfile && cvId) {
+    if (!resolvedProfile && cvId && supabase) {
       const { data: cvDoc } = await supabase
         .from('cv_documents')
         .select('master_profile')

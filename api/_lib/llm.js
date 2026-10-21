@@ -124,8 +124,49 @@ function getFixtureResponse(system, user) {
     };
   }
 
-  // 2. Rewrite single bullet fixture
-  if (lowerSystem.includes('merapikan satu bullet') || lowerSystem.includes('google x-y-z formula') || (lowerSystem.includes('bullet') && !lowerSystem.includes('master_profile'))) {
+  // 2. Interview scoring fixture (evaluating answers)
+  if (lowerSystem.includes('evaluator') || lowerSystem.includes('menilai jawaban') || lowerSystem.includes('rubrik star') || lowerSystem.includes('skor relevansi')) {
+    return {
+      relevance: 85,
+      relevance_score: 85,
+      cv_consistency: { is_consistent: true, notes: "Sesuai dengan pengalaman di CV" },
+      star_scores: { situation: 22, task: 21, action: 22, result: 20, total_relevance: 85 },
+      rubric: { S: 22, T: 21, A: 22, R: 20 },
+      improvements: [
+        "Jelaskan metrik hasil secara lebih spesifik.",
+        "Gunakan struktur Situasi, Tugas, Aksi, Hasil secara berurutan.",
+        "Kurangi penggunaan kata jeda vokal."
+      ],
+      model_answer: "Pada proyek sebelumnya, saya memimpin tim 4 orang untuk mengoptimalkan transmisi data, menghasilkan peningkatan efisiensi 35% dalam 2 bulan."
+    };
+  }
+
+  // 3. Interview question formulation fixture
+  if (lowerSystem.includes('merumuskan') || lowerSystem.includes('interviewer') || lowerSystem.includes('generate questions')) {
+    return {
+      questions: [
+        {
+          id: 1,
+          category: "TECHNICAL",
+          question: "Ceritakan bagaimana Anda merancang sistem telemetri sensor berbasis ESP32 dan MQTT?",
+          context_source: "CV_EXPERIENCE",
+          reference_fact: "ESP32 & MQTT telemetry experience",
+          follow_up_hints: ["Jelaskan cara mengatasi packet loss", "Bagaimana arsitektur broker MQTT?"]
+        },
+        {
+          id: 2,
+          category: "BEHAVIORAL_STAR",
+          question: "Bisa berikan contoh situasi saat Anda menghadapi deadline ketat dalam pengerjaan proyek IoT?",
+          context_source: "GENERAL_BEHAVIORAL",
+          reference_fact: "Lead Architect role",
+          follow_up_hints: ["Bagaimana memprioritaskan tugas tim?", "Apa hasil konkretnya?"]
+        }
+      ]
+    };
+  }
+
+  // 4. Rewrite single bullet fixture
+  if (lowerSystem.includes('merapikan satu bullet') || lowerSystem.includes('google x-y-z') || lowerSystem.includes('action verb')) {
     const hasNumbers = /\d+|%|persen/i.test(user);
     if (!hasNumbers) {
       return {
@@ -136,29 +177,6 @@ function getFixtureResponse(system, user) {
     return {
       suggested: "Memimpin perancangan modul telemetri IoT berbasis ESP32, meningkatkan akurasi data sensor sebesar 35%.",
       needs_input: null
-    };
-  }
-
-  // 2. Cover letter fixture
-  if (lowerSystem.includes('cover letter') || lowerSystem.includes('surat lamaran')) {
-    return {
-      subject: "Lamaran: Junior Analyst - Kandidat Pelamar (Fresh Graduate)",
-      body: "Dengan hormat Tim Rekrutmen,\n\nSaya tertarik mengajukan lamaran untuk posisi terkait. Dengan latar belakang pendidikan teknik dan pengalaman perancangan sistem telemetri, saya siap memberikan kontribusi nyata bagi perusahaan Anda.\n\nTerlampir Curriculum Vitae resmi saya untuk pertimbangan lebih lanjut.\n\nHormat saya,\nKandidat Pelamar"
-    };
-  }
-
-  // 3. Interview scoring fixture
-  if (lowerSystem.includes('wawancara') || lowerSystem.includes('interview')) {
-    return {
-      relevance: 85,
-      cv_consistency: true,
-      rubric: { S: 22, T: 21, A: 22, R: 20 },
-      improvements: [
-        "Jelaskan metrik hasil secara lebih spesifik.",
-        "Gunakan struktur Situasi, Tugas, Aksi, Hasil secara berurutan.",
-        "Kurangi penggunaan kata jeda vokal."
-      ],
-      model_answer: "Pada proyek sebelumnya, saya memimpin tim 4 orang untuk mengoptimalkan transmisi data, menghasilkan peningkatan efisiensi 35% dalam 2 bulan."
     };
   }
 
