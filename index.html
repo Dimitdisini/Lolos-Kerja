@@ -17818,7 +17818,7 @@ ${senderName}`;
 
       // Cloud Fetch dari Supabase PostgreSQL (Multi-Device Auto-Sync)
       if (currentUser.isLoggedIn && currentUser.email && typeof supabaseClient !== 'undefined' && supabaseClient) {
-        supabaseClient.from('users').select('*').eq('email', currentUser.email).maybeSingle()
+        supabaseClient.from('profiles').select('*').eq('email', currentUser.email).maybeSingle()
           .then(({ data, error }) => {
             if (data && !error) {
               currentUser.tier = data.tier || currentUser.tier;
@@ -18003,9 +18003,9 @@ ${senderName}`;
       }
       try {
         const testClient = window.supabase.createClient(url, key);
-        const { data, error } = await testClient.from('users').select('count', { count: 'exact', head: true });
+        const { data, error } = await testClient.from('profiles').select('count', { count: 'exact', head: true });
         if (error && error.code !== 'PGRST116') {
-          alert('Terhubung ke Supabase! (Catatan: Tabel public.users belum dibuat atau RLS aktif: ' + error.message + ')');
+          alert('Terhubung ke Supabase! (Catatan: Tabel public.profiles belum dibuat atau RLS aktif: ' + error.message + ')');
         } else {
           alert('Koneksi ke Supabase PostgreSQL Berhasil & Responsif 100%!');
         }
@@ -18018,7 +18018,7 @@ ${senderName}`;
     async function syncUserDataToSupabase(userData) {
       if (!supabaseClient) return;
       try {
-        const { error } = await supabaseClient.from('users').upsert({
+        const { error } = await supabaseClient.from('profiles').upsert({
           email: userData.email,
           full_name: userData.name,
           avatar_url: userData.avatar,
@@ -18114,15 +18114,15 @@ ${senderName}`;
     async function syncTransactionToSupabase(txData) {
       if (!supabaseClient) return;
       try {
-        const { error } = await supabaseClient.from('transactions').insert({
+        const { error } = await supabaseClient.from('payments').insert({
           order_id: txData.orderId,
-          plan_name: txData.plan,
+          plan: txData.plan,
           amount: txData.amount,
-          payment_method: txData.method || 'QRIS',
-          payment_status: txData.status || 'SETTLED',
+          provider: txData.method || 'manual',
+          status: txData.status || 'SETTLED',
           settled_at: new Date().toISOString()
         });
-        if (error) console.warn('[SUPABASE] Insert transaction warning:', error.message);
+        if (error) console.warn('[SUPABASE] Insert payment warning:', error.message);
       } catch (e) {
         console.warn('[SUPABASE] Transaction sync error:', e);
       }
@@ -18131,7 +18131,7 @@ ${senderName}`;
     async function syncBlastLogToSupabase(blastData) {
       if (!supabaseClient) return;
       try {
-        const { error } = await supabaseClient.from('blast_logs').insert({
+        const { error } = await supabaseClient.from('applications').insert({
           target_company: blastData.targetCompany,
           target_role: blastData.position,
           recruiter_email: blastData.recruiterEmail,
@@ -18450,7 +18450,7 @@ ${senderName}`;
       let existingUser = null;
       if (supabaseClient) {
         try {
-          const { data } = await supabaseClient.from('users').select('*').eq('email', email).maybeSingle();
+          const { data } = await supabaseClient.from('profiles').select('*').eq('email', email).maybeSingle();
           if (data) existingUser = data;
         } catch(err) {
           console.warn('[SUPABASE] Check existing user notice:', err);
@@ -18479,7 +18479,7 @@ ${senderName}`;
       // 1. Simpan ke Supabase PostgreSQL
       if (supabaseClient) {
         try {
-          const { error } = await supabaseClient.from('users').insert({
+          const { error } = await supabaseClient.from('profiles').insert({
             email: email,
             full_name: name,
             avatar_url: avatarUrl,
@@ -18573,7 +18573,7 @@ ${senderName}`;
               return;
             }
           } else if (authData && authData.user) {
-            const { data: profile } = await supabaseClient.from('users').select('*').eq('id', authData.user.id).maybeSingle();
+            const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', authData.user.id).maybeSingle();
             matchedUser = {
               name: (profile && profile.full_name) || authData.user.user_metadata?.full_name || email.split('@')[0],
               email: authData.user.email,
@@ -18582,7 +18582,7 @@ ${senderName}`;
               role: (profile && profile.role) || 'user',
               avatar: (profile && profile.avatar_url) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&h=120&fit=crop&crop=faces'
             };
-            supabaseClient.from('users').update({ last_login_at: new Date().toISOString() }).eq('id', authData.user.id).then(() => {});
+            supabaseClient.from('profiles').update({ last_login_at: new Date().toISOString() }).eq('id', authData.user.id).then(() => {});
           }
         } catch(err) {
           console.warn('[SUPABASE] Auth check warning:', err);
@@ -19295,8 +19295,8 @@ ${senderName}`;
       // 6. Sync to Supabase PostgreSQL Database (Cloud Real-Time Sync)
       if (supabaseClient) {
         try {
-          supabaseClient.from('transactions').update({
-            payment_status: 'SETTLED',
+          supabaseClient.from('payments').update({
+            status: 'SETTLED',
             settled_at: tx.settledAt
           }).eq('order_id', tx.id).then(() => {});
 
@@ -19337,7 +19337,7 @@ ${senderName}`;
 
       // Sinkronkan ke Supabase
       if (supabaseClient) {
-        supabaseClient.from('transactions').update({ payment_status: cleanStatus }).eq('order_id', tx.id).then(() => {
+        supabaseClient.from('payments').update({ status: cleanStatus }).eq('order_id', tx.id).then(() => {
           console.log('[SUPABASE] Transaction status updated:', tx.id, cleanStatus);
         });
       }
@@ -19508,7 +19508,7 @@ ${senderName}`;
 
       // Sinkronkan ke Supabase
       if (supabaseClient && targetUser.email) {
-        supabaseClient.from('users').update({ blast_quota: targetUser.quota }).eq('email', targetUser.email).then(() => {});
+        supabaseClient.from('profiles').update({ blast_quota: targetUser.quota }).eq('email', targetUser.email).then(() => {});
       }
     }
 
@@ -19525,7 +19525,7 @@ ${senderName}`;
 
       // Sinkronkan ke Supabase
       if (supabaseClient && targetUser.email) {
-        supabaseClient.from('users').update({
+        supabaseClient.from('profiles').update({
           tier: 'VIP',
           blast_quota: targetUser.quota,
           role: (targetUser.email === 'dimitriahmad000@gmail.com' ? 'owner' : 'admin')
@@ -19547,7 +19547,7 @@ ${senderName}`;
 
       // Sinkronkan ke Supabase
       if (supabaseClient && u.email) {
-        supabaseClient.from('users').update({ status: newStatus }).eq('email', u.email).then(() => {
+        supabaseClient.from('profiles').update({ status: newStatus }).eq('email', u.email).then(() => {
           console.log('[SUPABASE] User status updated:', u.email, newStatus);
         });
       }
@@ -19564,7 +19564,7 @@ ${senderName}`;
 
         // Hapus dari Supabase
         if (supabaseClient && u.email) {
-          supabaseClient.from('users').delete().eq('email', u.email).then(() => {
+          supabaseClient.from('profiles').delete().eq('email', u.email).then(() => {
             console.log('[SUPABASE] User deleted from cloud:', u.email);
           });
         }
@@ -19658,7 +19658,7 @@ ${senderName}`;
 
       // Sinkronkan ke Supabase PostgreSQL Cloud
       if (supabaseClient) {
-        supabaseClient.from('users').upsert({
+        supabaseClient.from('profiles').upsert({
           email: email,
           full_name: name,
           tier: tier,

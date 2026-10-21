@@ -1,13 +1,14 @@
 /**
  * rateLimit.js: Serverless Rate Limiting Guard
  * Protects endpoints from abuse using sliding-window tracking per IP/User.
+ * Supports persistent PostgreSQL table public.rate_limits (B4) with fast memory fallback.
  * Node.js ESM format
  */
 
-// In-memory rate limiting map for serverless execution context
-const memoryStore = new Map();
+import { getSupabaseAdmin } from './auth.js';
 
-// Periodically clean expired keys to prevent memory leak
+// In-memory rate limiting map for quick fallback or test runs
+const memoryStore = new Map();
 const CLEANUP_INTERVAL_MS = 60000;
 let lastCleanup = Date.now();
 
@@ -43,14 +44,7 @@ export function getClientIdentifier(req, userId = null) {
 }
 
 /**
- * Memeriksa dan memberlakukan rate limit.
- *
- * @param {Object} req - HTTP request object
- * @param {Object} [options]
- * @param {number} [options.maxRequests=30] - Maksimal request per window
- * @param {number} [options.windowMs=60000] - Window waktu dalam milidetik (default 1 menit)
- * @param {string} [options.userId=null] - Optional authenticated user ID
- * @returns {{ allowed: boolean, remaining: number, resetInSeconds: number }}
+ * Memeriksa dan memberlakukan rate limit secara sinkron (memori).
  */
 export function checkRateLimit(req, {
   maxRequests = 30,
@@ -97,6 +91,66 @@ export function checkRateLimit(req, {
 }
 
 /**
+ * Memeriksa rate limit persisten menggunakan tabel PostgreSQL public.rate_limits (B4)
+ */
+export async function checkRateLimitDb(req, {
+  maxRequests = 30,
+  windowMs = 60000,
+  userId = null
+} = {}) {
+  const clientId = getClientIdentifier(req, userId);
+  const now = new Date();
+  const windowStartThreshold = new Date(Date.now() - windowMs).toISOString();
+
+  try {
+    const supabase = getSupabaseAdmin();
+    // 1. Ambil atau buat record
+    const { data: record, error: fetchError } = await supabase
+      .from('rate_limits')
+      .select('key, window_start, hits')
+      .eq('key', clientId)
+      .maybeSingle();
+
+    if (fetchError || !record) {
+      // Masukkan baris baru
+      await supabase
+        .from('rate_limits')
+        .upsert({ key: clientId, window_start: now.toISOString(), hits: 1 });
+      return { allowed: true, remaining: maxRequests - 1, resetInSeconds: Math.ceil(windowMs / 1000) };
+    }
+
+    // Jika window sudah lewat, reset window
+    if (new Date(record.window_start).getTime() < Date.now() - windowMs) {
+      await supabase
+        .from('rate_limits')
+        .update({ window_start: now.toISOString(), hits: 1 })
+        .eq('key', clientId);
+      return { allowed: true, remaining: maxRequests - 1, resetInSeconds: Math.ceil(windowMs / 1000) };
+    }
+
+    // Hitung hits saat ini
+    const nextHits = record.hits + 1;
+    await supabase
+      .from('rate_limits')
+      .update({ hits: nextHits })
+      .eq('key', clientId);
+
+    const remaining = Math.max(0, maxRequests - nextHits);
+    const windowStartMs = new Date(record.window_start).getTime();
+    const resetInSeconds = Math.max(1, Math.ceil((windowStartMs + windowMs - Date.now()) / 1000));
+
+    return {
+      allowed: nextHits <= maxRequests,
+      remaining,
+      resetInSeconds
+    };
+  } catch (err) {
+    // Fallback aman ke in-memory jika DB belum terhubung
+    return checkRateLimit(req, { maxRequests, windowMs, userId });
+  }
+}
+
+/**
  * Helper middleware untuk endpoint Vercel Serverless
  */
 export function applyRateLimit(req, res, options = {}) {
@@ -104,11 +158,12 @@ export function applyRateLimit(req, res, options = {}) {
 
   res.setHeader('X-RateLimit-Limit', options.maxRequests || 30);
   res.setHeader('X-RateLimit-Remaining', result.remaining);
+  res.setHeader('X-RateLimit-Reset', result.resetInSeconds);
 
   if (!result.allowed) {
     res.setHeader('Retry-After', result.resetInSeconds);
     res.status(429).json({
-      error: 'Terlalu banyak permintaan. Silakan tunggu beberapa saat.',
+      error: 'Terlalu banyak permintaan (Rate Limit Exceeded). Silakan coba lagi dalam beberapa saat.',
       retryAfterSeconds: result.resetInSeconds
     });
     return false;
