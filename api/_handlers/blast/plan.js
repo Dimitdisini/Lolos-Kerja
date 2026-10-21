@@ -26,6 +26,59 @@ export function getWibDayStartIso() {
   return new Date(`${year}-${month}-${day}T00:00:00+07:00`).toISOString();
 }
 
+/**
+ * Memeriksa kecocokan kualifikasi CV kandidat dengan posisi lowongan.
+ * Menerapkan batas kompatibilitas ketat: hanya posisi serumpun yang diizinkan untuk di-blast.
+ */
+export function isJobCompatibleWithProfile(job, profile) {
+  if (!job || !profile) return false;
+  
+  const targetRoles = (profile.target_roles || []).map(r => r.toLowerCase());
+  const skills = [
+    ...(profile.skills?.technical || []),
+    ...(profile.skills?.tools || []),
+    ...(profile.skills?.soft || [])
+  ].map(s => s.toLowerCase());
+  
+  const education = (profile.education || []).map(e => `${e.major || ''} ${e.degree || ''}`.toLowerCase()).join(' ');
+  const experienceText = (profile.experience || []).map(ex => `${ex.role || ''} ${ex.tasks || ''}`).join(' ').toLowerCase();
+  const candidateText = `${targetRoles.join(' ')} ${skills.join(' ')} ${education} ${experienceText}`.toLowerCase();
+  
+  const jobTitle = (job.title || '').toLowerCase();
+  const jobCategory = (job.category || '').toLowerCase();
+  const jobRoleKeys = (job.role_keys || []).map(r => r.toLowerCase());
+  
+  const isTechCandidate = /software|developer|engineer|pemrogram|it |coding|frontend|backend|fullstack|data|ai |iot|telemetri|hardware|cloud|tech/.test(candidateText);
+  const isBusinessCandidate = /business|analyst|product|manajer|manajemen|project|consulting|pmo|operas/.test(candidateText);
+  const isMarketingCandidate = /market|growth|social media|copywrit|brand|creative|seo/.test(candidateText);
+  const isFinanceCandidate = /akuntan|accounting|finance|pajak|tax|audit|keuangan/.test(candidateText);
+
+  const isTechJob = /software|developer|engineer|pemrogram|data|ai|iot|cloud|tech|fullstack|backend|frontend/.test(jobTitle) || jobCategory === 'tech' || jobRoleKeys.includes('software-eng');
+  const isBusinessJob = /business|product|analyst|project|pmo|operas|operations|trainee|odp|management trainee/.test(jobTitle) || jobCategory === 'business' || jobRoleKeys.includes('business-analyst') || jobRoleKeys.includes('operations-trainee');
+  const isMarketingJob = /market|growth|social media|content|copywrit|brand|creative/.test(jobTitle) || jobCategory === 'marketing' || jobRoleKeys.includes('digital-marketing');
+  const isFinanceJob = /akuntan|accounting|finance|tax|pajak|audit|keuangan/.test(jobTitle) || jobCategory === 'finance' || jobRoleKeys.includes('finance-accounting');
+
+  // Hard Incompatibility Gate: Loker yang tidak cocok jangan pernah di-blast
+  if (isTechCandidate && !isFinanceCandidate && isFinanceJob) return false;
+  if (isFinanceCandidate && !isTechCandidate && isTechJob) return false;
+  if (isTechCandidate && !isMarketingCandidate && isMarketingJob && !/growth engineer|tech marketing/.test(jobTitle)) return false;
+
+  // Positive Affinity
+  if (isTechCandidate && isTechJob) return true;
+  if (isBusinessCandidate && (isBusinessJob || /trainee|analyst/i.test(jobTitle))) return true;
+  if (isMarketingCandidate && isMarketingJob) return true;
+  if (isFinanceCandidate && isFinanceJob) return true;
+
+  // Management Trainee BUMN/Nasional terbuka untuk seluruh rumpun sarjana
+  if (/management trainee|trainee|odp|officer development|bumn trainee/i.test(jobTitle)) return true;
+
+  const jobWords = jobTitle.split(/\s+/).filter(w => w.length > 3);
+  const matchCount = jobWords.filter(w => candidateText.includes(w)).length;
+  if (matchCount >= 2) return true;
+
+  return false;
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -92,25 +145,28 @@ export default async function handler(req, res) {
     // 4. Ambil lowongan yang punya email resmi valid dan belum pernah dikontak
     const { data: availableJobs, error: jobsErr } = await supabase
       .from('jobs')
-      .select('id, company, title, apply_email, email_kind, email_source_url, description, requirements')
+      .select('id, company, title, apply_email, email_kind, email_source_url, description, requirements, category, role_keys')
       .eq('apply_via', 'email')
       .eq('is_active', true)
       .not('apply_email', 'is', null)
-      .limit(50);
+      .limit(100);
 
     if (jobsErr) throw jobsErr;
 
-    // Filter kandidat lowongan
+    // Filter kandidat lowongan: belum pernah dikontak DAN wajib lolos Compatibility Gate
     const eligibleJobs = (availableJobs || []).filter(job => {
       const compKey = (job.company || '').toLowerCase().trim();
       const emailKey = (job.apply_email || '').toLowerCase().trim();
-      return !contactedCompanies.has(compKey) && !contactedEmails.has(emailKey);
+      if (contactedCompanies.has(compKey) || contactedEmails.has(emailKey)) {
+        return false;
+      }
+      return isJobCompatibleWithProfile(job, candidateProfile);
     }).slice(0, remainingSlots);
 
     if (eligibleJobs.length === 0) {
       return res.status(200).json({
         success: true,
-        message: 'Tidak ada kontak rekruter baru yang tersedia untuk antrean hari ini.',
+        message: 'Tidak ada kontak rekruter baru yang 100% cocok dengan kualifikasi CV Anda hari ini. Kuota Anda tetap utuh.',
         items: [],
         remainingToday: remainingSlots
       });
@@ -118,24 +174,33 @@ export default async function handler(req, res) {
 
     const plannedItems = [];
 
-    // 5. Susun Cover Letter Personal untuk Tiap Lowongan
+    // 5. Susun Cover Letter Personal Standar Korporat & BUMN untuk Tiap Lowongan
+    const candidateMajor = candidateProfile.education?.[0]?.major || 'Sarjana';
+    const candidateCampus = candidateProfile.education?.[0]?.institution || 'Universitas Terkemuka';
+
     for (const job of eligibleJobs) {
-      const coverLetterPrompt = `Tulis email lamaran kerja formal (120 - 180 kata) kepada tim rekrutmen ${job.company} untuk posisi "${job.title}".
-Gunakan HANYA 2-3 fakta pengalaman relevan dari kandidat:
-${sanitizeUserData(JSON.stringify(candidateProfile))}
+      const coverLetterPrompt = `Tuliskan email lamaran kerja resmi, elegan, dan profesional (120 - 160 kata) kepada Tim Rekrutmen ${job.company} untuk posisi "${job.title}".
 
-Catatan tambahan dari kandidat: "${customNotes}"
+PROFIL RESMI KANDIDAT:
+Nama: ${candidateName}
+Pendidikan: ${candidateMajor}, ${candidateCampus}
+Keahlian & Pengalaman Terverifikasi:
+${sanitizeUserData(JSON.stringify(candidateProfile.experience || candidateProfile))}
 
-ATURAN KETAT:
-1. Nada sopan, profesional, dan lugas.
-2. Dilarang mengarang klaim atau angka di luar profil kandidat.
-3. Sebutkan bahwa Curriculum Vitae lengkap terlampir pada email.
-4. Akhiri dengan ajakan wawancara singkat.
+Catatan Tambahan Kandidat: "${customNotes}"
 
-Kembalikan format JSON:
+ATURAN STRUKTUR STANDAR KORPORAT & BUMN (SATU TIPE PROFESIONAL):
+1. Subjek: Lamaran: ${job.title} - ${candidateName}
+2. Salam Pembuka: "Yth. Tim Rekrutmen ${job.company},"
+3. Paragraf 1: Menyatakan minat melamar posisi ${job.title} dengan menyebutkan latar belakang pendidikan ${candidateMajor} dari ${candidateCampus}.
+4. Paragraf 2: Tuliskan 2 poin pencapaian/proyek nyata dari data kandidat di atas yang paling relevan dengan kualifikasi ${job.title} menggunakan angka/metrik konkret (DILARANG mengarang angka atau perusahaan baru).
+5. Paragraf 3: Sebutkan bahwa Curriculum Vitae (CV) terperinci format ATS terlampir, dan sampaikan ketersediaan untuk sesi wawancara.
+6. Salam Penutup: "Hormat saya,\\n${candidateName}"
+
+Kembalikan format JSON persis:
 {
-  "subject": "Lamaran: [Judul Posisi] - [Nama Lengkap] (Fresh Graduate)",
-  "body": "Isi lengkap email..."
+  "subject": "Lamaran: ${job.title} - ${candidateName}",
+  "body": "Yth. Tim Rekrutmen ${job.company},\\n\\n..."
 }`;
 
       const coverLetterResult = await callJson({

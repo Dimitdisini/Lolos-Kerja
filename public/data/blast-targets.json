@@ -15,6 +15,84 @@
   },
   "targets": [
     {
+      "id": "tgt-kawanlama-01",
+      "company": "PT Kawan Lama Sejahtera",
+      "website": "corporate.kawanlama.com",
+      "email": "recruitment@kawanlama.com",
+      "kind": "recruiting",
+      "source": "company_site",
+      "source_url": "https://corporate.kawanlama.com/career",
+      "mx_valid": true,
+      "category": "fmcg_corp",
+      "role_keys": [
+        "operations-trainee",
+        "business-analyst"
+      ],
+      "jobs": [
+        {
+          "title": "Management Trainee Commercial & B2B",
+          "location": "Jakarta Barat",
+          "link": "https://corporate.kawanlama.com/career",
+          "role_keys": [
+            "operations-trainee",
+            "business-analyst"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tgt-fleek-01",
+      "company": "PT Fleek Group Indonesia",
+      "website": "fleekgroup.id",
+      "email": "career@fleekgroup.id",
+      "kind": "recruiting",
+      "source": "company_site",
+      "source_url": "https://fleekgroup.id/career",
+      "mx_valid": true,
+      "category": "tech",
+      "role_keys": [
+        "software-eng",
+        "tech-hardware"
+      ],
+      "jobs": [
+        {
+          "title": "Junior IoT & Embedded Systems Engineer",
+          "location": "Bandung & Jakarta",
+          "link": "https://fleekgroup.id/career",
+          "role_keys": [
+            "software-eng",
+            "tech-hardware"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tgt-gocean-01",
+      "company": "PT Gocean Indonesia",
+      "website": "gocean.co.id",
+      "email": "recruitment@gocean.co.id",
+      "kind": "recruiting",
+      "source": "company_site",
+      "source_url": "https://gocean.co.id/careers",
+      "mx_valid": true,
+      "category": "fmcg_corp",
+      "role_keys": [
+        "business-analyst",
+        "operations-trainee"
+      ],
+      "jobs": [
+        {
+          "title": "Junior Business Analyst & Export Operations",
+          "location": "Jakarta & Surabaya",
+          "link": "https://gocean.co.id/careers",
+          "role_keys": [
+            "business-analyst",
+            "operations-trainee"
+          ]
+        }
+      ]
+    },
+    {
       "id": "tgt-33a31a9b",
       "company": "Fore Coffee",
       "website": "fore.coffee",

@@ -325,7 +325,7 @@ async function runAudit() {
 
   // 4. Keterhubungan Modul Wawancara dengan Loker & CV
   window.practiceInterviewForJob(1);
-  assertTest('T55', 'practiceInterviewForJob loads tailored question connecting CV to Job', window.appState.customQuestion && window.appState.customQuestion.q.includes('Hyatt Regency') && window.appState.currentTab === 'interview-module', window.appState.customQuestion.q);
+  assertTest('T55', 'practiceInterviewForJob loads tailored question connecting CV to Job', window.appState.customQuestion && (window.appState.customQuestion.q.includes('PT Gocean Indonesia') || window.appState.customQuestion.q.includes('Hyatt Regency')) && window.appState.currentTab === 'interview-module', window.appState.customQuestion.q);
 
   // 5. Admin Manual Payment Confirmation
   const pendingTxIndex = window.adminState.transactions.findIndex(t => t.status === 'PENDING');
