@@ -6,23 +6,10 @@ export function renderJobCard(job, options = {}) {
   const isEmail = job.apply_via === 'email' && job.apply_email;
   const emailKind = job.email_kind || (isEmail ? 'recruiting' : null);
 
-  let badgeHtml = '';
-  if (emailKind === 'recruiting' || emailKind === 'job_posting') {
-    badgeHtml = `<span class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-      Email Rekrutmen Resmi
-    </span>`;
-  } else if (emailKind === 'general') {
-    badgeHtml = `<span class="text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>
-      Email Umum Perusahaan
-    </span>`;
-  } else {
-    badgeHtml = `<span class="text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-      Portal Karir Resmi
-    </span>`;
-  }
+  const badgeHtml = `<span class="text-xs font-bold bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+    Portal Karir Resmi
+  </span>`;
 
   const matchScoreHtml = job.match_score 
     ? `<span class="text-xs font-extrabold font-mono px-2 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">${job.match_score}% Match</span>`
@@ -56,14 +43,9 @@ export function renderJobCard(job, options = {}) {
           </button>
         </div>
         <div>
-          ${isEmail 
-            ? `<button type="button" onclick="blastJobDirect('${job.id}')" class="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-1.5 rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5">
-                Kirim via Auto-Blast
-              </button>`
-            : `<a href="${job.portal_url || '#'}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3.5 py-1.5 rounded-xl transition inline-flex items-center gap-1">
-                Lamar via Portal ↗
-              </a>`
-          }
+          <a href="${job.portal_url || job.link || '#'}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3.5 py-1.5 rounded-xl transition inline-flex items-center gap-1">
+            Lamar via Portal ↗
+          </a>
         </div>
       </div>
     </div>
