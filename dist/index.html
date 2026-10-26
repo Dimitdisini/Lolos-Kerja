@@ -1576,19 +1576,24 @@
         </div>
       </div>
 
-      <!-- VIEW SWITCHER: KATALOG GRID | MODE JOBSWIPE | TRACKER KANBAN -->
+      <!-- VIEW SWITCHER: KATALOG GRID | KIRIM EMAIL HRD | MODE JOBSWIPE | TRACKER KANBAN -->
       <div class="flex items-center justify-between gap-3 p-1.5 sm:p-2 bg-slate-100/90 border border-slate-200/90 rounded-2xl flex-wrap">
-        <div class="flex items-center gap-1.5 w-full sm:w-auto">
-          <button type="button" id="tabViewCatalogBtn" onclick="switchJobView('catalog')" class="flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer">
+        <div class="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <button type="button" id="tabViewCatalogBtn" onclick="switchJobView('catalog')" class="unified-job-view-btn btn-view-catalog flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap">
             <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
             <span>Katalog Lowongan</span>
           </button>
-          <button type="button" id="tabViewSwipeBtn" onclick="switchJobView('swipe')" class="flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button type="button" id="tabViewBlastBtn" onclick="switchJobView('blast')" class="unified-job-view-btn btn-view-blast flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <span>Kirim Email Blasting</span>
+            <span class="text-xs bg-indigo-100 text-indigo-800 px-1.5 py-0.2 rounded-full font-bold">Direct HRD</span>
+          </button>
+          <button type="button" id="tabViewSwipeBtn" onclick="switchJobView('swipe')" class="unified-job-view-btn btn-view-swipe flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
             <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
             <span>Mode JobSwipe</span>
             <span class="text-xs bg-rose-100 text-rose-700 px-1.5 py-0.2 rounded-full font-bold">Fast</span>
           </button>
-          <button type="button" id="tabViewTrackerBtn" onclick="switchJobView('tracker')" class="flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer">
+          <button type="button" id="tabViewTrackerBtn" onclick="switchJobView('tracker')" class="unified-job-view-btn btn-view-tracker flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
             <span>Tracker Lamaran</span>
             <span id="trackerTotalBadge" class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">0</span>
@@ -1832,6 +1837,31 @@
 
 
 
+      <!-- VIEW SWITCHER: KATALOG GRID | KIRIM EMAIL HRD | MODE JOBSWIPE | TRACKER KANBAN -->
+      <div class="flex items-center justify-between gap-3 p-1.5 sm:p-2 bg-slate-100/90 border border-slate-200/90 rounded-2xl flex-wrap">
+        <div class="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
+          <button type="button" onclick="switchJobView('catalog')" class="unified-job-view-btn flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <span>Katalog Lowongan</span>
+          </button>
+          <button type="button" class="unified-job-view-btn flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <span>Kirim Email Blasting</span>
+            <span class="text-xs bg-indigo-100 text-indigo-800 px-1.5 py-0.2 rounded-full font-bold">Direct HRD</span>
+          </button>
+          <button type="button" onclick="switchJobView('swipe')" class="unified-job-view-btn flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span>Mode JobSwipe</span>
+            <span class="text-xs bg-rose-100 text-rose-700 px-1.5 py-0.2 rounded-full font-bold">Fast</span>
+          </button>
+          <button type="button" onclick="switchJobView('tracker')" class="unified-job-view-btn flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <span>Tracker Lamaran</span>
+            <span id="blastTrackerTotalBadge" class="text-xs bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded-full font-bold">0</span>
+          </button>
+        </div>
+      </div>
+
       <!-- SUB-NAVIGATION: ANTREAN SIAP KIRIM VS PORTAL LAMARAN TERKIRIM -->
       <div class="flex items-center justify-between border-b border-slate-200 pb-3 flex-wrap gap-3">
         <div class="flex items-center gap-2">
@@ -1840,9 +1870,9 @@
             <span>Antrean Siap Kirim</span>
             <span id="blastBadgeAvailableCount" class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-mono font-bold">394</span>
           </button>
-          <button type="button" onclick="switchBlastView('applied')" id="btnBlastViewApplied" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-xs transition flex items-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <span>Portal Lamaran Terkirim</span>
+          <button type="button" onclick="switchJobView('tracker')" id="btnBlastViewApplied" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300 shadow-xs transition flex items-center gap-2 cursor-pointer" title="Buka Tracker Pipeline Terpadu">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <span>Buka Tracker Lamaran Terpadu</span>
             <span id="blastBadgeAppliedCount" class="bg-emerald-100 text-emerald-800 text-xs px-2 py-0.5 rounded-full font-mono font-bold">0</span>
           </button>
         </div>
@@ -16826,6 +16856,10 @@ ${400 + streamLen}
               <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
               <span>Skill Gap</span>
             </button>
+            <button type="button" onclick="blastJobDirect(${job.id})" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold px-2 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap" title="Kirim Lamaran ke Email HRD / Set Blasting Mandiri">
+              <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              <span>Blast</span>
+            </button>
             <button type="button" onclick="toggleSaveJobToTracker(${job.id})" id="btnBookmarkJob-${job.id}" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold px-2 py-2 rounded-xl transition flex items-center gap-1 cursor-pointer whitespace-nowrap" title="Simpan ke Tracker Lamaran">
               <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
               <span>Simpan</span>
@@ -16948,7 +16982,7 @@ ${senderName}`;
     window.copyPortalApplicationPitch = copyPortalApplicationPitch;
 
     function blastJobDirect(jobId) {
-      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => j.id === jobId);
+      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => String(j.id) === String(jobId));
       if (!job) return;
 
       const hasDirectEmail = Boolean(job.recruiterEmail && job.recruiterEmail.includes('@')) && job.applyMethod === 'email';
@@ -16957,7 +16991,7 @@ ${senderName}`;
       if (hasDirectEmail) {
         switchTab('blast-module');
 
-        let target = verifiedRecruiterTargets.find(t => t.jobId === jobId || t.id === 'job-rec-' + jobId);
+        let target = verifiedRecruiterTargets.find(t => String(t.jobId) === String(jobId) || t.id === 'job-rec-' + jobId);
         if (!target) {
           target = {
             id: 'job-rec-' + job.id,
@@ -17004,9 +17038,23 @@ ${senderName}`;
         return;
       }
 
-      // JALUR 2: Lowongan Portal ATS (Glints/LinkedIn/Website Perusahaan) -> TIDAK MENGARANG EMAIL PALSU!
-      // Jalankan formulir STAR copy & buka portal resmi
-      copyPortalApplicationPitch(jobId);
+      // JALUR 2: Lowongan Portal ATS (Glints/LinkedIn/Kalibrr)
+      // Opsi fleksibel mandiri: Setel Target Email HRD Sendiri atau Lamaran via Portal Resmi
+      const wantsCustomBlast = confirm(
+        'Lowongan "' + job.title + '" di ' + job.company + ' terdaftar dengan jalur Portal Resmi (' + (job.source || 'Karir') + ').\n\n' +
+        'Apakah Anda memiliki alamat email HRD/Recruiter spesifik untuk perusahaan ini dan ingin menyetel Email Blasting sendiri?\n\n' +
+        '• Klik OK untuk input Email HRD perusahaan ini & setel blasting.\n' +
+        '• Klik Cancel untuk lamar langsung via Portal Resmi (STAR Pitch generator).'
+      );
+
+      if (wantsCustomBlast) {
+        switchTab('blast-module');
+        setTimeout(() => {
+          toggleCustomRecruiterForm(true, job.company, job.title);
+        }, 200);
+      } else {
+        copyPortalApplicationPitch(jobId);
+      }
     }
 
     function filterJobs() {
@@ -17085,37 +17133,54 @@ ${senderName}`;
 
     function switchJobView(view) {
       currentJobView = view;
+      if (view === 'blast') {
+        switchTab('blast-module');
+        return;
+      }
+
+      if (appState.currentTab !== 'jobs-module') {
+        switchTab('jobs-module');
+      }
+
       const catalogContainer = document.getElementById('curatedJobsContainer');
       const filterContainer = document.getElementById('jobFiltersCollapsibleContainer');
       const swipeContainer = document.getElementById('jobSwipeContainer');
       const trackerContainer = document.getElementById('jobTrackerContainer');
 
       const btnCatalog = document.getElementById('tabViewCatalogBtn');
+      const btnBlast = document.getElementById('tabViewBlastBtn');
       const btnSwipe = document.getElementById('tabViewSwipeBtn');
       const btnTracker = document.getElementById('tabViewTrackerBtn');
 
-      if (!btnCatalog || !btnSwipe || !btnTracker) return;
-
-      // Reset button styles
-      [btnCatalog, btnSwipe, btnTracker].forEach(btn => {
-        btn.className = 'flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer';
+      // Reset button styles across both containers
+      document.querySelectorAll('.unified-job-view-btn').forEach(btn => {
+        btn.className = 'unified-job-view-btn flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-medium transition flex items-center justify-center gap-1.5 text-slate-600 hover:text-slate-900 cursor-pointer whitespace-nowrap';
       });
 
       if (view === 'catalog') {
-        btnCatalog.className = 'flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer';
+        document.querySelectorAll('.btn-view-catalog').forEach(b => {
+          b.className = 'unified-job-view-btn btn-view-catalog flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
+        });
+        if (btnCatalog) btnCatalog.className = 'unified-job-view-btn btn-view-catalog flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
         if (catalogContainer) catalogContainer.classList.remove('hidden');
         if (filterContainer) filterContainer.classList.remove('hidden');
         if (swipeContainer) swipeContainer.classList.add('hidden');
         if (trackerContainer) trackerContainer.classList.add('hidden');
       } else if (view === 'swipe') {
-        btnSwipe.className = 'flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer';
+        document.querySelectorAll('.btn-view-swipe').forEach(b => {
+          b.className = 'unified-job-view-btn btn-view-swipe flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
+        });
+        if (btnSwipe) btnSwipe.className = 'unified-job-view-btn btn-view-swipe flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
         if (catalogContainer) catalogContainer.classList.add('hidden');
         if (filterContainer) filterContainer.classList.add('hidden');
         if (swipeContainer) swipeContainer.classList.remove('hidden');
         if (trackerContainer) trackerContainer.classList.add('hidden');
         renderSwipeCard();
       } else if (view === 'tracker') {
-        btnTracker.className = 'flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer';
+        document.querySelectorAll('.btn-view-tracker').forEach(b => {
+          b.className = 'unified-job-view-btn btn-view-tracker flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
+        });
+        if (btnTracker) btnTracker.className = 'unified-job-view-btn btn-view-tracker flex-1 sm:flex-initial text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center justify-center gap-1.5 bg-white text-slate-900 shadow-xs border border-slate-200/80 cursor-pointer whitespace-nowrap';
         if (catalogContainer) catalogContainer.classList.add('hidden');
         if (filterContainer) filterContainer.classList.add('hidden');
         if (swipeContainer) swipeContainer.classList.add('hidden');
@@ -17125,7 +17190,7 @@ ${senderName}`;
     }
     window.switchJobView = switchJobView;
 
-    // --- TRACKER KANBAN CRM ---
+    // --- TRACKER KANBAN CRM (SINGLE SOURCE OF TRUTH) ---
     function initJobTracker() {
       if (!appState.jobTracker) {
         try {
@@ -17141,6 +17206,33 @@ ${senderName}`;
       ['wishlist', 'applied', 'interview', 'offer', 'archived'].forEach(k => {
         if (!Array.isArray(appState.jobTracker[k])) appState.jobTracker[k] = [];
       });
+
+      // SINKRONISASI OTOMATIS: Riwayat Blasting (appliedJobsHistory) otomatis masuk ke kolom 'applied'
+      if (typeof appliedJobsHistory !== 'undefined' && Array.isArray(appliedJobsHistory) && appliedJobsHistory.length > 0) {
+        appliedJobsHistory.forEach(aj => {
+          const exists = appState.jobTracker.applied.some(item => 
+            (item.id && aj.id && String(item.id) === String(aj.id)) ||
+            (item.company && aj.company && item.company.toLowerCase().trim() === aj.company.toLowerCase().trim() &&
+             item.title && aj.role && item.title.toLowerCase().trim() === aj.role.toLowerCase().trim())
+          );
+          if (!exists) {
+            appState.jobTracker.applied.push({
+              id: aj.id || ('blast-sync-' + Date.now()),
+              title: aj.role || 'Posisi Terkait',
+              company: aj.company || 'Perusahaan',
+              location: 'Indonesia',
+              level: 'Fresh Graduate',
+              link: '#',
+              addedAt: aj.sentAt ? new Date().toISOString() : new Date().toISOString(),
+              method: 'email_blast',
+              recruiterEmail: aj.email,
+              hr: aj.hr,
+              note: 'Terkirim via Auto-Blast ke ' + (aj.hr || 'HRD') + ' <' + (aj.email || '') + '>'
+            });
+          }
+        });
+      }
+
       updateTrackerBadges();
     }
     window.initJobTracker = initJobTracker;
@@ -17158,6 +17250,8 @@ ${senderName}`;
       const total = Object.values(appState.jobTracker).reduce((acc, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0);
       const mainBadge = document.getElementById('trackerTotalBadge');
       if (mainBadge) mainBadge.textContent = total;
+      const blastTrackerBadge = document.getElementById('blastTrackerTotalBadge');
+      if (blastTrackerBadge) blastTrackerBadge.textContent = total;
 
       const badgeW = document.getElementById('badgeWishlistCount');
       if (badgeW) badgeW.textContent = appState.jobTracker.wishlist.length;
@@ -17171,14 +17265,25 @@ ${senderName}`;
       if (badgeAr) badgeAr.textContent = appState.jobTracker.archived.length;
     }
 
-    function addJobToTracker(jobId, stage = 'wishlist', note = '') {
+    function addJobToTracker(jobId, stage = 'wishlist', note = '', extra = {}) {
       initJobTracker();
-      const job = (appState.activeJobs || curatedJobsDatabase || []).find(j => j.id === jobId);
-      if (!job) return;
+      let job = (appState.activeJobs || curatedJobsDatabase || []).find(j => String(j.id) === String(jobId));
+      if (!job) {
+        job = {
+          id: jobId,
+          title: extra.title || 'Posisi Terkait',
+          company: extra.company || 'Perusahaan',
+          location: 'Indonesia',
+          level: 'Fresh Graduate',
+          link: '#',
+          recruiterEmail: extra.recruiterEmail,
+          applyMethod: extra.method || 'email'
+        };
+      }
 
       // Remove from any previous stage
       ['wishlist', 'applied', 'interview', 'offer', 'archived'].forEach(st => {
-        appState.jobTracker[st] = appState.jobTracker[st].filter(item => item.id !== jobId);
+        appState.jobTracker[st] = appState.jobTracker[st].filter(item => String(item.id) !== String(jobId));
       });
 
       const entry = {
@@ -17189,7 +17294,10 @@ ${senderName}`;
         level: job.level || 'Fresh Graduate',
         link: job.link || job.apply_url || ('https://www.linkedin.com/jobs/search/?keywords=' + encodeURIComponent(job.title + ' ' + job.company)),
         addedAt: new Date().toISOString(),
-        note: note || ''
+        note: note || '',
+        method: extra.method || job.applyMethod || (job.recruiterEmail ? 'email_blast' : 'portal'),
+        recruiterEmail: extra.recruiterEmail || job.recruiterEmail || '',
+        hr: extra.hr || job.hrName || ''
       };
 
       appState.jobTracker[stage].unshift(entry);
@@ -17197,7 +17305,7 @@ ${senderName}`;
 
       const stageLabels = {
         wishlist: 'Disimpan (Wishlist)',
-        applied: 'Sudah Dilamar via Portal',
+        applied: 'Sudah Dilamar',
         interview: 'Tahap Wawancara',
         offer: 'Offering',
         archived: 'Arsip / Selesai'
@@ -17215,7 +17323,7 @@ ${senderName}`;
 
     function toggleSaveJobToTracker(jobId) {
       initJobTracker();
-      const isAlreadyInWishlist = (appState.jobTracker.wishlist || []).some(j => j.id === jobId);
+      const isAlreadyInWishlist = (appState.jobTracker.wishlist || []).some(j => String(j.id) === String(jobId));
       if (isAlreadyInWishlist) {
         if (typeof showToast === 'function') {
           showToast('Lowongan ini sudah ada di daftar Disimpan Tracker.', 'info');
@@ -17232,7 +17340,7 @@ ${senderName}`;
       initJobTracker();
       let found = null;
       ['wishlist', 'applied', 'interview', 'offer', 'archived'].forEach(st => {
-        const idx = appState.jobTracker[st].findIndex(it => it.id === jobId);
+        const idx = appState.jobTracker[st].findIndex(it => String(it.id) === String(jobId));
         if (idx !== -1) {
           found = appState.jobTracker[st].splice(idx, 1)[0];
         }
@@ -17248,7 +17356,7 @@ ${senderName}`;
     function removeTrackerJob(jobId) {
       initJobTracker();
       ['wishlist', 'applied', 'interview', 'offer', 'archived'].forEach(st => {
-        appState.jobTracker[st] = appState.jobTracker[st].filter(it => it.id !== jobId);
+        appState.jobTracker[st] = appState.jobTracker[st].filter(it => String(it.id) !== String(jobId));
       });
       saveJobTracker();
       renderJobTracker();
@@ -17278,28 +17386,64 @@ ${senderName}`;
           const card = document.createElement('div');
           card.className = 'p-3 bg-white border border-slate-200/90 rounded-xl shadow-xs space-y-2 hover:border-blue-400 transition text-xs';
           const dateStr = item.addedAt ? new Date(item.addedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : 'Baru';
+          const isEmailBlast = item.method === 'email_blast' || Boolean(item.recruiterEmail);
+          const safeId = typeof item.id === 'string' ? `'${item.id}'` : item.id;
+
+          let methodBadge = '';
+          let actionLinks = '';
+
+          if (isEmailBlast) {
+            methodBadge = `
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                  <svg class="w-3 h-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                  Email Blast
+                </span>
+                ${item.recruiterEmail ? `<span class="text-xs font-mono text-blue-600 font-medium truncate max-w-[130px]">${escapeHtml(item.recruiterEmail)}</span>` : ''}
+              </div>
+            `;
+            actionLinks = `
+              <button type="button" onclick="blastJobDirect(${safeId})" class="text-indigo-600 hover:underline font-semibold cursor-pointer" title="Buka Pengaturan Blasting">Set Blast</button>
+              ${st === 'applied' ? `<span>&bull;</span><button type="button" onclick="openFollowUpModal('${item.id || ''}', '${(item.company || '').replace(/'/g, "\\'")}', '${(item.title || '').replace(/'/g, "\\'")}', '${item.recruiterEmail || ''}', '${dateStr}')" class="text-emerald-700 hover:underline font-semibold cursor-pointer" title="Follow-up HRD H+7">Follow-up</button>` : ''}
+              <span>&bull;</span>
+              <button type="button" onclick="practiceInterviewForJob(${typeof item.id === 'number' ? item.id : 1})" class="text-amber-700 hover:underline font-semibold cursor-pointer" title="Latihan Interview">Latihan</button>
+            `;
+          } else {
+            methodBadge = `
+              <span class="text-xs bg-blue-50 text-blue-700 border border-blue-200 font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                Portal Resmi
+              </span>
+            `;
+            actionLinks = `
+              <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold" title="Buka Portal">Portal ↗</a>
+              <span>&bull;</span>
+              <button type="button" onclick="blastJobDirect(${safeId})" class="text-indigo-600 hover:underline font-semibold cursor-pointer" title="Kirim Lamaran ke HRD">Blast</button>
+              <span>&bull;</span>
+              <button type="button" onclick="practiceInterviewForJob(${typeof item.id === 'number' ? item.id : 1})" class="text-amber-700 hover:underline font-semibold cursor-pointer" title="Latihan Interview">Latihan</button>
+            `;
+          }
 
           card.innerHTML = `
             <div class="flex items-start justify-between gap-1">
               <div>
-                <h4 class="font-bold text-slate-900 leading-snug">${item.title}</h4>
-                <div class="font-semibold text-slate-500 mt-0.5">${item.company}</div>
+                <h4 class="font-bold text-slate-900 leading-snug">${escapeHtml(item.title)}</h4>
+                <div class="font-semibold text-slate-500 mt-0.5">${escapeHtml(item.company)}</div>
               </div>
-              <button type="button" onclick="removeTrackerJob(${item.id})" class="text-slate-300 hover:text-rose-500 p-0.5 rounded cursor-pointer" title="Hapus dari Tracker">
+              <button type="button" onclick="removeTrackerJob(${safeId})" class="text-slate-300 hover:text-rose-500 p-0.5 rounded cursor-pointer" title="Hapus dari Tracker">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
+            ${methodBadge}
             ${item.note ? `<p class="text-xs text-slate-600 bg-slate-50 p-1.5 rounded border border-slate-100 italic">${escapeHtml(item.note)}</p>` : ''}
             <div class="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-100">
               <span>${dateStr}</span>
               <div class="flex items-center gap-1">
-                <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline font-semibold" title="Buka Portal">Portal ↗</a>
-                <span>&bull;</span>
-                <button type="button" onclick="practiceInterviewForJob(${item.id})" class="text-amber-700 hover:underline font-semibold cursor-pointer" title="Latihan Interview">Latihan</button>
+                ${actionLinks}
               </div>
             </div>
             <div class="pt-1">
-              <select onchange="moveTrackerJob(${item.id}, this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-1 text-slate-700 font-medium cursor-pointer">
+              <select onchange="moveTrackerJob(${safeId}, this.value)" aria-label="Ubah Status Lamaran" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-lg p-1 text-slate-700 font-medium cursor-pointer">
                 <option value="wishlist" ${st === 'wishlist' ? 'selected' : ''}>Disimpan (Wishlist)</option>
                 <option value="applied" ${st === 'applied' ? 'selected' : ''}>Sudah Dilamar</option>
                 <option value="interview" ${st === 'interview' ? 'selected' : ''}>Tahap Wawancara</option>
@@ -17737,7 +17881,7 @@ ${senderName}`;
       }
     }
 
-    function toggleCustomRecruiterForm(force) {
+    function toggleCustomRecruiterForm(force, defaultCompany, defaultRole) {
       const form = document.getElementById('customRecruiterForm');
       if (!form) return;
       if (typeof force === 'boolean') {
@@ -17745,6 +17889,17 @@ ${senderName}`;
         else form.classList.add('hidden');
       } else {
         form.classList.toggle('hidden');
+      }
+      if (force && defaultCompany) {
+        const compInput = document.getElementById('customRecCompany');
+        if (compInput) compInput.value = defaultCompany;
+      }
+      if (force && defaultRole) {
+        const roleInput = document.getElementById('customRecRole');
+        if (roleInput) roleInput.value = defaultRole;
+      }
+      if (force) {
+        try { form.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e){}
       }
     }
 
@@ -18114,6 +18269,10 @@ ${senderName}`;
     }
 
     function switchBlastView(view) {
+      if (view === 'applied') {
+        switchJobView('tracker');
+        return;
+      }
       const qView = document.getElementById('blastQueueContainerView');
       const aView = document.getElementById('blastAppliedContainerView');
       const btnQ = document.getElementById('btnBlastViewQueue');
@@ -18712,6 +18871,19 @@ ${senderName}`;
             sentAt: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
           });
           saveAppliedJobsHistory();
+        }
+
+        // Sinkronisasi otomatis ke Tracker Lamaran Kanban CRM (Single Source of Truth)
+        if (typeof addJobToTracker === 'function') {
+          addJobToTracker(item.id, 'applied', 'Lamaran terkirim via Email HRD otomatis pada ' + new Date().toLocaleDateString('id-ID'), {
+            title: item.role,
+            company: item.company,
+            hr: item.hr,
+            email: item.email,
+            method: 'email_blast',
+            location: item.location || 'Indonesia (Direct HRD)',
+            type: item.type || 'Full Time'
+          });
         }
         
         // CRITICAL ATOMIC QUOTA DECREMENT: quota = quota - 1 with NO desynchronization
