@@ -1985,24 +1985,57 @@
 
             <div>
               <label class="block text-xs font-semibold text-slate-600 mb-1">Format Subjek Email ATS</label>
-              <input type="text" id="blastSubjectFormat" value="Application: [Target Role] - [Candidate Name] (Fresh Graduate)" class="dospem-input w-full text-xs rounded-lg p-2.5 font-mono text-xs">
+              <input type="text" id="blastSubjectFormat" value="Lamaran Pekerjaan: [Target Role] - [Candidate Name] (Fresh Graduate)" class="dospem-input w-full text-xs rounded-lg p-2.5 font-mono text-xs">
             </div>
 
-            <!-- Cover Letter AI -->
-            <div>
-              <div class="flex items-center justify-between mb-1">
-                <label class="block text-xs font-semibold text-slate-600">Gaya Cover Letter AI:</label>
-                <div class="flex items-center gap-2">
-                  <select id="blastAiPersonaSelect" onchange="regenerateBlastCoverLetter()" class="text-xs bg-slate-50 border border-slate-300 rounded px-2 py-1 font-semibold text-slate-700">
-                    <option value="general">Gaya Umum Fresh Graduate (Netral)</option>
-                    <option value="confident">Gaya Percaya Diri & Metrik STAR</option>
-                    <option value="corporate">Gaya Formal Korporat MNC (Sopan)</option>
-                    <option value="creative">Gaya Kreatif & Startup Tech (Agresif)</option>
-                  </select>
-                  <button onclick="regenerateBlastCoverLetter()" class="text-xs text-blue-600 hover:underline">Generate</button>
+            <!-- Format Surat Lamaran Kerja Baku (Standar BUMN & Korporat) -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-xs font-bold text-slate-800">Surat Lamaran (Format Baku Standar BUMN & Korporat):</label>
+                <span class="text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">Resmi & Terverifikasi</span>
+              </div>
+              <textarea id="blastCoverLetterBody" rows="6" class="dospem-input w-full p-3 rounded-lg text-xs font-mono leading-relaxed"></textarea>
+            </div>
+
+            <!-- PENGATURAN METODE PENGIRIM EMAIL (SERVER RESMI VS SMTP GMAIL PRIBADI) -->
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-800">Metode Pengiriman Email:</span>
+                <span class="text-xs text-slate-500 font-medium">Bisa pakai email pribadi</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 transition">
+                  <input type="radio" id="blastMailChannelPlatform" name="blastMailChannel" value="platform" checked onchange="toggleBlastMailChannel()" aria-label="Server Platform" class="text-blue-600">
+                  <div>
+                    <div class="font-bold text-slate-800">Server Platform</div>
+                    <div class="text-slate-400 text-xs">Kirim via Resend Resmi</div>
+                  </div>
+                </label>
+                <label class="flex items-center gap-2 p-2.5 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-blue-300 transition">
+                  <input type="radio" id="blastMailChannelPersonalSmtp" name="blastMailChannel" value="personal_smtp" onchange="toggleBlastMailChannel()" aria-label="Email Pribadi (SMTP)" class="text-blue-600">
+                  <div>
+                    <div class="font-bold text-slate-800">Email Pribadi (SMTP)</div>
+                    <div class="text-slate-400 text-xs">Gmail App Password</div>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Form Input SMTP Pribadi (Hidden by default) -->
+              <div id="blastPersonalSmtpConfig" class="hidden space-y-2.5 pt-2 border-t border-slate-200 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-slate-600 font-semibold mb-1">Email Gmail Pribadi:</label>
+                    <input type="email" id="blastSmtpUser" placeholder="misal: nama@gmail.com" class="dospem-input w-full p-2 rounded-lg text-xs font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-slate-600 font-semibold mb-1">Google App Password (16 Digit):</label>
+                    <input type="password" id="blastSmtpPass" placeholder="xxxx xxxx xxxx xxxx" class="dospem-input w-full p-2 rounded-lg text-xs font-mono">
+                  </div>
+                </div>
+                <div class="p-2.5 bg-blue-50/80 border border-blue-200/80 rounded-xl text-blue-900 leading-relaxed text-xs">
+                  <span class="font-bold">Info Keamanan:</span> Password disimpan secara lokal di browser Anda untuk sesi pengiriman. Dapatkan App Password 16-digit di menu <i>Google Account &rarr; Security &rarr; 2-Step Verification &rarr; App Passwords</i>.
                 </div>
               </div>
-              <textarea id="blastCoverLetterBody" rows="5" class="dospem-input w-full p-3 rounded-lg text-xs font-mono leading-relaxed"></textarea>
             </div>
 
             <!-- Lampiran File CV ATS (Terhubung ke Modul 1) -->
@@ -2024,6 +2057,15 @@
                   Bedah & Perbarui CV di Modul 1 &rarr;
                 </button>
               </div>
+            </div>
+
+            <!-- TOMBOL UJI COBA: KIRIM 1 EMAIL KE EMAIL PRIBADI -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <button type="button" onclick="sendTestSampleEmail()" id="btnSendTestSampleEmail" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-xs cursor-pointer">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <span id="btnSendTestSampleText">Kirim 1 Email Uji Coba ke Email Pribadi</span>
+              </button>
+              <p class="text-xs text-slate-500 text-center">Uji tampilan surat dan lampiran PDF langsung di inbox email Anda sebelum mengirim ke HRD.</p>
             </div>
 
             <!-- Mode Pengiriman: Nyata vs Simulasi Database -->
@@ -17823,15 +17865,19 @@ ${senderName}`;
     }
 
     function selectAllBlastTargets(check) {
-      const visibleCheckboxes = document.querySelectorAll('#blastTargetsContainer label[style*="display: flex"] input[name="blastTargetCheck"], #blastTargetsContainer label:not([style*="display: none"]) input[name="blastTargetCheck"]');
-      visibleCheckboxes.forEach(cb => { cb.checked = check; });
+      if (!check) {
+        document.querySelectorAll('#blastTargetsContainer input[name="blastTargetCheck"]').forEach(cb => { cb.checked = false; });
+      } else {
+        const visibleCheckboxes = document.querySelectorAll('#blastTargetsContainer label[style*="display: flex"] input[name="blastTargetCheck"]:not(:disabled), #blastTargetsContainer label:not([style*="display: none"]) input[name="blastTargetCheck"]:not(:disabled)');
+        visibleCheckboxes.forEach(cb => { cb.checked = true; });
+      }
       updateBlastQueuePreview();
       regenerateBlastCoverLetter();
     }
 
     function selectTopNBlastTargets(n) {
       selectAllBlastTargets(false);
-      const allCheckboxes = document.querySelectorAll('#blastTargetsContainer input[name="blastTargetCheck"]');
+      const allCheckboxes = document.querySelectorAll('#blastTargetsContainer input[name="blastTargetCheck"]:not(:disabled)');
       for (let i = 0; i < Math.min(n, allCheckboxes.length); i++) {
         allCheckboxes[i].checked = true;
       }
@@ -18169,6 +18215,56 @@ ${senderName}`;
       });
     }
 
+    function checkTargetCvCompatibility(target) {
+      if (!target) return true;
+      const mp = (typeof appState !== 'undefined' && appState.masterProfile) || {};
+      const cvText = ((document.getElementById('cvExperienceInput')?.value || '') + ' ' +
+        (document.getElementById('cvTargetRole')?.value || '') + ' ' +
+        (document.getElementById('targetRole')?.value || '') + ' ' +
+        (mp.experience?.map(e => (e.role || '') + ' ' + (e.bullets || []).join(' ')).join(' ') || '') + ' ' +
+        (mp.education?.map(e => (e.degree || '') + ' ' + (e.major || '')).join(' ') || '') + ' ' +
+        ((mp.skills?.technical || []).join(' ')) + ' ' +
+        ((mp.skills?.tools || []).join(' '))
+      ).toLowerCase().trim();
+
+      // Jika CV masih kosong/default, izinkan agar pelamar bisa memilih target
+      if (cvText.length < 30) return true;
+
+      const jobTitle = (target.role || target.title || '').toLowerCase();
+      const jobCategory = (target.category || '').toLowerCase();
+      const jobRoleKeys = (target.role_keys || []).map(r => String(r).toLowerCase());
+
+      const isTechCandidate = /software|developer|engineer|pemrogram|it |coding|frontend|backend|fullstack|data|ai |iot|telemetri|hardware|cloud|tech|informatika|sistem informasi|teknik fisika/.test(cvText);
+      const isBusinessCandidate = /business|analyst|product|manajer|manajemen|project|consulting|pmo|operas|administrasi/.test(cvText);
+      const isMarketingCandidate = /market|growth|social media|copywrit|brand|creative|seo|konten/.test(cvText);
+      const isFinanceCandidate = /akuntan|accounting|finance|pajak|tax|audit|keuangan/.test(cvText);
+
+      const isTechJob = /software|developer|engineer|pemrogram|data|ai|iot|cloud|tech|fullstack|backend|frontend|programmer|it support/.test(jobTitle) || jobCategory === 'tech' || jobRoleKeys.includes('software-eng');
+      const isBusinessJob = /business|product|analyst|project|pmo|operas|operations|trainee|odp|management trainee/.test(jobTitle) || jobCategory === 'business' || jobRoleKeys.includes('business-analyst') || jobRoleKeys.includes('operations-trainee');
+      const isMarketingJob = /market|growth|social media|content|copywrit|brand|creative/.test(jobTitle) || jobCategory === 'marketing' || jobRoleKeys.includes('digital-marketing');
+      const isFinanceJob = /akuntan|accounting|finance|tax|pajak|audit|keuangan/.test(jobTitle) || jobCategory === 'finance' || jobRoleKeys.includes('finance-accounting');
+
+      // Hard Incompatibility Gate: CV yang jelas tidak relevan dilarang di-blast
+      if (isTechCandidate && !isFinanceCandidate && isFinanceJob) return false;
+      if (isFinanceCandidate && !isTechCandidate && isTechJob) return false;
+      if (isTechCandidate && !isMarketingCandidate && isMarketingJob && !/growth engineer|tech marketing/.test(jobTitle)) return false;
+
+      // Management Trainee BUMN/Nasional terbuka untuk semua jurusan
+      if (/management trainee|trainee|odp|officer development|bumn trainee/i.test(jobTitle)) return true;
+
+      if (isTechCandidate && isTechJob) return true;
+      if (isBusinessCandidate && (isBusinessJob || /trainee|analyst/i.test(jobTitle))) return true;
+      if (isMarketingCandidate && isMarketingJob) return true;
+      if (isFinanceCandidate && isFinanceJob) return true;
+
+      const words = jobTitle.split(/\s+/).filter(w => w.length > 3);
+      const matchCount = words.filter(w => cvText.includes(w)).length;
+      if (matchCount >= 1) return true;
+
+      return false;
+    }
+    window.checkTargetCvCompatibility = checkTargetCvCompatibility;
+
     function initBlastTargets(autoCheckedIds = []) {
       loadCustomRecruitersFromStorage();
       loadAppliedJobsHistory();
@@ -18237,11 +18333,12 @@ ${senderName}`;
       const esc = (v) => (typeof escapeHtml === 'function' ? escapeHtml(String(v == null ? '' : v)) : String(v == null ? '' : v));
       availableTargets.forEach((t, i) => {
         const kindLabel = t.custom ? 'Kustom' : (t.sourceLabel || 'Kontak');
-        const isChecked = autoCheckedIds.includes(t.id); // tidak ada yang dicentang otomatis
+        const isCompatible = checkTargetCvCompatibility(t);
+        const isChecked = isCompatible && autoCheckedIds.includes(t.id); // tidak ada yang dicentang otomatis
         const card = document.createElement('label');
         card.setAttribute('data-category', t.category || (t.custom ? 'custom' : 'all'));
         card.setAttribute('data-subcategory', t.subCategory || (t.custom ? 'custom' : 'tier1'));
-        card.className = 'rounded-2xl border border-slate-200/80 bg-white/95 p-3.5 hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between cursor-pointer';
+        card.className = 'rounded-2xl border border-slate-200/80 bg-white/95 p-3.5 hover:border-slate-300 hover:shadow-xs transition-all flex items-center justify-between cursor-pointer' + (!isCompatible ? ' opacity-60 bg-slate-50/70 cursor-not-allowed' : '');
 
         const companyInitial = t.company ? t.company.charAt(0).toUpperCase() : 'H';
         let badgeHtml = '';
@@ -18268,10 +18365,14 @@ ${senderName}`;
           `;
         }
 
+        const compatBadge = !isCompatible 
+          ? `<span class="text-xs bg-red-50 text-red-700 border border-red-200 font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-0.5 shrink-0" title="Kualifikasi CV Anda berbeda rumpun dengan posisi ini. Pengiriman dinonaktifkan untuk menjaga reputasi profesional Anda.">Kualifikasi Tidak Sesuai</span>`
+          : '';
+
         const hrInitials = (t.hrName || t.company || 'HR').split(' ').filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
         card.innerHTML = `
           <div class="flex items-center gap-3 min-w-0 pr-2">
-            <input type="checkbox" name="blastTargetCheck" value="${t.id}" ${isChecked ? 'checked' : ''} onchange="updateBlastQueuePreview(); regenerateBlastCoverLetter();" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 shrink-0">
+            <input type="checkbox" name="blastTargetCheck" value="${t.id}" ${isChecked ? 'checked' : ''} ${!isCompatible ? 'disabled' : ''} onchange="updateBlastQueuePreview(); regenerateBlastCoverLetter();" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 shrink-0 ${!isCompatible ? 'opacity-40 cursor-not-allowed' : ''}">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200/80 flex items-center justify-center font-bold text-xs text-blue-900 shrink-0 shadow-xs">
               ${hrInitials}
             </div>
@@ -18282,6 +18383,7 @@ ${senderName}`;
                   <svg class="w-2.5 h-2.5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                   ${esc(kindLabel)}
                 </span>
+                ${compatBadge}
               </div>
               <div class="text-xs text-slate-500 font-medium truncate mt-0.5">
                 <span class="text-slate-700 font-semibold">${esc(t.hrTitle || t.hr)}</span> &bull; <span>${esc(t.company)}</span>
@@ -18330,11 +18432,124 @@ ${senderName}`;
         currentBlastCvFile = {
           name: file.name,
           size: file.size,
-          type: file.type
+          type: file.type,
+          rawFile: file
         };
+        window.currentBlastCvFile = currentBlastCvFile;
         if (status) status.innerHTML = '<span class="text-blue-700 font-bold">' + escapeHtml(file.name) + '</span> (' + (file.size/1024).toFixed(1) + ' KB) Terlampir';
       }
     }
+
+    async function getCvPdfBase64() {
+      if (currentBlastCvFile && currentBlastCvFile.rawFile) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.onerror = () => resolve(null);
+          reader.readAsDataURL(currentBlastCvFile.rawFile);
+        });
+      }
+      try {
+        if (typeof generateHarvardAtsPdfBlob === 'function') {
+          const blob = generateHarvardAtsPdfBlob();
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (err) {
+        console.warn('[PDF Base64 Generator]', err);
+      }
+      return null;
+    }
+
+    function toggleBlastMailChannel() {
+      const channel = document.querySelector('input[name="blastMailChannel"]:checked')?.value;
+      const smtpBox = document.getElementById('blastPersonalSmtpConfig');
+      if (!smtpBox) return;
+      if (channel === 'personal_smtp') {
+        smtpBox.classList.remove('hidden');
+      } else {
+        smtpBox.classList.add('hidden');
+      }
+    }
+    window.toggleBlastMailChannel = toggleBlastMailChannel;
+
+    async function sendTestSampleEmail() {
+      const btn = document.getElementById('btnSendTestSampleEmail');
+      const btnText = document.getElementById('btnSendTestSampleText');
+      const originalText = btnText ? btnText.innerText : 'Kirim 1 Email Uji Coba ke Email Pribadi';
+
+      const senderName = document.getElementById('blastSenderName')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.name : 'Kandidat Pelamar');
+      const senderEmail = document.getElementById('blastSenderEmail')?.value || (currentUser && currentUser.isLoggedIn ? currentUser.email : '');
+      
+      if (!senderEmail || !senderEmail.includes('@')) {
+        alert('Silakan isi Alamat Email Pengirim yang valid untuk menerima email uji coba.');
+        const emailInput = document.getElementById('blastSenderEmail');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      const channel = document.querySelector('input[name="blastMailChannel"]:checked')?.value || 'platform';
+      let smtpConfig = null;
+      if (channel === 'personal_smtp') {
+        const user = document.getElementById('blastSmtpUser')?.value.trim();
+        const pass = document.getElementById('blastSmtpPass')?.value.trim();
+        if (!user || !pass) {
+          alert('Untuk mengirim via SMTP Pribadi, silakan isi Email Gmail Pribadi dan Google App Password 16-digit.');
+          return;
+        }
+        smtpConfig = {
+          host: 'smtp.gmail.com',
+          port: 465,
+          user,
+          pass
+        };
+      }
+
+      const subject = document.getElementById('blastSubjectFormat')?.value || ('Application: Fresh Graduate ATS - ' + senderName);
+      const coverLetter = document.getElementById('blastCoverLetterBody')?.value || '';
+
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.innerText = 'Mengirim email sampel...';
+
+      try {
+        const pdfBase64 = await getCvPdfBase64();
+        const payload = {
+          testEmail: senderEmail,
+          senderName,
+          senderEmail,
+          subject,
+          coverLetter,
+          smtpConfig,
+          pdfBase64
+        };
+
+        const res = await fetch('/api/blast/test-sample', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || 'Gagal mengirim email uji coba.');
+        }
+
+        alert('Email sampel uji coba berhasil dikirim ke: ' + senderEmail + '\n\nSilakan periksa kotak masuk (inbox) atau spam Anda untuk mengecek tata letak surat dan kelengkapan lampiran berkas CV.');
+        appendBlastLog('[TEST SAMPLE]: Berhasil dikirim ke ' + senderEmail + ' (' + (data.channel === 'smtp_personal' ? 'Akun Gmail Pribadi' : 'Server Platform') + ').');
+      } catch (err) {
+        console.error('Error sending test sample:', err);
+        alert('Gagal mengirim email uji coba: ' + err.message);
+        appendBlastLog('[TEST SAMPLE GAGAL]: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (btnText) btnText.innerText = originalText;
+      }
+    }
+    window.sendTestSampleEmail = sendTestSampleEmail;
 
     function generatePersonalizedCoverLetter(targetItem, personaStyle, name, email) {
       const company = targetItem.company || 'Perusahaan Bapak/Ibu';
@@ -18345,44 +18560,25 @@ ${senderName}`;
       const previewEl = document.getElementById('previewAfter');
       const starPreview = (previewEl ? (previewEl.textContent || previewEl.innerText || '') : '').replace(/^"|"$/g, '').trim();
 
-      let highlight = 'Memiliki pemahaman terstruktur, rekam jejak kerja terukur, serta kemampuan analisis dan eksekusi cepat untuk mendukung target tim ' + company + '.';
+      let highlight = 'Memiliki pemahaman terstruktur, rekam jejak kerja terukur, serta kemampuan analisis dan eksekusi cepat untuk mendukung pencapaian target tim ' + company + '.';
       if (starPreview && !starPreview.includes('Formula STAR yang siap')) {
         highlight = starPreview;
       }
 
-      let body = '';
       const isTeam = targetItem.hrName && /tim|team|biro|recruitment|center|acquisition/i.test(targetItem.hrName);
       const hrPerson = targetItem.hrName 
         ? (isTeam ? targetItem.hrName : ((targetItem.hrSalutation || 'Bapak/Ibu') + ' ' + targetItem.hrName)) 
         : hr;
       const hrJobTitle = targetItem.hrTitle ? ('\n' + targetItem.hrTitle) : '';
 
-      if (personaStyle === 'corporate') {
-        body = 'Kepada Yth.\nBapak/Ibu ' + hrPerson + hrJobTitle + '\n' + company + '\n\nDengan hormat,\n\n' +
+      const body = 'Kepada Yth.\nBapak/Ibu ' + hrPerson + hrJobTitle + '\n' + company + '\n\nDengan hormat,\n\n' +
 'Sehubungan dengan dibukanya kesempatan karir untuk posisi ' + position + ' di ' + company + ', bersama ini saya, ' + name + ', mengajukan diri untuk berkontribusi secara profesional.\n\n' +
-'Latar belakang dan kompetensi yang saya miliki telah melatih integritas kerja, pemikiran terstruktur, dan orientasi kuat pada hasil kerja yang akurat. Saya meyakini dapat beradaptasi secara optimal dengan standar keunggulan di ' + company + '.\n\n' +
-'Bersama surat ini, saya melampirkan Curriculum Vitae (CV) terformat rapi untuk ditinjau. Besar harapan saya untuk memperoleh kesempatan wawancara guna mendiskusikan bagaimana kualifikasi saya dapat menjawab kebutuhan tim ' + company + '.\n\n' +
+'Latar belakang pendidikan dan kompetensi yang saya miliki telah melatih integritas kerja, pemikiran terstruktur, serta orientasi kuat pada hasil kerja yang akurat. Nilai tambah yang siap saya berikan:\n' +
+'• ' + highlight + '\n' +
+'• Kemampuan adaptasi cepat terhadap sistem operasional dan standar keunggulan ' + company + '.\n' +
+'• Kedisiplinan komunikasi profesional serta kolaborasi tim yang produktif.\n\n' +
+'Bersama surat ini, saya melampirkan berkas Curriculum Vitae (CV) ATS 1-kolom standar Harvard lengkap sebagai bahan pertimbangan Bapak/Ibu. Besar harapan saya untuk memperoleh kesempatan wawancara guna mendiskusikan bagaimana kualifikasi saya dapat menjawab kebutuhan tim ' + company + '.\n\n' +
 'Atas perhatian dan waktu Bapak/Ibu, saya ucapkan terima kasih.\n\nHormat saya,\n' + name + '\nKontak: ' + email;
-      } else if (personaStyle === 'creative') {
-        const greetingTarget = isTeam ? ('Tim Rekruter ' + company) : (((targetItem.hrSalutation || '') + ' ' + targetItem.hrName.split(' ')[0]).trim());
-        body = 'Halo ' + greetingTarget + '!\n\n' +
-'Saya ' + name + ', dan saya sangat antusias melamar posisi ' + position + ' di ' + company + '. Saya melihat potensi besar untuk berkontribusi langsung pada efisiensi operasional dan perkembangan produk tim Anda.\n\n' +
-'Nilai tambah yang siap saya bawa:\n' +
-'• ' + highlight + '\n' +
-'• Pola pikir proaktif dan fokus pada solusi praktis (problem-solving mindset).\n' +
-'• Kemampuan adaptasi cepat di lingkungan kerja dinamis dan kolaboratif.\n\n' +
-'Terlampir resume lengkap saya sebagai bahan pertimbangan. Saya siap berbincang lebih lanjut mengenai rencana kontribusi saya untuk ' + company + '.\n\n' +
-'Salam hangat,\n' + name + '\n' + email;
-      } else {
-        body = 'Yth. Bapak/Ibu ' + hr + ',\n' + company + '\n\n' +
-'Melalui surat ini, saya bermaksud menyampaikan lamaran untuk posisi ' + position + ' di ' + company + '. Sebagai kandidat yang berdedikasi dengan fondasi keahlian relevan, saya siap memberikan kontribusi produktif bagi pencapaian target tim Anda.\n\n' +
-'Kualifikasi & Poin Relevan:\n' +
-'• ' + highlight + '\n' +
-'• Terbiasa bekerja dengan target terukur, disiplin dokumentasi, dan komunikasi efektif lintas fungsi.\n' +
-'• Cepat mempelajari alur kerja dan teknologi baru yang diterapkan di ' + company + '.\n\n' +
-'Terlampir dokumen Curriculum Vitae (CV) ATS standar Harvard saya sebagai bahan tinjauan. Besar harapan saya untuk berdiskusi langsung mengenai peluang kontribusi saya di ' + company + '.\n\n' +
-'Terima kasih atas waktu dan kesempatan yang diberikan.\n\nHormat saya,\n' + name + '\nEmail: ' + email;
-      }
 
       const complianceFooter = '\n\n---\n[Kepatuhan B2B & Privasi]: Surat ini dikirimkan sebagai korespondensi bisnis sah untuk pengajuan karir profesional. Balas "UNSUBSCRIBE" jika posisi telah terpenuhi atau tidak berkenan menerima kontak di masa mendatang.';
       return body + complianceFooter;

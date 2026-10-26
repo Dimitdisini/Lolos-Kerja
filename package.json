@@ -29,6 +29,7 @@
     "@anthropic-ai/sdk": "^0.135.0",
     "@supabase/supabase-js": "^2.47.10",
     "jspdf": "^2.5.1",
+    "nodemailer": "^10.2.1",
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {

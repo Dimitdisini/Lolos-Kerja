@@ -5,9 +5,11 @@
  */
 
 import overviewHandler from '../_handlers/admin/overview.js';
+import scrapeHandler from '../_handlers/admin/scrape.js';
 
 const routes = {
-  overview: overviewHandler
+  overview: overviewHandler,
+  scrape: scrapeHandler
 };
 
 export default async function handler(req, res) {

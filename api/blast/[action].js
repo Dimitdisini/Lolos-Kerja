@@ -11,6 +11,7 @@ import statusHandler from '../_handlers/blast/status.js';
 import tickHandler from '../_handlers/blast/tick.js';
 import unsubscribeHandler from '../_handlers/blast/unsubscribe.js';
 import webhookResendHandler from '../_handlers/blast/webhook-resend.js';
+import testSampleHandler from '../_handlers/blast/test-sample.js';
 
 const routes = {
   plan: planHandler,
@@ -19,7 +20,8 @@ const routes = {
   status: statusHandler,
   tick: tickHandler,
   unsubscribe: unsubscribeHandler,
-  'webhook-resend': webhookResendHandler
+  'webhook-resend': webhookResendHandler,
+  'test-sample': testSampleHandler
 };
 
 export default async function handler(req, res) {

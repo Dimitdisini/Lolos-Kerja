@@ -60,6 +60,42 @@
       </div>
     </div>
 
+    <!-- Section: Pusat Sinkronisasi Scraping Loker -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-700/60">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Pusat Sinkronisasi Lowongan Kerja (Scraper Ingestion)</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Mengambil, menormalisasi, dan memfilter lowongan lokal Indonesia bebas loker senior & fiktif.</p>
+        </div>
+        <button id="btnAdminScrape" onclick="triggerAdminScraping()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span id="btnAdminScrapeText">Mulai Scraping Baru Sekarang</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Fokus Wilayah:</span>
+          <span class="font-bold text-slate-200">100% Loker Lokal Indonesia</span>
+          <span class="text-2xs text-slate-500 block">Glints, LinkedIn ID, Jobstreet, BUMN</span>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Seniority Filter:</span>
+          <span class="font-bold text-emerald-400">Aktif (Zero-Slop Fresh Grad)</span>
+          <span class="text-2xs text-slate-500 block">Senior & Manager Otomatis Dibuang</span>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Jadwal Cron Otomatis:</span>
+          <span class="font-bold text-blue-400">Aktif (Setiap Hari 08:00 WIB)</span>
+          <span id="adminScrapeLastUpdated" class="text-2xs text-slate-500 block">Status: Siap dijalankan</span>
+        </div>
+      </div>
+      <div id="adminScrapeResultBox" class="hidden p-3 bg-blue-950/40 border border-blue-800/60 rounded-xl text-xs text-blue-300"></div>
+    </div>
+
     <!-- Section: Users List -->
     <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5">
       <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3">Daftar Pengguna Aktif & Kuota</h2>
@@ -166,6 +202,44 @@
         loadAdminOverview();
       } catch (err) {
         alert('Gagal mengubah status jeda: ' + err.message);
+      }
+    };
+
+    window.triggerAdminScraping = async function() {
+      const btn = document.getElementById('btnAdminScrape');
+      const text = document.getElementById('btnAdminScrapeText');
+      const box = document.getElementById('adminScrapeResultBox');
+      const lastUp = document.getElementById('adminScrapeLastUpdated');
+
+      if (btn) btn.disabled = true;
+      if (text) text.textContent = 'Menjalankan Scraping & Deduplikasi...';
+      if (box) box.classList.add('hidden');
+
+      try {
+        const res = await apiFetch('/api/admin/scrape', { method: 'POST' });
+        if (box) {
+          box.classList.remove('hidden');
+          box.innerHTML = `
+            <div class="font-bold text-emerald-400 flex items-center gap-1.5 mb-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <span>${res.message || 'Scraping Selesai'}</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-2xs text-slate-300 mt-2">
+              <div>Total Masuk: <b class="text-white">${res.stats?.totalIngested || 0}</b></div>
+              <div>Loker Fresh Grad: <b class="text-emerald-400">${res.stats?.verifiedFreshGrad || 0}</b></div>
+              <div>Ditolak Senior: <b class="text-amber-400">${res.stats?.rejectedSeniority || 0}</b></div>
+              <div>Luar Negeri Ditolak: <b class="text-rose-400">${res.stats?.rejectedForeign || 0}</b></div>
+            </div>
+          `;
+        }
+        if (lastUp && res.stats?.lastUpdated) {
+          lastUp.textContent = `Terakhir: ${new Date(res.stats.lastUpdated).toLocaleTimeString('id-ID')}`;
+        }
+      } catch (err) {
+        alert('Gagal menjalankan scraping: ' + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+        if (text) text.textContent = 'Mulai Scraping Baru Sekarang';
       }
     };
 
