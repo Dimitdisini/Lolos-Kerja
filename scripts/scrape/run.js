@@ -122,16 +122,35 @@ export function normalizeJob(rawJob) {
 export async function runScrapePipeline() {
   console.log('=== MEMULAI INGESTION & SCRAPE PIPELINE LOLOS KERJA ===');
 
-  // Cari file sumber seed (clean-live-jobs.json)
+  // Cari file sumber seed (clean-live-jobs.json) dan hasil scraper JobSpy/API (jobspy-raw-jobs.json)
   const seedPath = path.resolve(__dirname, '../../clean-live-jobs.json');
-  if (!fs.existsSync(seedPath)) {
-    console.error('File seed clean-live-jobs.json tidak ditemukan di:', seedPath);
-    return;
+  const jobspyPath = path.resolve(__dirname, 'jobspy-raw-jobs.json');
+
+  let rawJobs = [];
+
+  if (fs.existsSync(seedPath)) {
+    const rawData = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
+    const seedJobs = Array.isArray(rawData) ? rawData : (rawData.jobs || []);
+    console.log(`Ditemukan ${seedJobs.length} raw jobs pada dataset seed.`);
+    rawJobs.push(...seedJobs);
   }
 
-  const rawData = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
-  const rawJobs = Array.isArray(rawData) ? rawData : (rawData.jobs || []);
-  console.log(`Ditemukan ${rawJobs.length} raw jobs pada dataset sumber.`);
+  if (fs.existsSync(jobspyPath)) {
+    try {
+      const jobspyData = JSON.parse(fs.readFileSync(jobspyPath, 'utf8'));
+      if (Array.isArray(jobspyData)) {
+        console.log(`Ditemukan ${jobspyData.length} raw jobs dari JobSpy / Open API fetcher.`);
+        rawJobs.push(...jobspyData);
+      }
+    } catch (e) {
+      console.warn('Gagal membaca jobspy-raw-jobs.json:', e.message);
+    }
+  }
+
+  if (rawJobs.length === 0) {
+    console.error('Tidak ada dataset sumber lowongan yang ditemukan.');
+    return;
+  }
 
   const normalizedMap = new Map();
   let rejectedSeniorCount = 0;

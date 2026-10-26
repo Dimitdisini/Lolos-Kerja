@@ -41,6 +41,12 @@ export function renderJobCard(job, options = {}) {
           <button type="button" onclick="practiceInterviewForJob('${job.id}')" class="text-xs font-bold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 px-3 py-1.5 rounded-xl border border-slate-200 transition flex items-center gap-1.5 cursor-pointer">
             Latihan Wawancara
           </button>
+          <button type="button" onclick="showSkillGapModal('${job.id}')" class="text-xs font-bold text-indigo-700 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-200 transition flex items-center gap-1.5 cursor-pointer">
+            Skill Gap
+          </button>
+          <button type="button" onclick="toggleSaveJobToTracker('${job.id}')" class="text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-xl border border-slate-200 transition flex items-center gap-1 cursor-pointer">
+            Simpan
+          </button>
         </div>
         <div>
           <a href="${job.portal_url || job.link || '#'}" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3.5 py-1.5 rounded-xl transition inline-flex items-center gap-1">

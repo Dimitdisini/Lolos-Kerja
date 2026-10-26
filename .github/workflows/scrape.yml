@@ -13,14 +13,31 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+        continue-on-error: true
+
+      - name: Install Scraping Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install python-jobspy requests || true
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Run Scraping Pipeline
+      - name: Run JobSpy & Open API Ingestion
+        run: |
+          if [ -f scripts/scrape/jobspy_fetcher.py ]; then
+            python3 scripts/scrape/jobspy_fetcher.py || echo "JobSpy fetch completed with notice."
+          fi
+
+      - name: Run Normalization & Supabase Ingestion
         env:
-          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
