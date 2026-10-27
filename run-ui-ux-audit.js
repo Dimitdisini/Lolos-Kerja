@@ -8,10 +8,11 @@ const __dirname = path.dirname(__filename);
 
 console.log('=================================================================');
 console.log('       DEWI & BIMA - COMPREHENSIVE UI/UX & MOBILE AUDIT          ');
-console.log('       Target: index.html (Lolos Kerja Production UI)            ');
+const targetHtmlFile = fs.existsSync(path.join(__dirname, 'legacy.html')) ? 'legacy.html' : 'index.html';
+console.log(`       Target: ${targetHtmlFile} (Lolos Kerja Production UI)`);
 console.log('=================================================================\n');
 
-const htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+const htmlContent = fs.readFileSync(path.join(__dirname, targetHtmlFile), 'utf8');
 
 const dom = new JSDOM(htmlContent, {
   runScripts: 'outside-only',

@@ -8,10 +8,11 @@ const __dirname = path.dirname(__filename);
 
 console.log('=================================================================');
 console.log('   DEWI (LEAD QA GATEKEEPER) - FULL END-TO-END QA AUDIT SCRIPT   ');
-console.log('   Target: index.html (Lolos Kerja Production File)              ');
+const targetHtmlFile = fs.existsSync(path.join(__dirname, 'legacy.html')) ? 'legacy.html' : 'index.html';
+console.log(`   Target: ${targetHtmlFile} (Lolos Kerja Production File)`);
 console.log('=================================================================\n');
 
-let htmlContent = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+let htmlContent = fs.readFileSync(path.join(__dirname, targetHtmlFile), 'utf8');
 // Mock tailwind CDN script to avoid external network delay in jsdom
 htmlContent = htmlContent.replace(
   /<script src="https:\/\/cdn.tailwindcss.com"><\/script>/g,

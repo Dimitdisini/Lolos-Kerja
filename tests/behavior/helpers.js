@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url';
 import { JSDOM } from 'jsdom';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const INDEX = path.resolve(__dirname, '../../index.html');
+const LEGACY = path.resolve(__dirname, '../../legacy.html');
+const INDEX = fs.existsSync(LEGACY) ? LEGACY : path.resolve(__dirname, '../../index.html');
 
 /**
  * Memuat index.html apa adanya di JSDOM, dengan kondisi awal yang bisa diatur:

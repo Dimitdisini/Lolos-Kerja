@@ -27,7 +27,8 @@ const rootDir = path.resolve(__dirname, '../');
  * @returns {Array<object>}
  */
 export function loadCuratedJobsFromHtml() {
-  const indexPath = path.join(rootDir, 'index.html');
+  const legacyPath = path.join(rootDir, 'legacy.html');
+  const indexPath = fs.existsSync(legacyPath) ? legacyPath : path.join(rootDir, 'index.html');
   if (!fs.existsSync(indexPath)) {
     throw new Error(`File index.html tidak ditemukan di: ${indexPath}`);
   }

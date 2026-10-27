@@ -16,6 +16,18 @@
     {
       "source": "/admin/(.*)",
       "destination": "/admin/$1"
+    },
+    {
+      "source": "/legacy",
+      "destination": "/legacy.html"
+    },
+    {
+      "source": "/v1",
+      "destination": "/legacy.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [

@@ -87,6 +87,7 @@ const legacyTables = new Set(['users', 'transactions', 'blast_logs']);
 
 // 3. Scan Frontend Files
 const feFiles = [];
+if (fs.existsSync(path.join(rootDir, 'legacy.html'))) feFiles.push(path.join(rootDir, 'legacy.html'));
 if (fs.existsSync(path.join(rootDir, 'index.html'))) feFiles.push(path.join(rootDir, 'index.html'));
 if (fs.existsSync(path.join(rootDir, 'admin/index.html'))) feFiles.push(path.join(rootDir, 'admin/index.html'));
 if (fs.existsSync(path.join(rootDir, 'src'))) {
