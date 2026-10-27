@@ -6,10 +6,14 @@
 
 import listHandler from '../_handlers/jobs/list.js';
 import matchHandler from '../_handlers/jobs/match.js';
+import arbeitnowHandler from '../_handlers/jobs/arbeitnow.js';
+import themuseHandler from '../_handlers/jobs/themuse.js';
 
 const routes = {
   list: listHandler,
-  match: matchHandler
+  match: matchHandler,
+  arbeitnow: arbeitnowHandler,
+  themuse: themuseHandler
 };
 
 export default async function handler(req, res) {

@@ -62,3 +62,41 @@ export async function matchJobsWithCv(cvId, masterProfile) {
     return { matches: [] };
   }
 }
+
+/**
+ * Mengambil lowongan remote tech terverifikasi dari Arbeitnow API
+ * @param {object} [params]
+ * @returns {Promise<{success: boolean, jobs: Array, totalMatched: number}>}
+ */
+export async function fetchArbeitnowJobs(params = {}) {
+  try {
+    const query = new URLSearchParams();
+    if (params.page) query.set('page', String(params.page));
+    if (params.limit) query.set('limit', String(params.limit));
+    if (params.q) query.set('q', params.q);
+
+    const endpoint = `/api/jobs/arbeitnow${query.toString() ? '?' + query.toString() : ''}`;
+    return await apiFetch(endpoint, { method: 'GET' });
+  } catch (err) {
+    console.error('[Arbeitnow Jobs Fetch Error]:', err);
+    return { success: false, jobs: [], totalMatched: 0 };
+  }
+}
+
+/**
+ * Mengambil lowongan entry-level dan data kultur perusahaan dari The Muse API
+ * @param {number} [page=0]
+ * @param {string} [level='Entry Level']
+ * @returns {Promise<{success: boolean, jobs: Array, totalReturned: number}>}
+ */
+export async function fetchTheMuseJobs(page = 0, level = 'Entry Level') {
+  try {
+    const query = new URLSearchParams({ page: String(page), level });
+    const endpoint = `/api/jobs/themuse?${query.toString()}`;
+    return await apiFetch(endpoint, { method: 'GET' });
+  } catch (err) {
+    console.error('[The Muse Jobs Fetch Error]:', err);
+    return { success: false, jobs: [], totalReturned: 0 };
+  }
+}
+
