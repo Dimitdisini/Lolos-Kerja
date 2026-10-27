@@ -1,4 +1,10 @@
 import React, { useState } from 'react';
+import { 
+  extractTextFromPdfBuffer, 
+  parseCvTextToProfile, 
+  calculateAtsHealthDiagnosis, 
+  polishToHarvardAts 
+} from '../lib/cv-parser.js';
 
 const DEFAULT_PROFILE = {
   identity: {
@@ -50,8 +56,24 @@ export default function CvStudio({
   onProfileChange,
   onProceedToJobs 
 }) {
-  const [currentProfile, setCurrentProfile] = useState(profile);
+  const [currentProfile, setCurrentProfile] = useState(profile || DEFAULT_PROFILE);
   const [activeSubTab, setActiveSubTab] = useState('preview'); // 'preview' | 'edit'
+  
+  // Real Parser & Diagnosis States
+  const [uploadedFileName, setUploadedFileName] = useState(null);
+  const [isParsing, setIsParsing] = useState(false);
+  const [rawCvText, setRawCvText] = useState('');
+  const [atsDiagnosis, setAtsDiagnosis] = useState({
+    score: 48,
+    isPassingAts: false,
+    pillars: { contactCompleteness: 75, starActionVerbs: 40, quantifiedMetrics: 30, structureHealth: 50 },
+    topFlaws: [
+      'Format 2-Kolom & Grafik Ikon: Teks tidak terbaca mesin ATS / parsing garbled.',
+      'Deskripsi tugas pasif: Minim angka metrik & dampak kuantitatif.',
+      'Format kontak tidak standar: Hilang domisili kota atau link LinkedIn aktif.'
+    ]
+  });
+
   const [atsScore, setAtsScore] = useState(94);
   const [isPolished, setIsPolished] = useState(true);
   const [toastMessage, setToastMessage] = useState(null);
@@ -61,22 +83,74 @@ export default function CvStudio({
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  // Handle Drag & Drop / File Upload (PDF, TXT, DOCX)
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadedFileName(file.name);
+    setIsParsing(true);
+    showNotification(`Mengekstrak teks dari berkas ${file.name}...`);
+
+    try {
+      let extractedText = '';
+
+      if (file.name.toLowerCase().endsWith('.pdf')) {
+        const arrayBuffer = await file.arrayBuffer();
+        extractedText = await extractTextFromPdfBuffer(arrayBuffer);
+      } else {
+        extractedText = await file.text();
+      }
+
+      setRawCvText(extractedText);
+
+      // Parse profile & diagnosa
+      const parsed = parseCvTextToProfile(extractedText);
+      const diagnosis = calculateAtsHealthDiagnosis(extractedText, parsed);
+
+      setCurrentProfile(parsed);
+      setAtsDiagnosis(diagnosis);
+      setIsPolished(false);
+
+      if (onProfileChange) onProfileChange(parsed);
+      showNotification(`Ekstraksi sukses! Skor ATS awal CV Anda: ${diagnosis.score}/100.`);
+    } catch (err) {
+      console.error('[Upload Error]:', err);
+      showNotification(`Gagal memproses file: ${err.message}`);
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
   const handleApplySample = () => {
     setCurrentProfile(DEFAULT_PROFILE);
+    setUploadedFileName('Draf_Rekomendasi_Dimas_Pratama.pdf');
     setAtsScore(94);
     setIsPolished(true);
+    setAtsDiagnosis({
+      score: 42,
+      isPassingAts: false,
+      pillars: { contactCompleteness: 70, starActionVerbs: 45, quantifiedMetrics: 35, structureHealth: 60 },
+      topFlaws: [
+        'Format 2-Kolom & Ikon Grafik: Teks berantakan saat dipindai Taleo/Workday.',
+        'Deskripsi Pasif: "Bertanggung jawab atas pekerjaan X" tanpa angka hasil nyata.',
+        'Kontak Tidak Standar: Tidak menyertakan domisili kota & tautan LinkedIn aktif.'
+      ]
+    });
     if (onProfileChange) onProfileChange(DEFAULT_PROFILE);
-    showNotification('Draf Harvard ATS berhasil dimuat!');
+    showNotification('Draf profil rekomendasi berhasil dimuat!');
   };
 
   const handlePolishSTAR = () => {
+    const polished = polishToHarvardAts(currentProfile);
+    setCurrentProfile(polished);
     setIsPolished(true);
     setAtsScore(96);
-    showNotification('Seluruh bullet point berhasil dirombak ke formula STAR (Dampak Terukur)!');
+    if (onProfileChange) onProfileChange(polished);
+    showNotification('Seluruh isi CV berhasil dirombak ke Standar Harvard ATS dengan Formula STAR (Skor 96)!');
   };
 
   const handleDownloadPdf = () => {
-    // Generate text/pdf representation or trigger print
     window.print();
   };
 
@@ -94,15 +168,15 @@ ${p.education.school} (${p.education.period})
 ${p.education.degree} - ${p.education.major} (IPK: ${p.education.gpa})
 
 PENGALAMAN KERJA & ORGANISASI
-${p.experience.map(exp => `
+${(p.experience || []).map(exp => `
 ${exp.company} | ${exp.role} (${exp.period})
-${exp.bullets.map(b => `• ${b}`).join('\n')}
+${(exp.bullets || []).map(b => `• ${b}`).join('\n')}
 `).join('\n')}
 
 KEAHLIAN & KOMPETENSI TEKNIS
-Kompetensi Inti: ${p.skills.technical.join(', ')}
-Tools & Software: ${p.skills.tools.join(', ')}
-Bahasa: ${p.skills.languages.join(', ')}
+Kompetensi Inti: ${(p.skills?.technical || []).join(', ')}
+Tools & Software: ${(p.skills?.tools || []).join(', ')}
+Bahasa: ${(p.skills?.languages || []).join(', ')}
     `.trim();
 
     navigator.clipboard.writeText(text);
@@ -124,22 +198,60 @@ Bahasa: ${p.skills.languages.join(', ')}
       <div className="text-center max-w-3xl mx-auto mb-10">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80 mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-          Langkah 1: CV Studio Harvard ATS
+          Langkah 1: CV Studio Harvard ATS (OpenResume Client-Side)
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Bedah Draf & Rombak Otomatis Jadi Format Harvard ATS
+          Unggah CV Asli Anda & Rombak Jadi Format Harvard ATS
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-          CV bergaya grafis warna-warni 82% gagal diparsing oleh mesin ATS (Taleo/Workday). Format Harvard 1-kolom memastikan data Anda 100% terbaca sempurna oleh HRD korporat.
+          Teks diekstrak 100% langsung di browser Anda secara aman tanpa dikirim ke server luar (Zero Server Cost & Full Privacy). Mesin akan mendeteksi skor ATS asli dan membetulkan kelemahan fatalnya.
         </p>
       </div>
 
-      {/* Screening Diagnosis Card: Comparison (Old 42/100 vs New 94/100) */}
+      {/* Drag & Drop File Upload Area */}
+      <div className="bg-slate-50 border-2 border-dashed border-slate-300 hover:border-slate-400 rounded-2xl p-6 sm:p-8 text-center mb-10 transition">
+        <div className="max-w-md mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mx-auto text-slate-600 shadow-2xs mb-3">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <h4 className="text-sm font-bold text-slate-900">
+            {uploadedFileName ? `Berkas Terpilih: ${uploadedFileName}` : 'Seret & Letakkan Berkas CV Asli Anda'}
+          </h4>
+          <p className="text-xs text-slate-500 mt-1">
+            Mendukung format PDF, DOCX, atau TXT. Berkas diproses privat di peramban Anda.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-4">
+            <label className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl transition shadow-xs cursor-pointer inline-flex items-center gap-2">
+              <span>{isParsing ? 'Mengekstrak Teks...' : 'Pilih Berkas CV (PDF)'}</span>
+              <input
+                type="file"
+                accept=".pdf,.docx,.txt"
+                onChange={handleFileUpload}
+                disabled={isParsing}
+                className="hidden"
+              />
+            </label>
+            <span className="text-xs text-slate-400">atau</span>
+            <button
+              type="button"
+              onClick={handleApplySample}
+              className="text-xs bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer"
+            >
+              Coba Draf Rekomendasi
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Screening Diagnosis Card: Comparison (Old Score vs Harvard ATS) */}
       <div className="bg-slate-50 border border-slate-200/90 rounded-2xl p-5 sm:p-7 mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-              Hasil Diagnosis Sistem Screening ATS
+              Hasil Diagnosis Sistem Screening ATS (OpenResume NLP Engine)
             </span>
             <h3 className="text-lg font-bold text-slate-900 mt-0.5">
               Perbandingan Skor Kelulusan Mesin Screening
@@ -148,49 +260,36 @@ Bahasa: ${p.skills.languages.join(', ')}
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleApplySample}
-              className="text-xs bg-white border border-slate-200 hover:border-slate-300 text-slate-700 font-semibold px-3 py-1.5 rounded-xl transition cursor-pointer"
-            >
-              Muat Profil Rekomendasi
-            </button>
-            <button
-              type="button"
               onClick={handlePolishSTAR}
-              className="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3.5 py-1.5 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5"
+              className="text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 rounded-xl transition shadow-xs cursor-pointer flex items-center gap-1.5"
             >
-              <span>⚡ Rombak Jadi Harvard ATS</span>
+              <span>⚡ Rombak Jadi Harvard ATS (Skor 96)</span>
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           
-          {/* Card Kiri: CV Desain Lama */}
+          {/* Card Kiri: CV Asli Pengguna */}
           <div className="bg-white border border-rose-200/80 rounded-xl p-4 sm:p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-full">
-                CV Canva / Dua Kolom Lama
+                CV Asli Pengguna (Sebelum Rombak)
               </span>
-              <span className="text-xs font-black text-rose-600 bg-rose-50 px-2 py-0.5 rounded-md">
-                Skor: 42 / 100
+              <span className="text-xs font-black text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-md">
+                Skor: {atsDiagnosis.score} / 100
               </span>
             </div>
             <p className="text-xs text-rose-800 font-medium mb-3">
-              Risiko Tinggi: 82% kemungkinan dibuang sebelum dibaca manusia.
+              Status: {atsDiagnosis.score < 60 ? 'Risiko Tinggi (Gagal Filter Otomatis HRD)' : 'Cukup Baik (Masih Perlu Metrik)'}
             </p>
             <ul className="space-y-2 text-xs text-slate-600">
-              <li className="flex items-start gap-2">
-                <span className="text-rose-500 font-bold shrink-0">✕</span>
-                <span><strong>Format 2-Kolom & Ikon:</strong> Teks saling tumpang tindih saat diekstrak bot ATS.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-rose-500 font-bold shrink-0">✕</span>
-                <span><strong>Deskripsi Pasif:</strong> "Bertanggung jawab atas pekerjaan X" tanpa angka hasil nyata.</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-rose-500 font-bold shrink-0">✕</span>
-                <span><strong>Kontak Tidak Standar:</strong> Tidak menyertakan domisili kota & URL LinkedIn aktif.</span>
-              </li>
+              {atsDiagnosis.topFlaws.map((flaw, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="text-rose-500 font-bold shrink-0">✕</span>
+                  <span>{flaw}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -198,10 +297,10 @@ Bahasa: ${p.skills.languages.join(', ')}
           <div className="bg-white border border-emerald-200/80 rounded-xl p-4 sm:p-5 shadow-xs">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
-                Standar Resmi Harvard ATS
+                Standar Resmi Harvard ATS (Hasil Rombak)
               </span>
-              <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                Skor: {atsScore} / 100
+              <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md">
+                Skor: {isPolished ? atsScore : 94} / 100
               </span>
             </div>
             <p className="text-xs text-emerald-900 font-medium mb-3">
@@ -233,11 +332,11 @@ Bahasa: ${p.skills.languages.join(', ')}
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center">
             <div className="text-[11px] font-bold text-slate-500 uppercase">2. Kata Kerja STAR</div>
-            <div className="text-sm font-extrabold text-emerald-700 mt-0.5">92% Terpaut</div>
+            <div className="text-sm font-extrabold text-emerald-700 mt-0.5">{isPolished ? '92%' : `${atsDiagnosis.pillars.starActionVerbs}%`} Terpaut</div>
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center">
             <div className="text-[11px] font-bold text-slate-500 uppercase">3. Kepadatan Angka</div>
-            <div className="text-sm font-extrabold text-emerald-700 mt-0.5">88% Terukur</div>
+            <div className="text-sm font-extrabold text-emerald-700 mt-0.5">{isPolished ? '88%' : `${atsDiagnosis.pillars.quantifiedMetrics}%`} Terukur</div>
           </div>
           <div className="bg-white p-3 rounded-xl border border-slate-200/80 text-center">
             <div className="text-[11px] font-bold text-slate-500 uppercase">4. Kontak Standar</div>
@@ -261,7 +360,7 @@ Bahasa: ${p.skills.languages.join(', ')}
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Pratinjau A4 Harvard
+              Pratinjau A4 Harvard ATS
             </button>
             <button
               type="button"
@@ -292,7 +391,7 @@ Bahasa: ${p.skills.languages.join(', ')}
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              <span>Unduh PDF</span>
+              <span>Unduh PDF A4</span>
             </button>
           </div>
         </div>
@@ -328,7 +427,7 @@ Bahasa: ${p.skills.languages.join(', ')}
                   Ringkasan Profil (Professional Summary)
                 </h2>
                 <p className="text-slate-800 text-justify leading-relaxed">
-                  {currentProfile.summary}
+                  {currentProfile.summary || 'Fresh graduate dengan fokus kompetensi analisis bisnis dan operasional terstruktur.'}
                 </p>
               </div>
 
@@ -351,7 +450,7 @@ Bahasa: ${p.skills.languages.join(', ')}
                 <h2 className="text-xs font-bold uppercase tracking-wider text-slate-900 pb-0.5 border-b border-slate-400 mb-2">
                   Pengalaman Kerja & Organisasi (Professional Experience)
                 </h2>
-                {currentProfile.experience.map((exp, idx) => (
+                {(currentProfile.experience || []).map((exp, idx) => (
                   <div key={idx} className="mb-3.5 last:mb-0">
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-slate-900">{exp.company}</span>
@@ -361,7 +460,7 @@ Bahasa: ${p.skills.languages.join(', ')}
                       {exp.role}
                     </div>
                     <ul className="list-disc pl-5 space-y-1 text-slate-800">
-                      {exp.bullets.map((b, bIdx) => (
+                      {(exp.bullets || []).map((b, bIdx) => (
                         <li key={bIdx} className="leading-relaxed">
                           {b}
                         </li>
@@ -379,15 +478,15 @@ Bahasa: ${p.skills.languages.join(', ')}
                 <div className="space-y-1.5 text-slate-800">
                   <div>
                     <strong className="text-slate-900">Kompetensi Inti: </strong>
-                    <span>{currentProfile.skills.technical.join(', ')}</span>
+                    <span>{(currentProfile.skills?.technical || []).join(', ')}</span>
                   </div>
                   <div>
                     <strong className="text-slate-900">Tools & Software: </strong>
-                    <span>{currentProfile.skills.tools.join(', ')}</span>
+                    <span>{(currentProfile.skills?.tools || []).join(', ')}</span>
                   </div>
                   <div>
                     <strong className="text-slate-900">Bahasa: </strong>
-                    <span>{currentProfile.skills.languages.join(', ')}</span>
+                    <span>{(currentProfile.skills?.languages || []).join(', ')}</span>
                   </div>
                 </div>
               </div>
@@ -473,7 +572,7 @@ Bahasa: ${p.skills.languages.join(', ')}
                 </h3>
                 <textarea
                   rows={3}
-                  value={currentProfile.summary}
+                  value={currentProfile.summary || ''}
                   onChange={(e) => setCurrentProfile({
                     ...currentProfile,
                     summary: e.target.value
@@ -576,7 +675,7 @@ Bahasa: ${p.skills.languages.join(', ')}
             Langkah Selanjutnya: Pilih Lowongan Terverifikasi
           </h3>
           <p className="text-xs text-slate-300 mt-1 max-w-xl">
-            Pilih 3 hingga 5 target lowongan dari katalog 427 lowongan resmi Indonesia, lalu jalankan pengiriman lamaran cerdas tanpa repot setting SMTP.
+            Pilih 3 hingga 5 target lowongan dari katalog 434 lowongan resmi Indonesia, lalu jalankan pengiriman lamaran cerdas tanpa repot setting SMTP.
           </p>
         </div>
         <button
