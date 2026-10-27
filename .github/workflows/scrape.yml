@@ -1,49 +1,76 @@
-name: Scheduled Job Sourcing & Normalization
+name: Dimitri HQ Daily Recruiter Scraping & Sync
 
 on:
   schedule:
-    # Runs at 01:00 UTC (08:00 WIB) every day
-    - cron: '0 1 * * *'
+    # Berjalan otomatis setiap pagi pukul 07:00 WIB (00:00 UTC)
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  run-scraper-pipeline:
+  daily-scraping-sync:
+    name: Sync Loker Harian (7 Aturan Dimitri HQ)
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Python
+      - name: Setup Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
         continue-on-error: true
 
-      - name: Install Scraping Dependencies
+      - name: Install Python JobSpy Fetcher (Optional Source)
         run: |
-          pip install --upgrade pip
-          pip install python-jobspy requests || true
+          python3 -m pip install --upgrade pip
+          pip install python-jobspy requests || echo "JobSpy installation fallback to native Node pipeline"
+        continue-on-error: true
 
-      - name: Setup Node.js
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: 'npm'
 
-      - name: Run JobSpy & Open API Ingestion
+      - name: Install Node Dependencies
+        run: npm ci || npm install
+
+      - name: Ingest Raw Fresh Jobs via Open APIs & JobSpy
         run: |
           if [ -f scripts/scrape/jobspy_fetcher.py ]; then
-            python3 scripts/scrape/jobspy_fetcher.py || echo "JobSpy fetch completed with notice."
+            python3 scripts/scrape/jobspy_fetcher.py || echo "Python fetch completed or bypassed."
           fi
 
-      - name: Run Normalization & Supabase Ingestion
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+      - name: Execute Dimitri HQ Daily Sync Pipeline (7 Rules Enforcer)
+        run: npm run scrape:daily
+
+      - name: Run Vitest Verification for Daily Sync & Dimitri Rules
+        run: npx vitest run tests/daily-sync.test.js tests/dimitri-rules.test.js
+
+      - name: Rebuild Production Distribution
+        run: npm run build
+
+      - name: Commit and Push Updated Loker Catalog
         run: |
-          if [ -f scripts/scrape/run.js ]; then
-            node scripts/scrape/run.js
+          git config --local user.name "Dimitri HQ Bot"
+          git config --local user.email "bot@dimitri-hq.internal"
+
+          # Cek apakah ada pembaruan pada katalog loker atau snapshot audit
+          if [ -n "$(git status --porcelain src/data/curatedJobs.js scripts/scrape/curated-clean-jobs.json dist/)" ]; then
+            echo "Ditemukan loker baru yang lolos 7 Aturan Dimitri HQ. Menyimpan perubahan..."
+            git add src/data/curatedJobs.js scripts/scrape/curated-clean-jobs.json
+            git add -f dist/
+            git commit -m "chore(auto-sync): update verified jobs catalog via Dimitri HQ 7 rules [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+            echo "Pembaruan katalog loker berhasil di-push ke GitHub!"
           else
-            echo "Scraper script not yet invoked; standby for live runs."
+            echo "Tidak ada lowongan baru yang lolos kualifikasi hari ini. Katalog tetap prima."
           fi
