@@ -1521,30 +1521,18 @@
     <!-- ========================================================================= -->
     <section id="jobs-module" class="tab-content space-y-3.5 sm:space-y-6">
       
-      <!-- HEADER MODUL 3: PUSAT LOKER (GLINTS 1-BAR UNIFIED SIMPLICITY) -->
-      <div class="dospem-card p-4 sm:p-5 border-l-4 border-l-emerald-500 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-center font-extrabold text-xs shrink-0 shadow-2xs">
-            427
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Pusat Loker Terverifikasi</h2>
-              <span class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">Live Feed</span>
-            </div>
-            <p class="text-xs text-slate-500 mt-0.5">Disaring langsung dari Glints, LinkedIn, & BUMN resmi tanpa loker fiktif.</p>
-          </div>
-        </div>
-
+            <!-- HEADER MODUL 3: PUSAT LOKER (GLINTS STYLE) -->
+      <div class="flex items-center justify-between gap-3 px-1 py-1.5 mb-1">
         <div class="flex items-center gap-2">
-          <button type="button" onclick="openRequestScrapingModal()" title="Minta tim kami scraping lowongan posisi yang belum ada di daftar" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer">
-            <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span>Request Scraping</span>
-          </button>
+          <span class="text-sm font-bold text-slate-900">Loker Terbuka</span>
+          <span class="text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full">427 Terverifikasi</span>
         </div>
+        <button type="button" onclick="openRequestScrapingModal()" class="text-xs text-slate-500 hover:text-blue-600 font-semibold flex items-center gap-1 cursor-pointer transition">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          Request Posisi
+        </button>
       </div>
-
-      <!-- 1-BAR SEARCH UNIFIED (GLINTS STYLE LAPANG & MINIMALIS) -->
+<!-- 1-BAR SEARCH UNIFIED (GLINTS STYLE LAPANG & MINIMALIS) -->
       <div class="dospem-card p-3 sm:p-3.5 bg-white border border-slate-200/90 shadow-2xs">
         <div class="flex flex-col md:flex-row items-center gap-2">
           <!-- Input Search Utama -->
@@ -21119,10 +21107,14 @@ ${senderName}`;
 
       const webhookInput = document.getElementById('adminWebhookUrlInput');
       if (webhookInput) webhookInput.value = GOOGLE_SHEETS_WEBHOOK_URL;
+
+      // Default landing: Katalog Loker (Glints-style — kartu loker langsung terlihat)
       if (window.location.hash === '#lord' || window.location.hash === '#admin' || window.location.pathname.endsWith('/lord')) {
         sessionStorage.setItem('dims_admin_unlocked', 'true');
         if (typeof updateUserNavbarUI === 'function') updateUserNavbarUI();
         switchTab('admin-module');
+      } else if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#home') {
+        switchTab('jobs-module');
       }
     });
 
