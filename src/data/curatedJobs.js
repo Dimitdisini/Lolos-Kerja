@@ -1,8 +1,143 @@
 // src/data/curatedJobs.js
-// 427 Verified Indonesian Jobs Database for Lolos Kerja V2
+// 434 Verified Indonesian Jobs Database for Lolos Kerja V2
 // Filtered: 100% PT Berbadan Hukum, Freshness <= 30 hari, Zero Scam
+// Disinkronkan Otomatis oleh Dimitri HQ Daily Sync Pipeline pada 2026-10-27T08:22:32.600Z
 
 export const curatedJobs = [
+  {
+    "id": "lk-sync-4d897653",
+    "title": "Reporting & Data Analyst (6-Month FTC)",
+    "company": "Form3",
+    "category": "business-operations",
+    "location": "Indonesia",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "IT"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.co.uk/jobs/companies/form3/reporting-data-analyst-6-month-ftc-202690",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: Reporting & Data Analyst (6-Month FTC) – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-26T09:55:21.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-8413dba8",
+    "title": "Commercial Legal Counsel (Contractor)",
+    "company": "Liftoff",
+    "category": "business-operations",
+    "location": "Indonesia",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Exec & Legal"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.co.uk/jobs/companies/liftoff/commercial-legal-counsel-contractor-364228",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: Commercial Legal Counsel (Contractor) – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-26T09:55:20.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-ddd9a39a",
+    "title": "Staff Application Security Engineer",
+    "company": "Samsara",
+    "category": "business-operations",
+    "location": "Indonesia",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "IT Security"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.co.uk/jobs/companies/samsara/staff-application-security-engineer-342314",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: Staff Application Security Engineer – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-26T03:55:24.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-5a988782",
+    "title": "Software Test Engineer",
+    "company": "SwissPeak Partners GmbH",
+    "category": "business-operations",
+    "location": "Remote job",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Software Engineering",
+      "Remote"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.ch/jobs/companies/swisspeak-partners-gmbh/remote-software-test-engineer-bern-487044",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: Software Test Engineer – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-25T03:31:09.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-4fcb96cf",
+    "title": "ServiceNow AI Architect",
+    "company": "SwissPeak Partners GmbH",
+    "category": "business-operations",
+    "location": "Remote job",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Remote"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.ch/jobs/companies/swisspeak-partners-gmbh/remote-servicenow-ai-architect-zurich-494295",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: ServiceNow AI Architect – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-25T03:31:09.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-77873370",
+    "title": "ServiceNow CRM Architect",
+    "company": "SwissPeak Partners GmbH",
+    "category": "business-operations",
+    "location": "Remote job",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Remote"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.ch/jobs/companies/swisspeak-partners-gmbh/remote-servicenow-crm-architect-zurich-276543",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: ServiceNow CRM Architect – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-25T03:31:09.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
+  {
+    "id": "lk-sync-986b7a07",
+    "title": "Accountant",
+    "company": "SwissBorg",
+    "category": "business-operations",
+    "location": "Remote - Europe Timezone",
+    "level": "Fresh Graduate",
+    "type": "Full-time",
+    "keyRequirements": [
+      "Accounting"
+    ],
+    "salary": "Rp 5.500.000 - Rp 8.500.000",
+    "link": "https://www.arbeitnow.ch/jobs/companies/swissborg/remote-accountant-11079",
+    "applyMethod": "portal",
+    "recruiterEmail": null,
+    "subjectFormat": "Lamaran: Accountant – Dimitri Ahmad | AI & Data Workflow Specialist",
+    "postedAt": "2026-10-25T03:07:29.000Z",
+    "syncedAt": "2026-10-27T08:22:32.599Z"
+  },
   {
     "id": 1,
     "title": "Junior Business Analyst & Export Operations",

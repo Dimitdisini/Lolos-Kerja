@@ -13,7 +13,8 @@
     "test:uiux": "node run-ui-ux-audit.js",
     "qa:wiring": "node scripts/qa/check-wiring.js",
     "test": "npm run test:unit && npm run test:qa && npm run test:uiux",
-    "scrape:emails": "node scripts/scrape/enrich-emails.js"
+    "scrape:emails": "node scripts/scrape/enrich-emails.js",
+    "scrape:daily": "node scripts/scrape/daily-sync.js"
   },
   "keywords": [
     "career",

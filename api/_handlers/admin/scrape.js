@@ -10,6 +10,7 @@
 
 import { getSupabaseAdmin } from '../../_lib/auth.js';
 import { generateJobHash, isFreshGradEligible, normalizeJob } from '../../../scripts/scrape/run.js';
+import { runDailySync } from '../../../scripts/scrape/daily-sync.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -191,6 +192,13 @@ export default async function handler(req, res) {
     }
 
     const uniqueIndonesiaJobs = Array.from(normalizedMap.values());
+
+    // 2b. Jalankan Dimitri HQ Daily Sync Pipeline
+    try {
+      await runDailySync({ feedJobs: allRawJobs });
+    } catch (syncErr) {
+      console.warn('[Dimitri HQ Daily Sync Notice]:', syncErr.message);
+    }
 
     // 3. Optional Upsert ke Supabase
     let upsertCount = 0;
