@@ -7,6 +7,11 @@ import {
   generateSubjectLine 
 } from '../lib/dimitri-rules.js';
 import { analyzeJobCvMatch, insertMissingKeywordsIntoCv } from '../lib/resume-matcher.js';
+import { 
+  generateTailoredCoverLetter, 
+  getCoverLetterDiagnostics,
+  detectIndustryContext 
+} from '../lib/cover-letter-engine.js';
 
 export default function BlastHub({ 
   selectedJobs = [], 
@@ -103,30 +108,70 @@ export default function BlastHub({
     }
   };
 
-  // Generate dynamic cover letter for a job
-  const generateCoverLetterText = (job) => {
+  // Pilihan Nada Tulisan (Tone) & Kustomisasi Surat Lamaran
+  const [selectedTone, setSelectedTone] = useState('modern'); // 'modern' | 'professional' | 'high_impact'
+  const [customCoverLetters, setCustomCoverLetters] = useState({}); // { [jobId]: text }
+  const [isEditingCoverLetter, setIsEditingCoverLetter] = useState(false);
+
+  // Dapatkan teks surat lamaran untuk pekerjaan tertentu (mengutamakan custom edit jika ada)
+  const getCoverLetterForJob = (job, tone = selectedTone) => {
     if (!job) return '';
-    const subjectInfo = generateSubjectLine(job, candName, 'tech');
-    const compName = job.company || 'Perusahaan';
-    const roleTitle = job.title || 'Posisi';
+    if (customCoverLetters[job.id]) {
+      return customCoverLetters[job.id];
+    }
+    return generateTailoredCoverLetter(job, candidateProfile, { tone });
+  };
 
-    // Ambil keterampilan utama yang relevan
-    const relevantSkills = candidateProfile?.skills?.technical?.slice(0, 4).join(', ') || 'analisis proses bisnis, perancangan User Stories, dan UAT';
+  const activeCoverLetterText = useMemo(() => {
+    return getCoverLetterForJob(activeJob, selectedTone);
+  }, [activeJob, candidateProfile, selectedTone, customCoverLetters]);
 
-    return `Yth. Tim Rekrutmen ${compName},
+  const activeLetterDiagnostics = useMemo(() => {
+    return getCoverLetterDiagnostics(activeCoverLetterText, activeJob, candidateProfile);
+  }, [activeCoverLetterText, activeJob, candidateProfile]);
 
-Perkenalkan saya ${candName}, lulusan ${candDegree} dari ${candSchool} dengan IPK ${candGpa}. Melalui surat ini, saya bermaksud mengajukan lamaran untuk posisi ${roleTitle} di ${compName}.
+  const activeIndustryContext = useMemo(() => {
+    return detectIndustryContext(activeJob);
+  }, [activeJob]);
 
-Berdasarkan latar belakang keahlian saya dalam ${relevantSkills}, saya telah berpengalaman menyederhanakan alur kerja operasional serta meningkatkan efisiensi alur approval hingga 28%. Saya memiliki ketertarikan tinggi terhadap standar kerja profesional ${compName} dan siap memberikan kontribusi nyata sejak hari pertama.
+  const handleToneChange = (newTone) => {
+    setSelectedTone(newTone);
+    if (activeJob && customCoverLetters[activeJob.id]) {
+      setCustomCoverLetters(prev => {
+        const updated = { ...prev };
+        delete updated[activeJob.id];
+        return updated;
+      });
+    }
+    const label = newTone === 'professional' ? 'Formal & Korporat' :
+      newTone === 'high_impact' ? 'Ringkas & High-Impact' : 'Modern & Kolaboratif';
+    showNotification(`Nada tulisan diubah ke: ${label}`);
+  };
 
-Bersama surat ini, saya lampirkan CV berstandar Harvard ATS lengkap dengan portofolio pencapaian terukur saya untuk bahan pertimbangan Bapak/Ibu.
+  const handleRegenerateLetter = () => {
+    if (!activeJob) return;
+    setCustomCoverLetters(prev => {
+      const updated = { ...prev };
+      delete updated[activeJob.id];
+      return updated;
+    });
+    showNotification('Surat lamaran berhasil dibuat ulang!');
+  };
 
-Terima kasih atas waktu dan kesempatan yang diberikan.
+  const handleCopyCoverLetter = () => {
+    if (!activeCoverLetterText) return;
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(activeCoverLetterText);
+    }
+    showNotification('Surat lamaran berhasil disalin ke clipboard!');
+  };
 
-Hormat saya,
-${candName}
-${candPhone} | ${candEmail}
-${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
+  const handleCustomLetterChange = (newText) => {
+    if (!activeJob) return;
+    setCustomCoverLetters(prev => ({
+      ...prev,
+      [activeJob.id]: newText
+    }));
   };
 
   // 1-Click "Buka di Gmail"
@@ -136,7 +181,7 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
 
     const email = targetJob.recruiterEmail || 'recruitment@company.com';
     const subjectObj = generateSubjectLine(targetJob, candName, 'tech');
-    const bodyText = generateCoverLetterText(targetJob);
+    const bodyText = getCoverLetterForJob(targetJob, selectedTone);
 
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subjectObj.subject)}&body=${encodeURIComponent(bodyText)}`;
     window.open(gmailUrl, '_blank');
@@ -493,27 +538,127 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
               </div>
             )}
 
-            {/* 2. Pratinjau Cover Letter */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Pratinjau Surat Lamaran Terpersonalisasi
-                </span>
-                <h4 className="text-sm font-extrabold text-slate-900 mt-0.5">
-                  Target: {activeJob ? `${activeJob.title} - ${activeJob.company}` : 'Pilih dari antrean'}
-                </h4>
+            {/* 2. Generator Surat Lamaran Terpersonalisasi */}
+            <div className="pb-3 border-b border-slate-200 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                    Cover Letter Studio
+                  </span>
+                  <h4 className="text-sm font-extrabold text-slate-900 mt-1">
+                    Target: {activeJob ? `${activeJob.title} - ${activeJob.company}` : 'Pilih dari antrean'}
+                  </h4>
+                </div>
+                {activeJob && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80">
+                      Reply-To: {candEmail}
+                    </span>
+                  </div>
+                )}
               </div>
+
+              {/* Pilihan Nada Tulisan (Tone Selector) */}
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                <span className="text-xs font-bold text-slate-600 mr-1">Pilih Nada:</span>
+                <button
+                  type="button"
+                  onClick={() => handleToneChange('modern')}
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer border ${
+                    selectedTone === 'modern'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  🚀 Modern & Kolaboratif
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToneChange('professional')}
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer border ${
+                    selectedTone === 'professional'
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-2xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  🏛️ Formal & Korporat
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleToneChange('high_impact')}
+                  className={`text-xs px-2.5 py-1 rounded-lg font-semibold transition cursor-pointer border ${
+                    selectedTone === 'high_impact'
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  ⚡ Ringkas & High-Impact
+                </button>
+              </div>
+
+              {/* Diagnostic Strip */}
               {activeJob && (
-                <span className="text-xs font-mono text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80">
-                  Reply-To: {candEmail}
-                </span>
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                  <span className="font-semibold text-slate-800">
+                    Konteks: {activeIndustryContext.name}
+                  </span>
+                  <span>•</span>
+                  <span>{activeLetterDiagnostics.wordCount} kata (~{activeLetterDiagnostics.readingTimeSec} dtk)</span>
+                  <span>•</span>
+                  <span className={activeLetterDiagnostics.hasQuantitativeMetric ? 'text-emerald-700 font-semibold' : 'text-slate-500'}>
+                    {activeLetterDiagnostics.hasQuantitativeMetric ? '✓ Metrik STAR Terhubung' : 'Standar Kualitatif'}
+                  </span>
+                  <span>•</span>
+                  <span className="font-extrabold text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                    {activeLetterDiagnostics.readinessScore}% Siap Kirim
+                  </span>
+                </div>
               )}
             </div>
 
-            {/* Email Body Viewer */}
-            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto">
-              {activeJob ? generateCoverLetterText(activeJob) : 'Pilih lowongan di sebelah kiri untuk melihat surat lamaran.'}
+            {/* Action Bar: Edit Mode, Copy, Regenerate */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setIsEditingCoverLetter(!isEditingCoverLetter)}
+                  className="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer"
+                >
+                  {isEditingCoverLetter ? '👁️ Lihat Pratinjau' : '✏️ Edit Langsung'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleRegenerateLetter}
+                  className="text-xs text-slate-600 hover:text-slate-900 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition cursor-pointer"
+                  title="Buat ulang berdasarkan data profil dan nada aktif"
+                >
+                  🔄 Reset / Buat Ulang
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopyCoverLetter}
+                className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1 rounded-lg flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
+              >
+                📋 Salin Teks
+              </button>
             </div>
+
+            {/* Email Body Viewer / Editor */}
+            {isEditingCoverLetter ? (
+              <textarea
+                value={activeCoverLetterText}
+                onChange={(e) => handleCustomLetterChange(e.target.value)}
+                rows={11}
+                className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs font-mono text-slate-800 leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 font-medium"
+                placeholder="Sesuaikan draf surat lamaran Anda di sini..."
+              />
+            ) : (
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto select-all">
+                {activeCoverLetterText || 'Pilih lowongan di sebelah kiri untuk melihat surat lamaran.'}
+              </div>
+            )}
 
             {/* Dua Mode Eksekusi Bebas Ribet */}
             <div className="mt-5 pt-4 border-t border-slate-200 space-y-3">

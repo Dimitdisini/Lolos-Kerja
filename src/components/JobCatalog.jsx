@@ -409,6 +409,27 @@ export default function JobCatalog({
                           </button>
                         </div>
                       )}
+
+                      {/* Tombol Cepat ke Cover Letter Studio */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const isSelected = selectedJobs.some(j => String(j.id) === String(job.id));
+                          if (!isSelected) {
+                            onToggleJob(job);
+                          }
+                          if (onProceedToBlast) {
+                            onProceedToBlast();
+                          }
+                        }}
+                        className="mt-2 w-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 font-bold text-[11px] py-1.5 px-3 rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                      >
+                        <svg className="w-3.5 h-3.5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span>📝 Buka Surat Lamaran Khusus Posisi Ini</span>
+                      </button>
                     </div>
                   )}
 
