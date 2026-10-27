@@ -6,10 +6,12 @@ import {
   validateHrdEmailQuality, 
   generateSubjectLine 
 } from '../lib/dimitri-rules.js';
+import { analyzeJobCvMatch, insertMissingKeywordsIntoCv } from '../lib/resume-matcher.js';
 
 export default function BlastHub({ 
   selectedJobs = [], 
   candidateProfile,
+  onProfileChange,
   onBackToJobs 
 }) {
   const candName = candidateProfile?.identity?.name || 'Dimas Pratama';
@@ -62,6 +64,11 @@ export default function BlastHub({
     return selectedJobs.find(j => j.id === activeJobId) || selectedJobs[0] || null;
   }, [selectedJobs, activeJobId]);
 
+  // Hitung kecocokan kata kunci (Resume Matcher) untuk lowongan yang sedang aktif
+  const activeMatch = useMemo(() => {
+    return analyzeJobCvMatch(activeJob, candidateProfile);
+  }, [activeJob, candidateProfile]);
+
   // Timing status & Daily Cap
   const timingStatus = useMemo(() => getOptimalRecruiterTimingStatus(), []);
   const dailyQuota = useMemo(() => checkDailyBlastQuota(dailySentCount, 35), [dailySentCount]);
@@ -77,6 +84,25 @@ export default function BlastHub({
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  // 1-Click Sisipkan Missing Keywords ke CV
+  const handleAutoInsertKeywords = () => {
+    if (!activeMatch.missingKeywords || activeMatch.missingKeywords.length === 0) {
+      showNotification('Semua kata kunci penting sudah ada di CV Anda.');
+      return;
+    }
+
+    if (!onProfileChange) {
+      showNotification('Koneksi update profil tidak tersedia.');
+      return;
+    }
+
+    const result = insertMissingKeywordsIntoCv(candidateProfile, activeMatch.missingKeywords);
+    if (result && result.addedCount > 0) {
+      onProfileChange(result.updatedProfile);
+      showNotification(`Sukses menyisipkan ${result.addedCount} kata kunci (${result.addedKeywords.join(', ')}) ke CV Anda!`);
+    }
+  };
+
   // Generate dynamic cover letter for a job
   const generateCoverLetterText = (job) => {
     if (!job) return '';
@@ -84,11 +110,14 @@ export default function BlastHub({
     const compName = job.company || 'Perusahaan';
     const roleTitle = job.title || 'Posisi';
 
+    // Ambil keterampilan utama yang relevan
+    const relevantSkills = candidateProfile?.skills?.technical?.slice(0, 4).join(', ') || 'analisis proses bisnis, perancangan User Stories, dan UAT';
+
     return `Yth. Tim Rekrutmen ${compName},
 
 Perkenalkan saya ${candName}, lulusan ${candDegree} dari ${candSchool} dengan IPK ${candGpa}. Melalui surat ini, saya bermaksud mengajukan lamaran untuk posisi ${roleTitle} di ${compName}.
 
-Berdasarkan latar belakang keahlian saya dalam analisis proses bisnis, perancangan User Stories, dan pengujian sistem UAT, saya telah berpengalaman menyederhanakan alur kerja operasional serta meningkatkan efisiensi alur approval hingga 28%. Saya memiliki ketertarikan tinggi terhadap standar kerja profesional ${compName} dan siap memberikan kontribusi nyata sejak hari pertama.
+Berdasarkan latar belakang keahlian saya dalam ${relevantSkills}, saya telah berpengalaman menyederhanakan alur kerja operasional serta meningkatkan efisiensi alur approval hingga 28%. Saya memiliki ketertarikan tinggi terhadap standar kerja profesional ${compName} dan siap memberikan kontribusi nyata sejak hari pertama.
 
 Bersama surat ini, saya lampirkan CV berstandar Harvard ATS lengkap dengan portofolio pencapaian terukur saya untuk bahan pertimbangan Bapak/Ibu.
 
@@ -213,7 +242,7 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
           Pengiriman Lamaran Otomatis Berstandar Dimitri HQ
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-          Kirim lamaran cerdas tanpa repot input password Google. Dilengkapi proteksi 30-day cooldown, pembatasan kuota harian, dan jaminan 100% masuk ke Kotak Masuk Utama HRD.
+          Kirim lamaran cerdas tanpa repot input password Google. Dilengkapi pencocokan kata kunci Resume Matcher, proteksi 30-day cooldown, pembatasan kuota harian, dan jaminan 100% masuk ke Kotak Masuk Utama HRD.
         </p>
       </div>
 
@@ -323,6 +352,7 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
                 const isActive = job.id === activeJobId;
                 const cooldown = check30DayCooldown(appliedHistory, job.company, job.title);
                 const subjectObj = generateSubjectLine(job, candName, 'tech');
+                const jobMatch = analyzeJobCvMatch(job, candidateProfile);
 
                 return (
                   <div
@@ -344,16 +374,23 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
                         </div>
                       </div>
                       
-                      {/* Cooldown Status Badge */}
-                      {cooldown.allowed ? (
-                        <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full shrink-0">
-                          Siap Kirim
+                      <div className="flex flex-col items-end gap-1">
+                        {/* Cooldown Status Badge */}
+                        {cooldown.allowed ? (
+                          <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full shrink-0">
+                            Siap Kirim
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full shrink-0">
+                            Cooldown {cooldown.cooldownRemainingDays} Hari
+                          </span>
+                        )}
+
+                        {/* Matcher Pill */}
+                        <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
+                          {jobMatch.matchScore}% Match
                         </span>
-                      ) : (
-                        <span className="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full shrink-0">
-                          Cooldown {cooldown.cooldownRemainingDays} Hari
-                        </span>
-                      )}
+                      </div>
                     </div>
 
                     {/* Email & Subject Info */}
@@ -372,10 +409,91 @@ ${candidateProfile?.identity?.linkedin || 'linkedin.com/in/dimas-pratama'}`;
           )}
         </div>
 
-        {/* Kolom Kanan: Pratinjau Cover Letter & Eksekusi (7 Kolom) */}
+        {/* Kolom Kanan: Resume Matcher, Pratinjau Cover Letter & Eksekusi (7 Kolom) */}
         <div className="lg:col-span-7 space-y-5">
           
           <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+            
+            {/* 1. Resume Matcher Box (Kecocokan Kata Kunci) */}
+            {activeJob && (
+              <div className="bg-slate-50 border border-slate-200/90 rounded-xl p-4 mb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      Resume Matcher
+                    </span>
+                    <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${
+                      activeMatch.matchScore >= 80 
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
+                        : activeMatch.matchScore >= 60 
+                          ? 'bg-blue-100 text-blue-800 border-blue-200' 
+                          : 'bg-amber-100 text-amber-800 border-amber-200'
+                    }`}>
+                      {activeMatch.matchScore}% Match ({activeMatch.grade})
+                    </span>
+                  </div>
+
+                  {activeMatch.missingKeywords.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={handleAutoInsertKeywords}
+                      className="text-xs bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-2xs cursor-pointer flex items-center gap-1.5 self-start sm:self-auto"
+                    >
+                      <span>⚡ Sisipkan {activeMatch.missingKeywords.length} Keyword ke CV</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Match Progress Bar */}
+                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mb-3">
+                  <div 
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      activeMatch.matchScore >= 80 ? 'bg-emerald-600' : activeMatch.matchScore >= 60 ? 'bg-blue-600' : 'bg-amber-500'
+                    }`}
+                    style={{ width: `${activeMatch.matchScore}%` }}
+                  ></div>
+                </div>
+
+                {/* Chips Kata Kunci Cocok & Kurang */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">
+                      Kata Kunci Terpenuhi ({activeMatch.matchedKeywords.length})
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {activeMatch.matchedKeywords.length > 0 ? (
+                        activeMatch.matchedKeywords.map((kw, idx) => (
+                          <span key={idx} className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                            <span>✓</span> {kw}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-slate-400 italic text-[11px]">Belum ada yang cocok</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[10px] font-bold text-amber-700 uppercase">
+                      Kata Kunci Belum Ada ({activeMatch.missingKeywords.length})
+                    </div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {activeMatch.missingKeywords.length > 0 ? (
+                        activeMatch.missingKeywords.map((kw, idx) => (
+                          <span key={idx} className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md flex items-center gap-0.5">
+                            <span>⚠</span> {kw}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-emerald-700 font-semibold text-[11px]">Semua kata kunci utama sudah ada di CV!</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 2. Pratinjau Cover Letter */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">

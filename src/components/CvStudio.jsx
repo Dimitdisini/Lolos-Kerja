@@ -6,7 +6,7 @@ import {
   polishToHarvardAts 
 } from '../lib/cv-parser.js';
 
-const DEFAULT_PROFILE = {
+export const DEFAULT_PROFILE = {
   identity: {
     name: 'Dimas Pratama',
     title: 'Fresh Graduate Manajemen & Business Analyst',

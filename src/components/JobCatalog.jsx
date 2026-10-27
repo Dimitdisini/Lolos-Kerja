@@ -1,8 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { curatedJobs } from '../data/curatedJobs.js';
+import { analyzeJobCvMatch, insertMissingKeywordsIntoCv } from '../lib/resume-matcher.js';
 
 export default function JobCatalog({ 
   selectedJobs = [], 
+  candidateProfile,
+  onProfileChange,
   onToggleJob,
   onProceedToBlast 
 }) {
@@ -10,7 +13,14 @@ export default function JobCatalog({
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedMethod, setSelectedMethod] = useState('all'); // 'all' | 'email' | 'portal'
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedGapJobId, setExpandedGapJobId] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
   const itemsPerPage = 12;
+
+  const showNotification = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   // Selected IDs set for quick lookup
   const selectedIdSet = useMemo(() => {
@@ -72,20 +82,43 @@ export default function JobCatalog({
     }
   };
 
+  const handleAutoInsertKeywords = (e, job, missingKeywords) => {
+    e.stopPropagation();
+    if (!candidateProfile || !onProfileChange) {
+      showNotification('Profil CV belum dimuat.');
+      return;
+    }
+    const result = insertMissingKeywordsIntoCv(candidateProfile, missingKeywords);
+    if (result && result.addedCount > 0) {
+      onProfileChange(result.updatedProfile);
+      showNotification(`Sukses menyisipkan ${result.addedCount} kata kunci (${result.addedKeywords.join(', ')}) ke CV Anda! Skor kesesuaian naik.`);
+    } else {
+      showNotification('Kata kunci sudah lengkap di CV Anda.');
+    }
+  };
+
   return (
     <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative pb-28">
       
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-lg border border-slate-700 transition animate-fade-in flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Top Header Badge */}
       <div className="text-center max-w-3xl mx-auto mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80 mb-3">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-          Langkah 2: Katalog Lowongan Terverifikasi (427 Loker)
+          Langkah 2: Katalog Lowongan Terverifikasi ({curatedJobs.length} Loker)
         </div>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Pilih 3–5 Target Loker Resmi Indonesia
+          Pilih 3–5 Target Loker & Cocokkan Kata Kunci CV Anda
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
-          100% lowongan dari korporat berbadan hukum resmi (PT/CV/Tbk). Seluruh data disaring ketat berdasarkan 7 Aturan Main Dimitri HQ: bulan berjalan, tanpa biaya admin, dan email tim HR terverifikasi.
+          Dilengkapi fitur <strong>Resume Matcher</strong>: membandingkan kata kunci CV Anda dengan syarat loker secara instan, mendeteksi kata kunci yang hilang, dan menyisipkannya otomatis dengan 1-klik.
         </p>
       </div>
 
@@ -93,15 +126,15 @@ export default function JobCatalog({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-4xl mx-auto mb-8">
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
           <div className="text-xs font-bold text-slate-500 uppercase">Total Lowongan</div>
-          <div className="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">427 Loker Aktif</div>
+          <div className="text-sm sm:text-base font-extrabold text-slate-900 mt-0.5">{curatedJobs.length} Loker Aktif</div>
         </div>
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
           <div className="text-xs font-bold text-slate-500 uppercase">Legalitas</div>
           <div className="text-sm sm:text-base font-extrabold text-emerald-700 mt-0.5">100% PT Resmi</div>
         </div>
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
-          <div className="text-xs font-bold text-slate-500 uppercase">Freshness</div>
-          <div className="text-sm sm:text-base font-extrabold text-emerald-700 mt-0.5">Oktober 2026</div>
+          <div className="text-xs font-bold text-slate-500 uppercase">Resume Matcher</div>
+          <div className="text-sm sm:text-base font-extrabold text-emerald-700 mt-0.5">Semantik Otomatis</div>
         </div>
         <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-center">
           <div className="text-xs font-bold text-slate-500 uppercase">Email HRD</div>
@@ -210,6 +243,10 @@ export default function JobCatalog({
           {paginatedJobs.map((job) => {
             const isSelected = selectedIdSet.has(String(job.id));
             const isEmail = job.applyMethod === 'email' && job.recruiterEmail;
+            const isExpanded = expandedGapJobId === job.id;
+
+            // Hitung skor kesesuaian dengan CV kandidat
+            const matchAnalysis = analyzeJobCvMatch(job, candidateProfile);
 
             return (
               <div 
@@ -223,8 +260,8 @@ export default function JobCatalog({
               >
                 <div>
                   
-                  {/* Top Row: Checkbox & Channel Badge */}
-                  <div className="flex items-start justify-between gap-3 mb-2.5">
+                  {/* Top Row: Checkbox, Channel Badge & Resume Matcher Badge */}
+                  <div className="flex items-start justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-2">
                       <div className={`w-5 h-5 rounded-lg border flex items-center justify-center transition ${
                         isSelected 
@@ -242,17 +279,30 @@ export default function JobCatalog({
                       </span>
                     </div>
 
-                    {/* Badge Saluran */}
-                    {isEmail ? (
-                      <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-                        Email HR Resmi
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {/* Matcher Score Pill */}
+                      <span className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md border ${
+                        matchAnalysis.matchScore >= 80 
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                          : matchAnalysis.matchScore >= 60 
+                            ? 'bg-blue-50 text-blue-800 border-blue-200' 
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                      }`}>
+                        {matchAnalysis.matchScore}% Match
                       </span>
-                    ) : (
-                      <span className="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md flex items-center gap-1">
-                        Portal Karir
-                      </span>
-                    )}
+
+                      {/* Badge Saluran */}
+                      {isEmail ? (
+                        <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                          Email HR
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md">
+                          Portal
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Company Name with Verified Check */}
@@ -288,12 +338,77 @@ export default function JobCatalog({
 
                   {/* Key Requirements Tags */}
                   {job.keyRequirements && job.keyRequirements.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-4">
+                    <div className="flex flex-wrap gap-1 mb-3">
                       {job.keyRequirements.slice(0, 3).map((req, rIdx) => (
                         <span key={rIdx} className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
                           {req}
                         </span>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Toggle Analisis Keyword Gap */}
+                  <div className="mb-3">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedGapJobId(isExpanded ? null : job.id);
+                      }}
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 underline underline-offset-2 flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>{isExpanded ? 'Tutup Analisis Gap' : '🔍 Cek Kata Kunci Lowongan vs CV'}</span>
+                      <svg className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+
+                  {/* Drawer Keyword Gap Analysis */}
+                  {isExpanded && (
+                    <div 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="bg-slate-50 border border-slate-200 rounded-xl p-3 mb-3 text-xs space-y-2.5 animate-fade-in"
+                    >
+                      <div>
+                        <div className="text-[10px] font-bold text-slate-500 uppercase">
+                          Kata Kunci Terpenuhi ({matchAnalysis.matchedKeywords.length})
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {matchAnalysis.matchedKeywords.length > 0 ? (
+                            matchAnalysis.matchedKeywords.map((kw, kIdx) => (
+                              <span key={kIdx} className="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <span>✓</span> {kw}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-[11px] text-slate-400 italic">Belum ada yang cocok</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {matchAnalysis.missingKeywords.length > 0 && (
+                        <div>
+                          <div className="text-[10px] font-bold text-amber-700 uppercase">
+                            Kata Kunci Belum Ada di CV ({matchAnalysis.missingKeywords.length})
+                          </div>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {matchAnalysis.missingKeywords.map((kw, kIdx) => (
+                              <span key={kIdx} className="text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                <span>⚠</span> {kw}
+                              </span>
+                            ))}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => handleAutoInsertKeywords(e, job, matchAnalysis.missingKeywords)}
+                            className="mt-2.5 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] py-1.5 px-3 rounded-lg transition flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                          >
+                            <span>⚡ Sisipkan Kata Kunci ke CV</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -367,7 +482,6 @@ export default function JobCatalog({
             <button
               type="button"
               onClick={() => {
-                // Clear all selections
                 if (onToggleJob) {
                   selectedJobs.forEach(j => onToggleJob(j));
                 }

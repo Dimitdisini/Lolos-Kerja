@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
 import HowItWorks from './components/HowItWorks.jsx';
-import CvStudio from './components/CvStudio.jsx';
+import CvStudio, { DEFAULT_PROFILE } from './components/CvStudio.jsx';
 import JobCatalog from './components/JobCatalog.jsx';
 import BlastHub from './components/BlastHub.jsx';
 import Comparison from './components/Comparison.jsx';
@@ -11,7 +11,7 @@ import { curatedJobs } from './data/curatedJobs.js';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
-  const [candidateProfile, setCandidateProfile] = useState(null);
+  const [candidateProfile, setCandidateProfile] = useState(DEFAULT_PROFILE);
   const [selectedJobs, setSelectedJobs] = useState(() => {
     // Default pre-select top 2 high-quality verified jobs so users can test BlastHub immediately
     return curatedJobs.slice(0, 2);
@@ -77,6 +77,8 @@ export default function App() {
           <div className="animate-fade-in">
             <JobCatalog 
               selectedJobs={selectedJobs}
+              candidateProfile={candidateProfile}
+              onProfileChange={setCandidateProfile}
               onToggleJob={handleToggleJob}
               onProceedToBlast={() => handleNavigate('blast')}
             />
@@ -89,6 +91,7 @@ export default function App() {
             <BlastHub 
               selectedJobs={selectedJobs}
               candidateProfile={candidateProfile}
+              onProfileChange={setCandidateProfile}
               onBackToJobs={() => handleNavigate('jobs')}
             />
           </div>
