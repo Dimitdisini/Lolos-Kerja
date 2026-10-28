@@ -17,7 +17,10 @@ export default function BlastHub({
   selectedJobs = [], 
   candidateProfile,
   onProfileChange,
-  onBackToJobs 
+  onBackToJobs,
+  appliedHistory: propHistory,
+  onAppliedHistoryChange,
+  onNavigateToTracker 
 }) {
   const candName = candidateProfile?.identity?.name || 'Dimas Pratama';
   const candEmail = candidateProfile?.identity?.email || 'dimas.pratama@gmail.com';
@@ -27,22 +30,36 @@ export default function BlastHub({
   const candGpa = candidateProfile?.education?.gpa || '3.72';
 
   // Local storage backed applied history & daily count
-  const [appliedHistory, setAppliedHistory] = useState(() => {
+  const [internalAppliedHistory, setInternalAppliedHistory] = useState(() => {
     try {
       const saved = localStorage.getItem('lk_applied_history');
       return saved ? JSON.parse(saved) : [
         {
+          id: 'app-init-1',
           company: 'PT Unilever Indonesia',
           role: 'Management Trainee Supply Chain',
           email: 'recruitment.indonesia@unilever.com',
           appliedAt: new Date(Date.now() - (12 * 24 * 60 * 60 * 1000)).toISOString(),
-          status: 'Terkirim'
+          stage: 'interview',
+          status: 'interview',
+          notes: 'Jadwal Initial HR Interview via Zoom pada hari Jumat jam 10.00 WIB.'
         }
       ];
     } catch (e) {
       return [];
     }
   });
+
+  const appliedHistory = propHistory || internalAppliedHistory;
+
+  const updateAppliedHistory = (newHistory) => {
+    if (onAppliedHistoryChange) {
+      onAppliedHistoryChange(newHistory);
+    } else {
+      setInternalAppliedHistory(newHistory);
+      try { localStorage.setItem('lk_applied_history', JSON.stringify(newHistory)); } catch(e) {}
+    }
+  };
 
   const [dailySentCount, setDailySentCount] = useState(() => {
     try {
@@ -186,7 +203,28 @@ export default function BlastHub({
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subjectObj.subject)}&body=${encodeURIComponent(bodyText)}`;
     window.open(gmailUrl, '_blank');
 
-    showNotification(`Membuka Gmail untuk lamaran ke ${targetJob.company}...`);
+    // Catat otomatis ke Pelacak Lamaran
+    const record = {
+      id: `app-gmail-${Date.now()}`,
+      company: targetJob.company,
+      role: targetJob.title,
+      email: email,
+      subject: subjectObj.subject,
+      appliedAt: new Date().toISOString(),
+      stage: 'sent',
+      status: 'sent',
+      notes: `Dikirim via tab Gmail pribadi (${subjectObj.subject})`
+    };
+
+    const exists = appliedHistory.some(a => 
+      a.company.toLowerCase() === targetJob.company.toLowerCase() && 
+      (a.role || a.title || '').toLowerCase() === targetJob.title.toLowerCase()
+    );
+    if (!exists) {
+      updateAppliedHistory([record, ...appliedHistory]);
+    }
+
+    showNotification(`Membuka Gmail & mencatat lamaran ke ${targetJob.company} di Pelacak Lamaran.`);
   };
 
   // Automated Smart Drip Blast
@@ -230,20 +268,19 @@ export default function BlastHub({
       const targetEmail = job.recruiterEmail || 'careers@perusahaan.co.id';
 
       const record = {
+        id: `app-blast-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
         company: job.company,
         role: job.title,
         email: targetEmail,
         subject: subjectObj.subject,
         appliedAt: new Date().toISOString(),
-        status: 'Terkirim (100% Primary Inbox)'
+        stage: 'sent',
+        status: 'sent',
+        notes: `Terkirim via Smart Drip Cloud (${subjectObj.subject})`
       };
 
       // Update state & persistence
-      setAppliedHistory(prev => {
-        const updated = [record, ...prev];
-        try { localStorage.setItem('lk_applied_history', JSON.stringify(updated)); } catch(e) {}
-        return updated;
-      });
+      updateAppliedHistory([record, ...appliedHistory]);
 
       setDailySentCount(prev => {
         const next = prev + 1;
@@ -743,7 +780,7 @@ export default function BlastHub({
 
       {/* Riwayat Pengiriman & Pelacak Cooldown 30 Hari */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 mb-4 gap-2">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Pelacak Cooldown & Riwayat Lamaran
@@ -752,9 +789,20 @@ export default function BlastHub({
               Daftar Perusahaan yang Pernah Dikirimkan Lamaran
             </h4>
           </div>
-          <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
-            {appliedHistory.length} Riwayat Tersimpan
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
+              {appliedHistory.length} Riwayat Tersimpan
+            </span>
+            {onNavigateToTracker && (
+              <button
+                type="button"
+                onClick={onNavigateToTracker}
+                className="text-xs font-extrabold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1 rounded-lg transition cursor-pointer flex items-center gap-1"
+              >
+                <span>Buka Kanban Pelacak →</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {appliedHistory.length === 0 ? (

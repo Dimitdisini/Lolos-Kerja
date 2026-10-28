@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Navbar({ onNavigate, activeTab = 'home' }) {
+export default function Navbar({ onNavigate, activeTab = 'home', applicationsCount = 0 }) {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between gap-4">
@@ -71,6 +71,23 @@ export default function Navbar({ onNavigate, activeTab = 'home' }) {
             }`}
           >
             Kirim Lamaran
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => onNavigate && onNavigate('tracker')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'tracker' 
+                ? 'bg-white text-slate-900 shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+            }`}
+          >
+            <span>Pelacak Lamaran</span>
+            {applicationsCount > 0 && (
+              <span className="text-[10px] bg-purple-100 text-purple-800 font-extrabold px-1.5 py-0.2 rounded-full">
+                {applicationsCount}
+              </span>
+            )}
           </button>
 
           <button 
