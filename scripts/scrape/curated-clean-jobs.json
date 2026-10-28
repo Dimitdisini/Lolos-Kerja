@@ -1,59 +1,16 @@
 {
-  "lastSync": "2026-10-27T08:22:32.602Z",
+  "lastSync": "2026-10-28T04:24:02.148Z",
   "totalCurated": 434,
-  "newIngestedToday": 7,
+  "newIngestedToday": 0,
   "auditReport": {
-    "totalScraped": 177,
-    "rejectedSenior": 10,
+    "totalScraped": 0,
+    "rejectedSenior": 0,
     "rejectedScam": 0,
     "rejectedExpired": 0,
-    "rejectedForeign": 160,
+    "rejectedForeign": 0,
     "rejectedDuplicate": 0,
     "rejectedBadEmail": 0,
-    "acceptedCount": 7,
-    "newJobs": [
-      {
-        "company": "Form3",
-        "title": "Reporting & Data Analyst (6-Month FTC)",
-        "email": "Portal",
-        "subject": "Lamaran: Reporting & Data Analyst (6-Month FTC) – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "Liftoff",
-        "title": "Commercial Legal Counsel (Contractor)",
-        "email": "Portal",
-        "subject": "Lamaran: Commercial Legal Counsel (Contractor) – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "Samsara",
-        "title": "Staff Application Security Engineer",
-        "email": "Portal",
-        "subject": "Lamaran: Staff Application Security Engineer – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "SwissPeak Partners GmbH",
-        "title": "Software Test Engineer",
-        "email": "Portal",
-        "subject": "Lamaran: Software Test Engineer – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "SwissPeak Partners GmbH",
-        "title": "ServiceNow AI Architect",
-        "email": "Portal",
-        "subject": "Lamaran: ServiceNow AI Architect – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "SwissPeak Partners GmbH",
-        "title": "ServiceNow CRM Architect",
-        "email": "Portal",
-        "subject": "Lamaran: ServiceNow CRM Architect – Dimitri Ahmad | AI & Data Workflow Specialist"
-      },
-      {
-        "company": "SwissBorg",
-        "title": "Accountant",
-        "email": "Portal",
-        "subject": "Lamaran: Accountant – Dimitri Ahmad | AI & Data Workflow Specialist"
-      }
-    ]
+    "acceptedCount": 0,
+    "newJobs": []
   }
 }

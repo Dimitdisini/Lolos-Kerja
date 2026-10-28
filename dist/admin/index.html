@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lolos Kerja - Admin Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/admin-CtImJumK.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/main-C4SQer2v.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-CBmV614R.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans p-4 sm:p-8">
+  <div class="max-w-6xl mx-auto space-y-6">
+    <!-- Header -->
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-slate-800 gap-4">
+      <div>
+        <div class="flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Admin Command Center</h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">Platform Orchestration, Blast Health & Settlement Control</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 transition">Kembali ke Aplikasi</a>
+        <button onclick="loadAdminOverview()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 rounded-lg transition">Segarkan Data</button>
+      </div>
+    </header>
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-xl">
+        <div class="text-xs text-slate-400 font-medium">Antrean Blast Aktif</div>
+        <div id="statQueued" class="text-2xl font-bold text-white mt-1">0</div>
+        <div class="text-2xs text-slate-500 mt-1">Akan dikirim pada tick berikutnya</div>
+      </div>
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-xl">
+        <div class="text-xs text-slate-400 font-medium">Pembayaran Menunggu</div>
+        <div id="statPendingPayments" class="text-2xl font-bold text-amber-400 mt-1">0</div>
+        <div class="text-2xs text-slate-500 mt-1">Perlu konfirmasi manual</div>
+      </div>
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-xl">
+        <div class="text-xs text-slate-400 font-medium">Status Blast Global</div>
+        <div id="statBlastStatus" class="text-lg font-bold text-emerald-400 mt-1">BERJALAN</div>
+        <div class="mt-2">
+          <button id="btnTogglePause" onclick="toggleBlastPause()" class="text-2xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded transition">Jeda Pengiriman</button>
+        </div>
+      </div>
+      <div class="bg-slate-800/80 border border-slate-700/60 p-4 rounded-xl">
+        <div class="text-xs text-slate-400 font-medium">Mode Sandbox Allowlist</div>
+        <div id="statAllowlist" class="text-lg font-bold text-blue-400 mt-1">AKTIF</div>
+        <div class="text-2xs text-slate-500 mt-1">Hanya kirim ke kotak masuk uji</div>
+      </div>
+    </div>
+
+    <!-- Section: Pending Payments -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5">
+      <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3">Konfirmasi Pembayaran Manual</h2>
+      <div id="pendingPaymentsContainer" class="space-y-3">
+        <div class="text-xs text-slate-400 py-3 text-center">Memuat data transaksi...</div>
+      </div>
+    </div>
+
+    <!-- Section: Pusat Sinkronisasi Scraping Loker -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-700/60">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider">Pusat Sinkronisasi Lowongan Kerja (Scraper Ingestion)</h2>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">Mengambil, menormalisasi, dan memfilter lowongan lokal Indonesia bebas loker senior & fiktif.</p>
+        </div>
+        <button id="btnAdminScrape" onclick="triggerAdminScraping()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+          <span id="btnAdminScrapeText">Mulai Scraping Baru Sekarang</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Fokus Wilayah:</span>
+          <span class="font-bold text-slate-200">100% Loker Lokal Indonesia</span>
+          <span class="text-2xs text-slate-500 block">Glints, LinkedIn ID, Jobstreet, BUMN</span>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Seniority Filter:</span>
+          <span class="font-bold text-emerald-400">Aktif (Zero-Slop Fresh Grad)</span>
+          <span class="text-2xs text-slate-500 block">Senior & Manager Otomatis Dibuang</span>
+        </div>
+        <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1">
+          <span class="text-slate-400 text-2xs block uppercase">Jadwal Cron Otomatis:</span>
+          <span class="font-bold text-blue-400">Aktif (Setiap Hari 08:00 WIB)</span>
+          <span id="adminScrapeLastUpdated" class="text-2xs text-slate-500 block">Status: Siap dijalankan</span>
+        </div>
+      </div>
+      <div id="adminScrapeResultBox" class="hidden p-3 bg-blue-950/40 border border-blue-800/60 rounded-xl text-xs text-blue-300"></div>
+    </div>
+
+    <!-- Section: Users List -->
+    <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-5">
+      <h2 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-3">Daftar Pengguna Aktif & Kuota</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="text-slate-400 border-b border-slate-700 text-2xs uppercase">
+            <tr>
+              <th class="py-2.5 px-3">Nama / Email</th>
+              <th class="py-2.5 px-3">Role</th>
+              <th class="py-2.5 px-3">Tier</th>
+              <th class="py-2.5 px-3">Kuota Blast</th>
+              <th class="py-2.5 px-3">Masa Aktif</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody" class="divide-y divide-slate-800">
+            <tr><td colspan="5" class="py-4 text-center text-slate-500">Memuat data pengguna...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
